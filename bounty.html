@@ -246,6 +246,30 @@ a.story-card:hover h3, a.story-card:focus-visible h3 { color: #ffe2a9; }
 .case-edit label{margin:12px 0 5px;font-size:12px}
 .case-edit textarea{min-height:130px}
 .case-edit .actions{margin-top:12px}
+/* 發布委託：柔和圓角案牘，與無框卷宗列表區分 */
+#publish.panel {
+  max-width: 790px;
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 46px);
+  border: 1px solid rgba(193, 166, 113, .64);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(17, 42, 43, .97), rgba(8, 24, 29, .96));
+  box-shadow: 0 20px 55px rgba(0,0,0,.33), inset 0 1px rgba(235,211,166,.09);
+}
+#publish h2 { margin-top: 0; }
+#publish input, #publish select, #publish textarea {
+  border-radius: 10px;
+  transition: border-color .2s, box-shadow .2s;
+}
+#publish input:focus, #publish select:focus, #publish textarea:focus {
+  outline: none;
+  border-color: #c7ab79;
+  box-shadow: 0 0 0 3px rgba(199,171,121,.13);
+}
+#publish .submit-btn { border-radius: 12px; }
+@media(max-width:650px) {
+  #publish.panel { border-radius: 16px; padding: 23px 19px; }
+}
 </style>
 </head>
 
