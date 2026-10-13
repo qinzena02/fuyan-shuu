@@ -263,7 +263,7 @@ a.story-card:hover h3, a.story-card:focus-visible h3 { color: #ffe2a9; }
     </div>
   </div>
   <hr class="board-divider">
-  <p class="board-subtitle">鏢局告示 · 玩家委託</p>
+  <p class="board-subtitle">鏢局告示 · 玩家委託（雲端同步）</p>
 <div id="caseList"></div>
 </section>
 
@@ -306,7 +306,7 @@ a.story-card:hover h3, a.story-card:focus-visible h3 { color: #ffe2a9; }
 
 <section id="mine" class="panel hidden">
   <h2>我的案件</h2>
-  <p class="description">此處記錄你發布、接取或參與的委託。</p>
+  <p class="description">目前顯示你以線上帳號發布的委託；跨玩家接取與參與功能將於下一階段開放。</p>
   <div id="myCaseList"></div>
 </section>
 
@@ -322,48 +322,26 @@ a.story-card:hover h3, a.story-card:focus-visible h3 { color: #ffe2a9; }
 <footer>長明府 · 鏢局委託終端｜承光年間</footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-client.js"></script>
 <script>
+"use strict";
+const db = window.fuyanshuDB;
 const playerKey = "fuyanshu_player";
-const casesKey = "fuyanshu_bounties_v1";
-
 let player = null;
+try { player = JSON.parse(localStorage.getItem(playerKey) || "null"); } catch (_) {}
+const playerName = typeof player?.name === "string" ? player.name.trim() : "";
+let user = null;
 let cases = [];
-
-try {
-  player = JSON.parse(localStorage.getItem(playerKey));
-} catch (e) {}
-
-try {
-  const saved = JSON.parse(localStorage.getItem(casesKey));
-  if (Array.isArray(saved)) cases = saved;
-} catch (e) {}
-
-const playerName =
-  player && typeof player.name === "string"
-    ? player.name.trim()
-    : "";
-
-document.getElementById("identity").textContent =
-  playerName
-    ? "示籙持有人：" + playerName
-    : "尚未建立示籙，請先返回登記頁。";
-
-function saveCases() {
-  try {
-    localStorage.setItem(casesKey, JSON.stringify(cases));
-    return true;
-  } catch (e) {
-    alert("無法儲存案件，請檢查瀏覽器儲存設定。");
-    return false;
-  }
-}
-
-function makeId() {
-  if (window.crypto && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return Date.now() + "-" + Math.random().toString(36).slice(2);
-}
+const identity = document.getElementById("identity");
+const publishNote = document.querySelector("#publish .description");
+const submitButton = document.querySelector('#caseForm button[type="submit"]');
+const authLink = document.createElement("a");
+authLink.href = "login.html";
+authLink.className = "back";
+authLink.style.marginLeft = "18px";
+authLink.textContent = "線上帳號登入 →";
+document.querySelector(".back").after(authLink);
 
 function makeElement(tag, text, className) {
   const el = document.createElement(tag);
@@ -371,163 +349,89 @@ function makeElement(tag, text, className) {
   if (className) el.className = className;
   return el;
 }
-
 function switchTab(tab) {
-  document.querySelectorAll(".panel").forEach(panel => {
-    panel.classList.toggle("hidden", panel.id !== tab);
-  });
-
-  document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.tab === tab);
-  });
-
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("hidden", p.id !== tab));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
   render();
 }
-
-document.querySelectorAll(".nav-btn").forEach(btn => {
-  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-});
-
-function createCaseCard(item, isMine = false) {
+document.querySelectorAll(".nav-btn").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.tab)));
+function displayDate(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleString("zh-TW", {timeZone:"Asia/Taipei", hour12:false});
+}
+function createCaseCard(item, isMine=false) {
   const card = makeElement("article", undefined, "case");
-
-  card.appendChild(makeElement("span", item.status, "status"));
+  card.appendChild(makeElement("span", item.status || "待接取", "status"));
   card.appendChild(makeElement("h3", item.title));
-
-  const meta = makeElement(
-    "div",
-    "地點：" + item.location +
-    "｜類型：" + item.type +
-    "｜委託者：" + item.owner +
-    "｜報酬：" + item.reward,
-    "meta"
-  );
-  card.appendChild(meta);
+  card.appendChild(makeElement("div", `地點：${item.location || "未註明"}｜類型：${item.type || "其他"}｜委託者：${item.author_name}｜報酬：${item.reward || "面議"}`, "meta"));
+  card.appendChild(makeElement("div", `登錄時間：${displayDate(item.created_at)}`, "meta"));
   card.appendChild(makeElement("p", item.description));
-
-  const members = Array.isArray(item.members) ? item.members : [];
-  const memberText = makeElement(
-    "div",
-    "接取者：" + (item.taker || "尚無") +
-    "｜參與者：" + (members.join("、") || "尚無"),
-    "meta"
-  );
-  card.appendChild(memberText);
-
-  const actions = makeElement("div", undefined, "actions");
-
-  if (!isMine && item.status !== "已結案" && playerName) {
-    if (!item.taker && item.owner !== playerName) {
-      const take = makeElement("button", "接取委託", "action-btn");
-      take.addEventListener("click", () => {
-        item.taker = playerName;
-        item.status = "進行中";
-        if (saveCases()) render();
-      });
-      actions.appendChild(take);
-    }
-
-    if (
-      item.owner !== playerName &&
-      item.taker !== playerName &&
-      !members.includes(playerName)
-    ) {
-      const join = makeElement("button", "參與委託", "action-btn");
-      join.addEventListener("click", () => {
-        item.members = [...members, playerName];
-        if (saveCases()) render();
-      });
-      actions.appendChild(join);
-    }
-  }
-
-  if (
-    isMine &&
-    item.owner === playerName &&
-    item.status !== "已結案"
-  ) {
+  if (isMine && item.author_id === user?.id && item.status !== "已結案") {
+    const actions = makeElement("div", undefined, "actions");
     const close = makeElement("button", "標記結案", "action-btn");
-    close.addEventListener("click", () => {
+    close.type = "button";
+    close.addEventListener("click", async () => {
       if (!confirm("確定將此委託標記為已結案？")) return;
-      item.status = "已結案";
-      item.closedAt = new Date().toISOString();
-      if (saveCases()) render();
+      close.disabled = true;
+      const {error} = await db.from("bounties").update({status:"已結案"}).eq("id", item.id).eq("author_id", user.id);
+      if (error) { alert("結案失敗：" + error.message); close.disabled = false; return; }
+      await loadCases();
     });
     actions.appendChild(close);
+    card.appendChild(actions);
   }
-
-  card.appendChild(actions);
   return card;
 }
-
 function render() {
   const list = document.getElementById("caseList");
-  const myList = document.getElementById("myCaseList");
-  list.replaceChildren();
-  myList.replaceChildren();
-
-  const openCases = cases.filter(c => c.status !== "已結案");
-
-  if (!openCases.length) {
-    list.appendChild(makeElement("div", "目前尚無公開委託。", "empty"));
-  }
-
-  openCases.forEach(item => {
-    list.appendChild(createCaseCard(item));
-  });
-
-  const mine = cases.filter(item => {
-    const members = Array.isArray(item.members) ? item.members : [];
-    return playerName && (
-      item.owner === playerName ||
-      item.taker === playerName ||
-      members.includes(playerName)
-    );
-  });
-
-  if (!mine.length) {
-    myList.appendChild(makeElement("div", "尚無相關案件紀錄。", "empty"));
-  }
-
-  mine.forEach(item => {
-    myList.appendChild(createCaseCard(item, true));
-  });
+  const mine = document.getElementById("myCaseList");
+  list.replaceChildren(); mine.replaceChildren();
+  const open = cases.filter(c => c.status !== "已結案");
+  if (!open.length) list.appendChild(makeElement("div", "目前尚無公開委託。", "empty"));
+  open.forEach(c => list.appendChild(createCaseCard(c)));
+  const own = user ? cases.filter(c => c.author_id === user.id) : [];
+  if (!own.length) mine.appendChild(makeElement("div", user ? "尚無你發布的案件。" : "請先登入線上帳號，查看你的案件。", "empty"));
+  own.forEach(c => mine.appendChild(createCaseCard(c, true)));
 }
-
-document.getElementById("caseForm").addEventListener("submit", e => {
+async function loadCases() {
+  if (!db) { document.getElementById("caseList").textContent = "無法載入 Supabase 連線，請確認 supabase-client.js 與 Publishable key。"; return; }
+  const {data,error} = await db.from("bounties")
+    .select("id,title,description,author_name,author_id,status,location,type,reward,created_at")
+    .order("created_at", {ascending:false}).limit(100);
+  if (error) { document.getElementById("caseList").textContent = "雲端讀取失敗：" + error.message; return; }
+  cases = data || []; render();
+}
+function updateIdentity() {
+  identity.textContent = user
+    ? `線上帳號已核驗：${user.email || "已登入"}｜本機示籙：${playerName || "尚未建立"}`
+    : `尚未登入線上帳號｜本機示籙：${playerName || "尚未建立"}`;
+  authLink.textContent = user ? "帳號管理 →" : "線上帳號登入 →";
+  submitButton.disabled = !user || !playerName || !db;
+  publishNote.textContent = !user ? "請先登入線上帳號，才能將委託登錄至雲端。"
+    : !playerName ? "請先建立本機示籙，再發布委託。" : "委託將公開儲存至雲端懸賞榜，所有玩家都可閱讀。";
+}
+document.getElementById("caseForm").addEventListener("submit", async e => {
   e.preventDefault();
-
-  if (!playerName) {
-    alert("請先建立示籙，才能發布委託。");
-    window.location.href = "index.html";
-    return;
-  }
-
-  const item = {
-    id: makeId(),
+  if (!db || !user) { alert("請先登入線上帳號。"); location.href="login.html"; return; }
+  if (!playerName) { alert("請先建立示籙。"); location.href="index.html"; return; }
+  const form = e.currentTarget;
+  const record = {
     title: document.getElementById("caseTitle").value.trim(),
     location: document.getElementById("caseLocation").value,
     type: document.getElementById("caseType").value,
     reward: document.getElementById("caseReward").value.trim(),
     description: document.getElementById("caseDescription").value.trim(),
-    owner: playerName,
-    taker: "",
-    members: [],
-    status: "招募中",
-    createdAt: new Date().toISOString()
+    author_name: playerName, author_id: user.id, status:"待接取"
   };
-
-  if (!item.title || !item.reward || !item.description) return;
-
-  cases.unshift(item);
-
-  if (saveCases()) {
-    e.target.reset();
-    switchTab("board");
-    alert("委託已登錄鏢局懸賞榜。");
-  }
+  if (!record.title || !record.description || !record.location || !record.type || !record.reward) return;
+  submitButton.disabled = true;
+  const {error} = await db.from("bounties").insert(record);
+  submitButton.disabled = false;
+  if (error) { alert("雲端登錄失敗：" + error.message); return; }
+  form.reset(); await loadCases(); switchTab("board");
+  alert("委託已成功登錄雲端懸賞榜，其他玩家也能看見。 ");
 });
-
 const archiveCases = [
   {
     year: "承光三年",
@@ -573,11 +477,19 @@ card.appendChild(
   card.appendChild(makeElement("p", item.result));
   archiveList.appendChild(card);
 });
-// 初始化懸賞榜與玩家委託清單
+
 render();
+(async () => {
+  if (!db) { updateIdentity(); await loadCases(); return; }
+  const {data,error} = await db.auth.getUser();
+  if (!error) user = data?.user || null;
+  updateIdentity();
+  await loadCases();
+  db.auth.onAuthStateChange((_event, session) => {
+    user = session?.user || null;
+    updateIdentity(); render();
+  });
+})();
 </script>
-<!-- Supabase 函式庫必須先載入，接著才是本站連線設定 -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="supabase-client.js"></script>
 </body>
 </html>
