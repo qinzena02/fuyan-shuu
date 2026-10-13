@@ -457,7 +457,18 @@ function openEditForm(card,item) {
     if(key==="title"||key==="description")field.required=true;
     inputs[key]=field;form.append(labelNode,field);
   }
-  const note=makeElement("p","僅修改委託內容；指定主理人、協辦名單與案件狀態不受影響。","edit-note");
+  const leaderLabel=makeElement("label","指定鏢局主理人");
+  const leaderField=document.createElement("select");
+  leaderField.name="lead_npc";
+  leaderField.required=true;
+  leaderField.appendChild(new Option("請選擇主理人",""));
+  leaders.forEach(l=>leaderField.appendChild(new Option(l.name,l.name)));
+  if(item.lead_npc && !leaders.some(l=>l.name===item.lead_npc)){
+    leaderField.appendChild(new Option(item.lead_npc+"（已停用，請重新指定）",item.lead_npc));
+  }
+  leaderField.value=item.lead_npc||"";
+  form.append(leaderLabel,leaderField);
+  const note=makeElement("p","舊案件可在此補選主理人；僅發案人能修改，結案後無法更動。","edit-note");
   form.appendChild(note);
   const actions=makeElement("div",undefined,"actions");
   const save=makeElement("button","儲存修改","action-btn");save.type="submit";
@@ -468,6 +479,9 @@ function openEditForm(card,item) {
     event.preventDefault();
     const values=Object.fromEntries(Object.entries(inputs).map(([k,v])=>[k,v.value.trim()]));
     if(!values.title||!values.description){alert("請填寫案件名稱及內容。");return;}
+    if(!leaderField.value || !leaders.some(l=>l.name===leaderField.value)){
+      alert("請選擇有效的鏢局主理人。");return;
+    }
     save.disabled=true;
     try{
       const {data,error}=await db.rpc("edit_bounty",{
@@ -475,7 +489,11 @@ function openEditForm(card,item) {
         p_location:values.location,p_type:values.type,p_reward:values.reward
       });
       if(error)throw error;
-      await loadCases();alert(data||"委託修改成功。");
+      const {error:leaderError}=await db.rpc("set_bounty_leader",{
+        p_bounty_id:item.id,p_lead_npc:leaderField.value
+      });
+      if(leaderError)throw new Error("委託內容已儲存，但主理人設定失敗："+leaderError.message);
+      await loadCases();alert("委託修改成功，主理人已更新。");
     }catch(error){alert("修改失敗："+(error?.message||error));save.disabled=false;}
   });
   card.appendChild(form);
