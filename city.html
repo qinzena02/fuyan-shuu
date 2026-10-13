@@ -88,11 +88,11 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 </style>
 </head>
 <body>
-<header><div class="logo">負驗書</div><div class="player"><div id="player">示籙核驗中</div><div>禁步 · 仁德值：<span id="virtue">50</span></div></div></header>
+<header><div class="logo">負驗書</div><div class="player"><div id="player">示籙核驗中</div><div>禁步 · 仁德值：<span id="virtue">讀取中…</span></div></div></header>
 <section class="hero"><p class="eyebrow">承光年間 · 咸陵</p><h1>天下地脈</h1><p>鋼鐵築城，符機行世。</p><p>舊朝已逝，而人間依舊燈火長明。</p></section>
 <main>
 <h2>示籙 · 個人通行憑證</h2>
-<div class="identity"><div class="identity-top"><span>長明府 · 示籙登記</span><span class="status">● 核驗通過</span></div><div class="identity-grid"><div><small>姓名</small><strong id="name">—</strong></div><div><small>所屬門派</small><strong id="sect">—</strong></div><div><small>籍貫</small><strong id="origin">—</strong></div><div><small>仁德值</small><strong id="virtueCard">50</strong></div></div></div>
+<div class="identity"><div class="identity-top"><span>長明府 · 示籙登記</span><span class="status">● 核驗通過</span></div><div class="identity-grid"><div><small>姓名</small><strong id="name">—</strong></div><div><small>所屬門派</small><strong id="sect">—</strong></div><div><small>籍貫</small><strong id="origin">—</strong></div><div><small>仁德值</small><strong id="virtueCard">讀取中…</strong></div></div></div>
 <section class="story-portal" aria-label="江湖演繹入口">
   <div class="story-portal-heading"><em>INTERACTIVE STORY · 江湖演繹</em><strong>入世</strong><span>人間萬象，各有其途。</span></div>
   <div class="story-portal-actions">
@@ -144,10 +144,8 @@ if(!player||!player.name){window.location.replace('index.html')}else{
  document.getElementById('name').textContent=name;
  document.getElementById('sect').textContent=player.sect||'未登記';
  document.getElementById('origin').textContent=player.origin||'未登記';
- const storedVirtue=Number(localStorage.getItem('fuyanshu_virtue') ?? player.virtue ?? 50);
- const virtue=Number.isFinite(storedVirtue)?storedVirtue:50;
- document.getElementById('virtue').textContent=virtue;
- document.getElementById('virtueCard').textContent=virtue;
+ // 仁德值只以已登入帳號的 Supabase 示籙為準，不再顯示舊 localStorage 數字。
+
 }
 
 </script>
@@ -188,6 +186,61 @@ if(!player||!player.name){window.location.replace('index.html')}else{
  side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setOpen(false)));
 })();
 </script>
-<script src="virtue-system.js"></script>
+<!-- 與登入頁及懸賞榜共用同一份 Supabase 客戶端設定 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-client.js"></script>
+<script>
+(function(){
+ 'use strict';
+ const numberTop=document.getElementById('virtue');
+ const numberCard=document.getElementById('virtueCard');
+ const status=document.querySelector('.identity-top .status');
+ const setPoints=value=>{numberTop.textContent=String(value);numberCard.textContent=String(value);};
+ let busy=false;
+ async function refreshCloudVirtue(){
+   if(busy)return;
+   busy=true;
+   try{
+     const db=window.fuyanshuDB;
+     if(!db || !db.auth || typeof db.auth.getUser!=='function')throw new Error('無法載入 Supabase 客戶端');
+     const {data:authData,error:authError}=await db.auth.getUser();
+     if(authError)throw authError;
+     const user=authData?.user;
+     if(!user){
+       setPoints('請登入');
+       status.textContent='● 尚未登入線上帳號';
+       return;
+     }
+     const {data:profile,error:profileError}=await db.from('player_profiles')
+       .select('character_name,sect,origin,virtue_points')
+       .eq('user_id',user.id).maybeSingle();
+     if(profileError)throw profileError;
+     if(!profile){
+       setPoints('待建立');
+       status.textContent='● 尚未綁定雲端示籙';
+       return;
+     }
+     const points=Number(profile.virtue_points);
+     if(!Number.isFinite(points))throw new Error('仁德值資料無效');
+     setPoints(points);
+     if(profile.character_name){
+       document.getElementById('player').textContent='示籙持有人：'+profile.character_name;
+       document.getElementById('name').textContent=profile.character_name;
+     }
+     document.getElementById('sect').textContent=profile.sect||'未登記';
+     document.getElementById('origin').textContent=profile.origin||'未登記';
+     status.textContent='● 雲端示籙核驗通過';
+   }catch(error){
+     setPoints('同步失敗');
+     status.textContent='● 雲端連線異常';
+     console.error('《負驗書》雲端仁德值讀取失敗：',error);
+   }finally{busy=false;}
+ }
+ window.refreshFuyanshuVirtue=refreshCloudVirtue;
+ refreshCloudVirtue();
+ window.addEventListener('focus',refreshCloudVirtue);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshCloudVirtue();});
+})();
+</script>
 </body>
 </html>
