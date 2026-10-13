@@ -2,137 +2,425 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>負驗書｜長明府示籙系統</title>
-<style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: radial-gradient(ellipse at top, #17332f, #080e10 70%);
-    color: #e5ddc9;
-    font-family: "Microsoft JhengHei", serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .panel {
-    width: 100%;
-    max-width: 460px;
-    padding: 38px 28px;
-    border: 1px solid #56766a;
-    background: rgba(8, 19, 21, .92);
-    box-shadow: 0 0 45px #1d55402a;
-    text-align: center;
-  }
-  .small {
-    color: #86b9a9;
-    font-size: 12px;
-    letter-spacing: 4px;
-  }
-  h1 {
-    color: #d7bb83;
-    font-size: 36px;
-    letter-spacing: 8px;
-    font-weight: normal;
-    margin: 26px 0 10px;
-  }
-  p { line-height: 2; color: #a9bcb4; }
-  input {
-    width: 100%;
-    padding: 15px;
-    margin: 20px 0;
-    background: #0e2020;
-    border: 1px solid #527c70;
-    color: #fff;
-    font-size: 16px;
-    text-align: center;
-  }
-  button {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #bfa677;
-    background: #254c43;
-    color: #f0e3c5;
-    font-size: 16px;
-    cursor: pointer;
-    letter-spacing: 3px;
-  }
-  button:hover { background: #35685b; }
-  .hidden { display: none; }
-  .notice { font-size: 12px; color: #7e9d94; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>負驗書｜示籙登記</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Serif TC", "Microsoft JhengHei", serif;
+      color: #e8dfcb;
+
+      background:
+        linear-gradient(
+          rgba(5, 13, 18, 0.72),
+          rgba(5, 13, 18, 0.91)
+        ),
+        url("images/xianling-bg.jpg") center / cover fixed no-repeat;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 18px;
+    }
+
+    /* 頁面裝飾 */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 16px;
+      border: 1px solid rgba(191, 161, 100, 0.24);
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .top-label {
+      text-align: center;
+      color: #8fc4b8;
+      font-size: 12px;
+      letter-spacing: 5px;
+      margin-bottom: 15px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 46px;
+      font-weight: 500;
+      letter-spacing: 12px;
+      color: #dec38b;
+      margin: 0 0 12px;
+      text-shadow: 0 0 25px rgba(203, 172, 107, 0.28);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #a5b8b0;
+      font-size: 13px;
+      letter-spacing: 3px;
+      margin-bottom: 34px;
+    }
+
+    /* 示籙核驗面板 */
+    .panel {
+      position: relative;
+      padding: 38px 35px;
+      background: rgba(9, 25, 29, 0.9);
+      border: 1px solid #927a52;
+      box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.55),
+        inset 0 0 35px rgba(40, 99, 88, 0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    .panel::before,
+    .panel::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-color: #d8ba79;
+      border-style: solid;
+      pointer-events: none;
+    }
+
+    .panel::before {
+      top: -5px;
+      left: -5px;
+      border-width: 2px 0 0 2px;
+    }
+
+    .panel::after {
+      bottom: -5px;
+      right: -5px;
+      border-width: 0 2px 2px 0;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #8bc5b7;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(190, 161, 104, 0.35);
+    }
+
+    .seal {
+      text-align: center;
+      padding: 30px 0 15px;
+    }
+
+    .seal-symbol {
+      display: inline-flex;
+      width: 82px;
+      height: 82px;
+      border: 1px solid #c4a46b;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: #d9c18e;
+      box-shadow:
+        0 0 25px rgba(92, 180, 162, 0.15),
+        inset 0 0 18px rgba(92, 180, 162, 0.12);
+      animation: sealGlow 4s ease-in-out infinite;
+    }
+
+    @keyframes sealGlow {
+      0%, 100% {
+        box-shadow: 0 0 12px rgba(92, 180, 162, 0.12);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(92, 180, 162, 0.35);
+      }
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 25px;
+      color: #e4ca94;
+      letter-spacing: 7px;
+      margin: 12px 0;
+    }
+
+    .description {
+      text-align: center;
+      font-size: 13px;
+      line-height: 2;
+      color: #9cb7ad;
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #c4b58e;
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      background: rgba(3, 15, 19, 0.75);
+      border: 1px solid #456b62;
+      color: #f2e8d4;
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #bca06b;
+      box-shadow: 0 0 15px rgba(105, 193, 175, 0.18);
+    }
+
+    input::placeholder {
+      color: #607c75;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 22px;
+      background: linear-gradient(135deg, #244d47, #397467);
+      border: 1px solid #9c936d;
+      color: #f3e6c8;
+      font-family: inherit;
+      font-size: 15px;
+      letter-spacing: 4px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #397467, #4a9684);
+      box-shadow: 0 0 24px rgba(88, 186, 165, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .welcome-name {
+      text-align: center;
+      color: #e3c78f;
+      font-size: 25px;
+      letter-spacing: 3px;
+      margin: 20px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 20px;
+      color: #8da79e;
+      font-size: 12px;
+      line-height: 2;
+    }
+
+    .footer {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 11px;
+      color: #718d84;
+      letter-spacing: 2px;
+    }
+
+    @media (max-width: 480px) {
+      .title {
+        font-size: 34px;
+        letter-spacing: 7px;
+      }
+
+      .panel {
+        padding: 26px 20px;
+      }
+
+      .panel-header {
+        font-size: 9px;
+        letter-spacing: 1px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .seal-symbol {
+        animation: none;
+      }
+
+      button {
+        transition: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <main class="panel">
-    <div class="small">咸陵 · 長明府 · 天監院</div>
 
-    <section id="register">
-      <h1>示籙登記</h1>
-      <p>凡入咸陵者，皆須有籙可循。<br>
-      姓名既錄，行跡自明。</p>
+  <main class="container">
 
-      <form id="registerForm">
-        <input id="playerName" type="text"
-          maxlength="20" placeholder="請輸入登記姓名"
-          required>
-        <button type="submit">核驗身分 · 入城</button>
-      </form>
-      <p class="notice">此為本機登記，無須提供真實姓名。</p>
+    <div class="top-label">
+      咸陵 · 長明府 · 天監院
+    </div>
+
+    <h1 class="title">負驗書</h1>
+
+    <div class="subtitle">
+      承光年間 · 官方身分核驗終端
+    </div>
+
+    <section class="panel">
+
+      <div class="panel-header">
+        <span>CHANGMING / 001</span>
+        <span>示籙核驗系統</span>
+      </div>
+
+      <div class="seal">
+        <div class="seal-symbol">籙</div>
+      </div>
+
+      <h2 class="section-title">示籙登記</h2>
+
+      <p class="description">
+        天下地脈，皆有所循。<br>
+        凡入咸陵者，須先立籙。<br>
+        請留下你的姓名。
+      </p>
+
+      <!-- 新玩家登記 -->
+      <div id="register">
+
+        <form id="registerForm">
+
+          <label for="playerName">
+            示籙姓名
+          </label>
+
+          <input
+            type="text"
+            id="playerName"
+            placeholder="請輸入你的姓名"
+            maxlength="20"
+            autocomplete="off"
+            required
+          >
+
+          <button type="submit">
+            建立示籙
+          </button>
+
+        </form>
+
+      </div>
+
+      <!-- 已登記玩家 -->
+      <div id="welcome" class="hidden">
+
+        <p class="description">
+          示籙核驗完成。
+          長明府已收錄你的身分。
+        </p>
+
+        <div class="welcome-name" id="displayName"></div>
+
+        <button type="button" id="enterButton">
+          進入咸陵
+        </button>
+
+      </div>
+
+      <div class="status" id="status">
+        天監院示籙終端已啟動。<br>
+        等待身分核驗。
+      </div>
+
     </section>
 
-    <section id="welcome" class="hidden">
-      <h1>准予入城</h1>
-      <p>示籙核驗完成。</p>
-      <p>登記姓名：<strong id="displayName"></strong></p>
-      <p>所屬：未登錄<br>禁步：待核發<br>仁德值：待評定</p>
-      <button id="enterButton">進入咸陵</button>
-      <p class="notice" id="status"></p>
-    </section>
+    <div class="footer">
+      長明府 · 天監院<br>
+      地脈運行監察中
+    </div>
+
   </main>
 
-<script>
-  const key = "fuyanshu_player";
-  const register = document.getElementById("register");
-  const welcome = document.getElementById("welcome");
-  const displayName = document.getElementById("displayName");
+  <script>
+    const key = "fuyanshu_player";
 
-  function showPlayer(name) {
-    displayName.textContent = name;
-    register.classList.add("hidden");
-    welcome.classList.remove("hidden");
-  }
+    const register = document.getElementById("register");
+    const welcome = document.getElementById("welcome");
+    const displayName = document.getElementById("displayName");
+    const status = document.getElementById("status");
 
-  try {
-    const saved = JSON.parse(localStorage.getItem(key));
-    if (saved && typeof saved.name === "string" && saved.name) {
-      showPlayer(saved.name);
+    function showPlayer(name) {
+      displayName.textContent = name;
+      register.classList.add("hidden");
+      welcome.classList.remove("hidden");
+      status.textContent = "身分核驗通過，准予入城。";
     }
-  } catch (error) {
-    console.log("尚無有效的示籙紀錄");
-  }
 
-  document.getElementById("registerForm")
-    .addEventListener("submit", function(event) {
-      event.preventDefault();
-      const name = document.getElementById("playerName").value.trim();
-      if (!name) return;
-      try {
-        localStorage.setItem(key, JSON.stringify({ name: name }));
-        showPlayer(name);
-      } catch (error) {
-        alert("瀏覽器無法儲存示籙，請確認儲存設定。");
+    // 檢查玩家是否已有示籙
+    try {
+      const saved = JSON.parse(localStorage.getItem(key));
+
+      if (
+        saved &&
+        typeof saved.name === "string" &&
+        saved.name
+      ) {
+        showPlayer(saved.name);
       }
-    });
+    } catch (error) {
+      console.log("尚無有效的示籙紀錄");
+    }
 
-document.getElementById("enterButton")
-  .addEventListener("click", function() {
-    window.location.href = "city.html";
-  });
-  
-</script>
+    // 建立示籙
+    document.getElementById("registerForm")
+      .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        const name = document
+          .getElementById("playerName")
+          .value
+          .trim();
+
+        if (!name) return;
+
+        try {
+          localStorage.setItem(
+            key,
+            JSON.stringify({ name: name })
+          );
+
+          showPlayer(name);
+
+        } catch (error) {
+          alert("無法儲存示籙，請檢查瀏覽器設定。");
+        }
+      });
+
+    // 進入咸陵主城
+    document.getElementById("enterButton")
+      .addEventListener("click", function() {
+        window.location.href = "city.html";
+      });
+  </script>
+
 </body>
 </html>
-  
