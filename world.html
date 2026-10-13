@@ -18,7 +18,7 @@
 <audio id="music" src="music/lv_0_20260927142906.mp3" preload="auto" loop></audio>
 <script>
 'use strict';
-const allowed=new Set(['city.html','archive.html','bounty.html','story.html','main-story.html']);
+const allowed=new Set(['city.html','archive.html','bounty.html','story.html','personal.html']);
 const frame=document.getElementById('page'),music=document.getElementById('music'),toggle=document.getElementById('toggle'),controls=document.getElementById('controls'),hint=document.getElementById('hint');
 const initial=new URLSearchParams(location.search).get('page');
 frame.src=allowed.has(initial)?initial:'city.html';
@@ -29,7 +29,7 @@ function update(){toggle.textContent=enabled?(music.paused?'♫ 播放主城音�
 async function play(){if(!enabled||isCase)return;try{await music.play();hint.textContent='咸陵行旅 · 背景配樂';}catch(e){hint.textContent='點擊音樂按鈕開始播放';}update();}
 function currentPage(){try{return new URL(frame.contentWindow.location.href).pathname.split('/').pop()||'city.html';}catch(e){return 'city.html';}}
 frame.addEventListener('load',()=>{
- const page=currentPage();isCase=page==='story.html'||page==='main-story.html';
+ const page=currentPage();isCase=page==='story.html';
  controls.style.display=isCase?'none':'flex';
  if(isCase)music.pause();else play();
  update();
@@ -46,5 +46,4 @@ window.addEventListener('message',e=>{if(e.source===frame.contentWindow&&e.data=
 music.addEventListener('error',()=>{hint.textContent='找不到音樂檔案';});
 update();play();
 </script>
-<script src="virtue-system.js"></script>
 </body></html>

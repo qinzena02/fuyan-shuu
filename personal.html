@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>負驗書｜示籙個人中心</title><style>*{box-sizing:border-box}body{margin:0;background:#091113;color:#ded6c5;font-family:'Microsoft JhengHei',serif;line-height:1.9}a{color:#b8d5c8;text-decoration:none}header{border-bottom:1px solid #37564e;background:#0c191b;padding:20px max(20px,calc((100vw - 900px)/2));display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.brand{color:#dfc899;font-size:21px;letter-spacing:5px}main{max-width:900px;margin:60px auto 90px;padding:0 20px}h1{font-size:30px;color:#e4ce9e;font-weight:normal;letter-spacing:4px}p{color:#9eb9ad}.identity{background:linear-gradient(130deg,#102b29,#0c1e1f);border:1px solid #5c776b;padding:30px;margin-top:25px}.identity-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#d8c39b;font-size:17px}.status{color:#90c7b6;font-size:13px}.identity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 24px;margin-top:30px}.identity-grid>div{display:flex;flex-direction:column;gap:10px}.identity-grid small{color:#91b2a7;font-size:15px}.identity-grid strong{font-size:25px;font-weight:normal;color:#eee0c9}.note{font-size:13px;color:#8aa99f;margin-top:20px}@media(max-width:550px){.identity-grid{gap:22px}.identity{padding:22px}.identity-grid strong{font-size:20px}}</style></head><body><header><div class="brand">負驗書 · 示籙</div><nav><a href="city.html">← 返回咸陵主城</a></nav></header><main><p>長明府 · 天監院 · 通行核驗</p><h1>個人通行憑證</h1><p>凡入咸陵者，皆留其名。示籙所載，為長明府認可之身分。</p><h2>示籙 · 個人通行憑證</h2>
+<div class="identity"><div class="identity-top"><span>長明府 · 示籙登記</span><span class="status">● 核驗通過</span></div><div class="identity-grid"><div><small>姓名</small><strong id="name">—</strong></div><div><small>所屬門派</small><strong id="sect">—</strong></div><div><small>籍貫</small><strong id="origin">—</strong></div><div><small>仁德值</small><strong id="virtueCard">讀取中…</strong></div></div></div>
+<p class="note" id="cloudNote">正在核對雲端示籙……</p></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script src="supabase-client.js"></script><script>
+(function(){
+ const set=(id,value)=>{document.getElementById(id).textContent=String(value??'—')};
+ let player=null;try{player=JSON.parse(localStorage.getItem('fuyanshu_player')||'null')}catch(e){}
+ if(player){set('name',player.name||'—');set('sect',player.sect||'—');set('origin',player.origin||'—')}
+ async function load(){try{
+ const db=window.fuyanshuDB;
+ if(!db)throw Error('雲端連線尚未載入');
+ const {data:{user},error}=await db.auth.getUser();if(error)throw error;
+ if(!user){set('virtueCard','請登入');document.getElementById('cloudNote').textContent='尚未登入線上帳號；請先完成線上登入。';return;}
+ const {data,error:err}=await db.from('player_profiles').select('character_name,sect,origin,virtue_points').eq('user_id',user.id).maybeSingle();if(err)throw err;
+ if(!data){set('virtueCard','待建立');document.getElementById('cloudNote').textContent='此帳號尚未建立雲端示籙。';return;}
+ set('name',data.character_name);set('sect',data.sect);set('origin',data.origin);set('virtueCard',data.virtue_points);
+ document.querySelector('.identity-top .status').textContent='● 雲端核驗通過';
+ document.getElementById('cloudNote').textContent='示籙資料與仁德值均以目前登入帳號的雲端紀錄為準。';
+ }catch(e){set('virtueCard','讀取失敗');document.getElementById('cloudNote').textContent='無法讀取雲端示籙，請檢查登入及連線。';console.warn(e)}}
+ load();
+})();
+</script></body></html>
