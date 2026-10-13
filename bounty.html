@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>負驗書｜江湖懸賞榜 · 支線卷宗</title>
+<title>負驗書｜江湖懸賞榜</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -187,19 +187,43 @@ footer {
   nav { grid-template-columns: repeat(2,1fr); }
   .panel { padding: 18px; }
 }
-/* 支線故事卷宗 */
-.story-section{margin-bottom:28px;padding-bottom:25px;border-bottom:1px solid #476258}
-.story-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.story-heading small{color:#67e7f1;font-size:11px;letter-spacing:2px;text-shadow:0 0 9px #43d4e988}
-.story-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}
-.story-card{display:flex;flex-direction:column;gap:7px;min-height:190px;padding:23px;background:linear-gradient(135deg,#193332,#0c1b20);border:1px solid #ad9160;color:inherit;text-decoration:none;transition:transform .2s,border-color .2s,box-shadow .2s}
-.story-card h3{margin:2px 0;color:#ebd29b;font-size:23px;font-weight:normal;text-shadow:0 0 12px #d9a85455}
-.story-card p{color:#b3c8bf;font-size:13px;line-height:1.9;margin:0}
-.story-card .story-tag{color:#67e7f1;font-size:11px;letter-spacing:2px}
-.story-card .story-status{color:#d6c49d;font-size:12px;margin-top:auto}
-a.story-card:hover,a.story-card:focus-visible{transform:translateY(-3px);border-color:#ead2a2;box-shadow:0 0 18px #c8aa7044;outline:none}
-.story-card.locked{opacity:.62;border-color:#48645d}
-@media(max-width:650px){.story-grid{grid-template-columns:1fr}}
+/* 支線故事：無外框、無金屬浮雕，像卷宗目錄的細長條列 */
+.story-section { margin: 0 0 18px; }
+.story-grid { display: flex; flex-direction: column; margin: 12px 0 18px; }
+.story-card {
+  display: grid;
+  grid-template-columns: 95px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 15px;
+  min-height: 62px;
+  padding: 12px 8px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #36524b;
+  border-radius: 0;
+  box-shadow: none;
+  color: inherit;
+  text-decoration: none;
+  transition: background .2s;
+}
+.story-card:first-child { border-top: 1px solid #36524b; }
+.story-card .story-tag { color: #69e4ed; font-size: 11px; letter-spacing: 1px; line-height: 1.5; }
+.story-card .story-main { min-width: 0; }
+.story-card h3 { margin: 0; color: #ead09a; font-size: 17px; font-weight: normal; text-shadow: 0 0 8px #dbb77333; }
+.story-card p { color: #abc0b5; font-size: 12px; line-height: 1.6; margin: 2px 0 0; }
+.story-card .story-status { color: #e0c78d; font-size: 12px; white-space: nowrap; }
+a.story-card:hover, a.story-card:focus-visible { background: rgba(91,151,132,.10); outline: none; }
+a.story-card:hover h3, a.story-card:focus-visible h3 { color: #ffe2a9; }
+.story-card.locked { opacity: .55; cursor: default; }
+.board-divider { border: 0; border-top: 1px solid #3c5952; margin: 20px 0 18px; }
+.board-subtitle { font-size: 12px; color: #89aca0; letter-spacing: 1px; margin: 0 0 8px; }
+@media(max-width:650px) {
+  .story-card { grid-template-columns: 1fr auto; gap: 5px 10px; padding: 12px 4px; }
+  .story-card .story-tag { grid-column: 1/-1; }
+  .story-card h3 { font-size: 16px; }
+  .story-card p { font-size: 11px; }
+  .story-card .story-status { grid-column: 2; grid-row: 2/4; align-self: center; }
+}
 </style>
 </head>
 
@@ -223,27 +247,24 @@ a.story-card:hover,a.story-card:focus-visible{transform:translateY(-3px);border-
 </nav>
 
 <section id="board" class="panel">
+  <p class="description">人間千面，江湖萬事。此處收錄鏢局委託、人物支線與未曾記入正史的軼聞。</p>
   <div class="story-section">
-    <div class="story-heading"><h2>江湖軼事 · 支線卷宗</h2><small>SIDE STORIES / ARCHIVE</small></div>
-    <p class="description">人間千面，江湖萬事。此處收錄人物支線、鏢局舊案與未曾記入正史的軼聞。</p>
     <div class="story-grid">
-      <a class="story-card" href="story.html" aria-label="進入支線故事江上無歸人">
-        <span class="story-tag">SIDE STORY · 001 / 已開放</span>
-        <h3>《江上無歸人》</h3>
-        <p>天環江上，故人未歸。循著遺落的線索，親自走入一樁未了的江湖舊事。</p>
-        <span class="story-status">啟封卷宗 →</span>
+      <a class="story-card" href="story.html" aria-label="啟封支線故事江上無歸人">
+        <span class="story-tag">卷宗 001<br>已開放</span>
+        <div class="story-main"><h3>《江上無歸人》</h3><p>天環江上，故人未歸。循著遺落的線索，走入一樁未了的江湖舊事。</p></div>
+        <span class="story-status">啟封卷宗 ↗</span>
       </a>
       <div class="story-card locked" aria-label="後續支線尚未開放">
-        <span class="story-tag">SIDE STORY · 002 / 待解封</span>
-        <h3>未公開卷宗</h3>
-        <p>人物往事、江湖奇聞與更多支線故事，將陸續收錄於此。</p>
-        <span class="story-status">卷宗封存中 · 敬請期待</span>
+        <span class="story-tag">卷宗 002<br>待解封</span>
+        <div class="story-main"><h3>未公開卷宗</h3><p>人物往事與江湖奇聞，將陸續收錄於此。</p></div>
+        <span class="story-status">封存中</span>
       </div>
     </div>
   </div>
-  <h2>鏢局懸賞告示</h2>
-  <p class="description">凡有委託，皆可登錄。憑示籙接取，同行者亦可申請參與。</p>
-  <div id="caseList"></div>
+  <hr class="board-divider">
+  <p class="board-subtitle">鏢局告示 · 玩家委託</p>
+<div id="caseList"></div>
 </section>
 
 <section id="publish" class="panel hidden">
@@ -558,8 +579,3 @@ render();
 </body>
 </html>
 
-
-render();
-</script>
-</body>
-</html>
