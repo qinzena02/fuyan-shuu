@@ -239,6 +239,13 @@ a.story-card:hover h3, a.story-card:focus-visible h3 { color: #ffe2a9; }
 .subheading{font-size:18px;margin-top:28px}
 .notice{color:#a8c9bd;font-size:12px;line-height:1.8;margin-top:12px}
 .error-note{color:#ffad9d}
+.outcome-success{border-color:#709b7d;color:#b7e3c1}
+.outcome-failed{border-color:#a86b64;color:#f3b1a6}
+.outcome-label{font-size:12px;color:#a7c3b7;line-height:1.8;margin-top:12px}
+.case-edit{margin-top:15px;border-top:1px solid #456b62;padding:12px 0 4px}
+.case-edit label{margin:12px 0 5px;font-size:12px}
+.case-edit textarea{min-height:130px}
+.case-edit .actions{margin-top:12px}
 </style>
 </head>
 
@@ -406,6 +413,61 @@ function makeAction(label, handler) {
   });
   return button;
 }
+function openEditForm(card,item) {
+  const existing=card.querySelector(".case-edit");
+  if(existing){existing.remove();return;}
+  const form=makeElement("form",undefined,"case-edit");
+  const fields=[
+    ["案件名稱","title","input",100],
+    ["案件地點","location","input",100],
+    ["委託類型","type","input",80],
+    ["委託報酬","reward","input",100],
+    ["委託內容","description","textarea",5000]
+  ];
+  const inputs={};
+  for(const [label,key,tag,max] of fields){
+    const id="edit-"+key+"-"+item.id;
+    const labelNode=makeElement("label",label);labelNode.htmlFor=id;
+    const field=document.createElement(tag);
+    field.id=id;field.name=key;field.value=item[key]||"";field.maxLength=max;
+    if(key==="title"||key==="description")field.required=true;
+    inputs[key]=field;form.append(labelNode,field);
+  }
+  const note=makeElement("p","僅修改委託內容；指定主理人、協辦名單與案件狀態不受影響。","edit-note");
+  form.appendChild(note);
+  const actions=makeElement("div",undefined,"actions");
+  const save=makeElement("button","儲存修改","action-btn");save.type="submit";
+  const cancel=makeElement("button","取消","action-btn");cancel.type="button";
+  cancel.addEventListener("click",()=>form.remove());
+  actions.append(save,cancel);form.appendChild(actions);
+  form.addEventListener("submit",async event=>{
+    event.preventDefault();
+    const values=Object.fromEntries(Object.entries(inputs).map(([k,v])=>[k,v.value.trim()]));
+    if(!values.title||!values.description){alert("請填寫案件名稱及內容。");return;}
+    save.disabled=true;
+    try{
+      const {data,error}=await db.rpc("edit_bounty",{
+        p_bounty_id:item.id,p_title:values.title,p_description:values.description,
+        p_location:values.location,p_type:values.type,p_reward:values.reward
+      });
+      if(error)throw error;
+      await loadCases();alert(data||"委託修改成功。");
+    }catch(error){alert("修改失敗："+(error?.message||error));save.disabled=false;}
+  });
+  card.appendChild(form);
+  inputs.title.focus();
+}
+async function settleBounty(item,outcome){
+  if(!item.lead_npc){alert("此案件尚未指定有效主理人，暫時無法結案。");return;}
+  const delta=outcome==="成功"?"每人增加 3 點":"每人扣除 2 點";
+  const count=caseMembers(item.id).length;
+  if(!confirm(`「${item.title}」\n\n結案結果：${outcome}\n發案人及 ${count} 名協辦玩家：${delta}仁德值。\n\n結案後無法修改或再次結算，確定繼續？`))return;
+  if(!confirm(`最後確認：將「${item.title}」標記為「${outcome}」並永久歸檔？`))return;
+  const {data,error}=await db.rpc("close_bounty",{p_bounty_id:item.id,p_outcome:outcome});
+  if(error)throw error;
+  await loadProfile();await loadCases();updateIdentity();
+  alert(data||"案件已結案並完成仁德值結算。");
+}
 function createCaseCard(item, mode="board") {
   const card = makeElement("article",undefined,"case");
   const closed = item.status === "已結案";
@@ -423,7 +485,7 @@ function createCaseCard(item, mode="board") {
     const record = caseClosure(item.id);
     if (record) {
       const names = Array.isArray(record.participants) ? record.participants.map(p => `${p.character_name || "未署名"}（${p.sect || "未註明門派"}）`).join("、") : "";
-      card.appendChild(makeElement("div",`歸檔主理人：${record.lead_npc}｜協辦：${names || "無"}｜結案：${displayDate(record.closed_at)}`,"roster"));
+      card.appendChild(makeElement("div",`結案結果：${record.outcome || "舊卷宗（未記錄結果）"}｜歸檔主理人：${record.lead_npc}｜協辦：${names || "無"}｜結案：${displayDate(record.closed_at)}`,"roster"));
     }
   }
   const actions = makeElement("div",undefined,"actions");
@@ -440,14 +502,13 @@ function createCaseCard(item, mode="board") {
     else actions.appendChild(makeElement("span","協辦名額已滿。","notice"));
   } else if (joined && !closed) actions.appendChild(makeElement("span","你已參與此案。","notice"));
   if (mine && !closed) {
-    actions.appendChild(makeAction("確認結案 · 歸檔",async () => {
-      if (!item.lead_npc) {alert("此舊案件尚未指定主理人，暫時無法結案。");return;}
-      if (!confirm(`確認將「${item.title}」結案？系統會永久記錄主理人及目前的協辦玩家，結案後不能再接案。`)) return;
-      const {data,error} = await db.rpc("close_bounty",{p_bounty_id:item.id});
-      if (error) throw error;
-      await loadCases(); alert(data || "已結案並歸檔。");
-    }));
-    actions.appendChild(makeElement("span","編輯委託暫停開放（待安全修改功能完成）。","notice"));
+    actions.appendChild(makeAction("修改委託",async () => openEditForm(card,item)));
+    const success=makeAction("成功結案 · 全體 +3",async () => settleBounty(item,"成功"));
+    success.classList.add("outcome-success");
+    const failed=makeAction("失敗結案 · 全體 −2",async () => settleBounty(item,"失敗"));
+    failed.classList.add("outcome-failed");
+    actions.append(success,failed);
+    actions.appendChild(makeElement("span","只有原發案人可結案；結算包含發案人與最多三名協辦玩家。","outcome-label"));
   }
   if (!user && !closed && mode === "board") actions.appendChild(makeElement("span","登入線上帳號後可接取委託。","notice"));
   if (actions.childNodes.length) card.appendChild(actions);
@@ -488,7 +549,7 @@ async function loadLeaders() {
 async function loadProfile() {
   myProfile = null;
   if (!db || !user) return;
-  const {data,error} = await db.from("player_profiles").select("character_name,sect").eq("user_id",user.id).maybeSingle();
+  const {data,error} = await db.from("player_profiles").select("character_name,sect,virtue_points").eq("user_id",user.id).maybeSingle();
   if (!error) myProfile = data;
 }
 async function loadCases() {
@@ -502,7 +563,7 @@ async function loadCases() {
   readWarnings=[];
   const [pResult,cResult] = await Promise.all([
     user ? db.from("bounty_participants").select("bounty_id,user_id") : Promise.resolve({data:[],error:null}),
-    user ? db.from("bounty_closures").select("bounty_id,lead_npc,participants,closed_at") : Promise.resolve({data:[],error:null})
+    user ? db.from("bounty_closures").select("bounty_id,lead_npc,participants,closed_at,outcome") : Promise.resolve({data:[],error:null})
   ]);
   participants=pResult.data || [];closures=cResult.data || [];
   if(pResult.error)readWarnings.push("協辦名單讀取失敗："+pResult.error.message);
@@ -511,7 +572,7 @@ async function loadCases() {
 }
 function updateIdentity() {
   identity.textContent = user
-    ? `線上帳號已核驗：${user.email || "已登入"}｜線上示籙：${myProfile?.character_name || "尚未建立"}｜門派：${myProfile?.sect || "未登錄"}`
+    ? `線上帳號已核驗：${user.email || "已登入"}｜線上示籙：${myProfile?.character_name || "尚未建立"}｜門派：${myProfile?.sect || "未登錄"}｜仁德值：${myProfile?.virtue_points ?? "未讀取"}`
     : `尚未登入線上帳號｜本機示籙：${playerName || "尚未建立"}`;
   authLink.textContent = user ? "帳號管理 →" : "線上帳號登入 →";
   submitButton.disabled = !user || !myProfile?.character_name || !db || !leaders.length;
