@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>負驗書｜委託演繹</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #091113;
+  color: #ded6c5;
+  font-family: "Microsoft JhengHei", serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+main {
+  width: min(720px, 90%);
+  padding: 40px;
+  background: #101f21;
+  border: 1px solid #927a52;
+}
+small { color: #8fc4b8; letter-spacing: 3px; }
+h1 { color: #dfc899; font-weight: normal; }
+p { line-height: 2.4; }
+a { color: #8fc4b8; }
+</style>
+</head>
+<body>
+<main>
+  <small>咸陵鏢局 · 委託演繹</small>
+  <h1>江上無歸人</h1>
+  <p>天環江商旅失蹤案</p>
+  <p>案卷已啟封，故事即將開始。</p>
+  <a href="bounty.html">← 返回鏢局委託榜</a>
+</main>
+</body>
+</html>
