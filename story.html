@@ -67,5 +67,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sidebar.classList.c
 $('restart').addEventListener('click',()=>{if(!confirm('要重新開始《江上無歸人》嗎？本案進度、線索與本案人物關係會重設。'))return;state=newState();enterNode();window.scrollTo({top:0,behavior:'smooth'})});
 enterNode();
 </script>
+<script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
 </body></html>
 
