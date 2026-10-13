@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -10,6 +9,7 @@
 </style>
 </head>
 <body>
+<script>if(window.self===window.top){window.location.replace("world.html?page=archive.html");}</script>
 <header><div class="logo">負驗書 · 公開典籍</div><nav><a href="city.html">← 返回咸陵主城</a></nav></header>
 <section class="hero"><small>長明府 · 公開文獻查詢</small><h1>咸陵典籍庫</h1><p>山河有跡，眾生有名。凡可公開之事，皆存卷中。</p></section>
 <main>
@@ -49,5 +49,6 @@ search.addEventListener('input',render);
 const player=JSON.parse(localStorage.getItem('fuyanshu_player')||'null');if(!player||!player.name)window.location.replace('index.html');
 render();
 </script>
+<script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
 </body>
 </html>
