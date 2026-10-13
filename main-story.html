@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>負驗書｜卷一 · 天地不問來處</title>
+<style>
+:root{--bg:#091113;--panel:#112326;--line:#3b6059;--gold:#e1c994;--blue:#75eaff;--text:#d5d9ce;--muted:#9db9ae}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);background:radial-gradient(ellipse at 50% -10%,#24433c 0%,#091113 55%);font-family:"Microsoft JhengHei","Noto Serif TC",serif;line-height:1.95}button,a{font:inherit}a{color:var(--muted);text-decoration:none}a:hover{color:var(--gold)}header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px max(18px,calc((100vw - 1080px)/2));border-bottom:1px solid var(--line);background:#0b191bdc;flex-wrap:wrap}.brand{color:var(--gold);letter-spacing:3px}.header-right{display:flex;gap:15px;align-items:center;font-size:13px}.time{color:var(--blue);text-shadow:0 0 12px #43dfff9e;font-variant-numeric:tabular-nums}.wrap{max-width:1080px;margin:0 auto;padding:42px 20px 75px}.eyebrow{color:var(--blue);font-size:11px;letter-spacing:3px}.intro{text-align:center;margin-bottom:32px}.intro h1{font-size:clamp(32px,6vw,52px);font-weight:normal;color:var(--gold);letter-spacing:7px;text-shadow:0 0 20px #dfbb694f;margin:12px 0}.intro p{color:var(--muted);font-size:14px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start}.scene,.aside-card{background:#102123ee;border:1px solid var(--line);box-shadow:0 16px 55px #0003}.scene{padding:clamp(22px,4vw,43px);min-height:480px}.chapter{color:var(--blue);font-size:12px;letter-spacing:2px}.scene h2{font-size:26px;font-weight:normal;color:var(--gold);margin:8px 0 22px;text-shadow:0 0 15px #cbb47a55}.story{white-space:pre-line;font-size:15px;line-height:2.25}.story p{margin:0 0 18px}.choices{border-top:1px solid #36564d;padding-top:22px;margin-top:24px}.choice{display:block;width:100%;text-align:left;color:#e6d4aa;background:#172e2f;border:1px solid #42665d;padding:13px 18px;margin:9px 0;cursor:pointer;transition:.2s}.choice:hover,.choice:focus-visible{border-color:var(--gold);background:#24423f;transform:translateX(3px);outline:none}.aside{display:grid;gap:14px}.aside-card{padding:18px}.aside h3{font-weight:normal;color:var(--gold);font-size:16px;margin:0 0 10px}.aside p,.aside li{font-size:13px;color:var(--muted);margin:5px 0}.aside ul{padding-left:18px;margin:0}.pill{display:inline-block;border:1px solid #4e827c;color:var(--blue);padding:2px 8px;font-size:11px;margin-top:8px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:17px}.secondary{background:transparent;border:1px solid #806f50;color:var(--gold);padding:8px 12px;cursor:pointer;font-size:12px}.secondary:hover{background:#243b36}.note{font-size:12px;color:#9bb1a6}.error{border:1px solid #b98b65;padding:20px;color:#e9caa8;background:#241e1b}.hidden{display:none}footer{text-align:center;color:#67867e;font-size:12px;padding:15px 0 35px}@media(max-width:780px){.layout{grid-template-columns:1fr}.aside{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding-top:28px}}@media(max-width:520px){.aside{grid-template-columns:1fr}.intro h1{letter-spacing:3px}.scene{min-height:0}}
+</style>
+</head>
+<body>
+<header><div class="brand">負驗書 · 主線卷宗</div><div class="header-right"><span class="time" id="clock">--:--:--</span><a href="city.html">← 返回咸陵主城</a></div></header>
+<div class="wrap"><div class="intro"><div class="eyebrow">MAIN STORY · VOLUME 01</div><h1>天地不問來處</h1><p>承光年間 · 北城第三更　／　序幕：禁步歸零</p></div>
+<div class="layout"><main class="scene"><div id="error" class="error hidden"></div><div id="game"><div class="chapter" id="chapter"></div><h2 id="scene-title"></h2><div class="story" id="story"></div><div class="choices" id="choices"></div><div class="actions"><button class="secondary" id="restart" type="button">重啟本卷序幕</button><button class="secondary" id="save" type="button">手動儲存</button></div><p class="note" id="status" role="status">行跡將自動記錄於此裝置。</p></div></main>
+<aside class="aside"><section class="aside-card"><h3>示籙 · 行旅者</h3><p id="player-name">—</p><p id="player-sect">—</p><p id="player-origin">—</p><span class="pill">主線進行中</span></section><section class="aside-card"><h3>線索簿</h3><ul id="clue-list"><li>尚無記錄</li></ul></section><section class="aside-card"><h3>人物交集</h3><ul id="relation-list"><li>尚無記錄</li></ul></section></aside></div></div>
+<footer>長明府未公開卷宗 · 你的選擇將留在這片土地上</footer>
+<script>
+'use strict';
+// 遊戲進度與示籙分開儲存，不會覆蓋其他支線故事。
+const SAVE_KEY='fuyanshu_main_vol1_v1';
+const $=id=>document.getElementById(id);
+const escapeText=s=>String(s??'');
+let player=null;
+try{player=JSON.parse(localStorage.getItem('fuyanshu_player')||'null');}catch(e){}
+function clock(){ $('clock').textContent=new Date().toLocaleTimeString('zh-TW',{hour12:false}); }clock();setInterval(clock,1000);
+const scenes={
+ start:{chapter:'序幕 · 第三更',title:'北城，箭過長街',paragraphs:[
+ '第三更，咸陵北城的夜雨剛停。你沿著脈軌走過長街，腕間禁步映著沿途燈火。',
+ '忽然，有人高聲呼喊。琉璃符箭穿過人群，直取一個尚未反應過來的孩子。',
+ '一名少女迎了上去。箭鋒擦過她的肩頭，孩子被人匆忙拉開，而她腕上的禁步發出一聲細響。',
+ '「德數歸零者，禁止前行。」',
+ '城門上方的天眼轉向少女，猩紅判定光沿著脈軌蔓延。封鎖線正在收攏，你仍站在它的邊緣。'],options:[['走向受傷的少女','approach'],['留下觀察天眼的判定','observe'],['沿熄滅的脈軌追查異常','tracks']]},
+ approach:{chapter:'序幕 · 封鎖線',title:'被判定的人',paragraphs:[
+ '你趁封鎖線尚未合攏，朝少女走去。她按著受傷的肩，卻先確認那個孩子是否平安。',
+ '「別靠太近。」她抬眼看你，語氣仍算平穩，「他們會把你也記進去。」',
+ '她腕間禁步的光已熄滅，金屬深處卻浮出一道不屬於長明府制式符紋的微光。'],clues:['禁步內側的陌生符紋'],relations:['紀玖年：封鎖線內的初遇'],options:[['問她是否需要幫忙','help'],['記下那道古老符紋','rune']]},
+ observe:{chapter:'序幕 · 天眼',title:'判定之前',paragraphs:[
+ '你沒有立即靠近。天眼的光束掃過人群，示籙核驗符紋一層層展開，卻始終停在那名少女身上。',
+ '她剛剛救了一個孩子。這一幕有許多人親眼看見，可天眼只重複同一句判定。',
+ '你發現光束邊緣的測流刻度正反覆跳動，彷彿有另一組不屬於天眼的訊號正試圖接入。'],clues:['天眼判定與現場目擊不一致'],options:[['記下天眼的異常刻度','record'],['趁機靠近封鎖線','approach']]},
+ tracks:{chapter:'序幕 · 脈軌',title:'逆行的金光',paragraphs:[
+ '你沿著熄滅的脈軌往北走。原本應該靜止的軌道深處，忽然流過一道金熾的光。',
+ '附近的脈站傳來急促的符鈴聲。石階上，一名穿著長明府工作服的青年正低頭檢查測流符。',
+ '「別碰軌道。」他沒有抬頭，「現在的流向不對。」'],clues:['脈軌內出現逆向金光'],relations:['紀不允：脈站外的初遇'],options:[['詢問青年測流符出了什麼事','ask'],['先觀察脈站的符燈','lamps']]},
+ help:{chapter:'序幕 · 人間',title:'一線之隔',paragraphs:[
+ '你蹲下身，問少女傷勢如何。她短暫地怔了一下，隨即搖頭。',
+ '「我叫紀玖年。」她看了一眼逐漸收緊的封鎖線，「現在先想辦法讓那孩子離開。」',
+ '你記下她的名字，也看見那道古老符紋在她腕間輕輕跳動。'],clues:['禁步內側的陌生符紋'],relations:['紀玖年：你曾主動伸出援手'],options:[['繼續留在現場','quake']]},
+ rune:{chapter:'序幕 · 古紋',title:'不在記錄之中',paragraphs:[
+ '你記住符紋的輪廓：它既不像示籙，也不像常見的禁步刻印。',
+ '紀玖年察覺你的視線，低頭看去，卻同樣露出疑惑。',
+ '還未等你們說話，腳下傳來一聲極低的震動。'],clues:['禁步內側的陌生符紋'],options:[['抬頭查看異變','quake']]},
+ record:{chapter:'序幕 · 異常記錄',title:'無法歸檔的判定',paragraphs:[
+ '你把天眼刻度的變化記在隨身紙頁上。那串數字在最後一瞬反向跳動，隨即被猩紅判定光覆蓋。',
+ '遠處傳來金屬開裂的脆響。有人尖叫，整條長街忽然暗了下來。'],clues:['天眼測流刻度曾短暫逆轉'],options:[['抬頭查看異變','quake']]},
+ ask:{chapter:'序幕 · 脈站',title:'符流逆轉',paragraphs:[
+ '青年終於抬眼。他的神色很淡，卻把你引到石階內側，避開仍在發亮的軌道。',
+ '「測流符指向了相反的方向。」他說，「如果你還要留在北城，就不要只相信天眼。」',
+ '脈站門旁的識別牌寫著：恆天樓，紀不允。'],clues:['測流符指向相反方向'],relations:['紀不允：短暫交談'],options:[['查看脈站外的異象','quake']]},
+ lamps:{chapter:'序幕 · 脈站',title:'熄滅的符燈',paragraphs:[
+ '符燈先後暗下，接著又在沒有供能的情況下自行亮起。牆上測流符卻全數停住。',
+ '那名青年望向北城深處，眉心微蹙。你看見他的工作牌上寫著「紀不允」。',
+ '遠處的天眼，同時轉向同一個方向。'],clues:['符燈曾在斷能後自行亮起'],relations:['紀不允：脈站外的目擊'],options:[['查看北城異變','quake']]},
+ quake:{chapter:'序幕 · 地脈甦醒',title:'天地之下',paragraphs:[
+ '下一瞬，整座北城的地脈同時震了一下。',
+ '能源井接連熄滅，脈軌中的金光卻逆向奔流。城牆上的天眼裂開細縫，幾座早已封存的舊式符機，在黑暗裡一一亮起。',
+ '你聽見人群奔逃的聲音，也聽見某種比符機運轉更低沉的回響，彷彿這座城市腳下的土地，終於回應了什麼。',
+ '北城封鎖令隨即下達。今夜發生的一切，將被長明府記作一次「地脈運行異常」。',
+ '而你知道，自己親眼看見的，遠不止如此。'],clues:['北城地脈異常甦醒'],options:[['記錄序幕，等待第一章','ending']]},
+ ending:{chapter:'卷一 · 序幕完',title:'未完之卷',paragraphs:[
+ '你的示籙裡，多了一段不曾預料的行跡。',
+ '紀玖年被困在封鎖線內；紀不允仍在追查測流符的逆轉。兩條尚未交會的線索，正在北城的夜色裡悄然延伸。',
+ '《天地不問來處》第一章尚待開放。你可以返回主城，也可以重新遊玩序幕，尋找不同的線索。'],options:[]}
+};
+let state={scene:'start',clues:[],relations:[]};
+function uniqueAdd(key,values){for(const value of values||[])if(!state[key].includes(value))state[key].push(value);}
+function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));$('status').textContent='已儲存 · '+new Date().toLocaleTimeString('zh-TW',{hour12:false});}catch(e){$('status').textContent='無法儲存：請檢查瀏覽器是否允許本機儲存。';}}
+function render(){const scene=scenes[state.scene]||scenes.start;uniqueAdd('clues',scene.clues);uniqueAdd('relations',scene.relations);$('chapter').textContent=scene.chapter;$('scene-title').textContent=scene.title;$('story').replaceChildren();for(const p of scene.paragraphs){const node=document.createElement('p');node.textContent=p;$('story').appendChild(node);}$('choices').replaceChildren();for(const [label,next] of scene.options){const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='→ '+label;b.addEventListener('click',()=>{state.scene=next;render();document.querySelector('.scene').scrollIntoView({behavior:'smooth',block:'start'});});$('choices').appendChild(b);}if(!scene.options.length){const a=document.createElement('a');a.href='city.html';a.className='choice';a.textContent='← 返回咸陵主城';$('choices').appendChild(a);}for(const [key,target] of [['clues','clue-list'],['relations','relation-list']]){const ul=$(target);ul.replaceChildren();for(const text of state[key].length?state[key]:['尚無記錄']){const li=document.createElement('li');li.textContent=text;ul.appendChild(li);}}persist();}
+$('restart').addEventListener('click',()=>{if(confirm('確定重新開始卷一序幕？本卷的線索與人物交集將重設，其他支線存檔不受影響。')){state={scene:'start',clues:[],relations:[]};render();}});
+$('save').addEventListener('click',persist);
+if(!player||!player.name){$('game').classList.add('hidden');$('error').classList.remove('hidden');$('error').textContent='尚未建立示籙。請先返回登記頁建立玩家身分，再進入主線。';const a=document.createElement('a');a.href='index.html';a.textContent=' → 前往示籙登記';$('error').appendChild(a);}else{
+ $('player-name').textContent='姓名 · '+escapeText(player.name);$('player-sect').textContent='門派 · '+escapeText(player.sect||'未登錄');$('player-origin').textContent='籍貫 · '+escapeText(player.origin||'未登錄');
+ try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&scenes[saved.scene]&&Array.isArray(saved.clues)&&Array.isArray(saved.relations))state={scene:saved.scene,clues:saved.clues.filter(x=>typeof x==='string'),relations:saved.relations.filter(x=>typeof x==='string')};}catch(e){}
+ render();}
+</script>
+</body></html>
