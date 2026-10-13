@@ -2,12 +2,370 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>負驗書｜入城前導</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>負驗書｜咸陵入城前導</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Noto Serif TC", "Microsoft JhengHei", serif;
+  color: #e8dfcb;
+  background:
+    linear-gradient(
+      rgba(5, 13, 18, 0.72),
+      rgba(5, 13, 18, 0.93)
+    ),
+    url("images/xianling-bg.jpg.jpg") center / cover fixed no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 35px 18px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 16px;
+  border: 1px solid rgba(191, 161, 100, 0.22);
+  pointer-events: none;
+}
+
+.container {
+  width: 100%;
+  max-width: 760px;
+  position: relative;
+  z-index: 1;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  color: #8fc4b8;
+  font-size: 12px;
+  letter-spacing: 4px;
+}
+
+h1 {
+  font-size: clamp(36px, 7vw, 62px);
+  font-weight: normal;
+  letter-spacing: 12px;
+  color: #dec38b;
+  margin: 20px 0 12px;
+  text-shadow: 0 0 25px rgba(203, 172, 107, 0.3);
+}
+
+.subtitle {
+  color: #9db8ad;
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+
+.panel {
+  background: rgba(9, 25, 29, 0.93);
+  border: 1px solid #927a52;
+  padding: clamp(25px, 5vw, 55px);
+  min-height: 390px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  position: relative;
+}
+
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: #d8ba79;
+  border-style: solid;
+}
+
+.panel::before {
+  top: -5px;
+  left: -5px;
+  border-width: 2px 0 0 2px;
+}
+
+.panel::after {
+  bottom: -5px;
+  right: -5px;
+  border-width: 0 2px 2px 0;
+}
+
+.chapter {
+  color: #8fc4b8;
+  font-size: 12px;
+  letter-spacing: 3px;
+  margin-bottom: 22px;
+}
+
+.chapter-title {
+  font-size: 27px;
+  font-weight: normal;
+  letter-spacing: 5px;
+  color: #e2c88f;
+  margin-bottom: 25px;
+}
+
+.story {
+  color: #d4d8ce;
+  font-size: 16px;
+  line-height: 2.5;
+  min-height: 150px;
+  white-space: pre-line;
+}
+
+.fade {
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.progress {
+  display: flex;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.progress-bar {
+  height: 3px;
+  flex: 1;
+  background: #345149;
+}
+
+.progress-bar.active {
+  background: #d5b87e;
+  box-shadow: 0 0 10px rgba(213, 184, 126, 0.45);
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  padding: 15px;
+  border: 1px solid #a28b60;
+  transition: 0.25s;
+}
+
+button:hover {
+  filter: brightness(1.2);
+}
+
+.previous {
+  flex: 1;
+  background: transparent;
+  color: #c5c6b2;
+}
+
+.next {
+  flex: 2;
+  background: linear-gradient(135deg, #244d47, #397467);
+  color: #f2e7ca;
+}
+
+button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.skip {
+  display: block;
+  text-align: center;
+  margin: 24px auto 0;
+  background: transparent;
+  border: none;
+  color: #8faea5;
+  font-size: 12px;
+}
+
+.footer {
+  text-align: center;
+  color: #829c93;
+  font-size: 11px;
+  margin-top: 25px;
+  letter-spacing: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade {
+    animation: none;
+  }
+}
+</style>
 </head>
+
 <body>
-  <h1>咸陵 · 入城前導</h1>
-  <p>世界革新之後，咸陵仍燈火長明。</p>
+
+<main class="container">
+
+  <header class="heading">
+    <div class="eyebrow">長明府 · 地理志 · 卷首</div>
+    <h1>咸陵</h1>
+    <div class="subtitle">世界革新之後，文明仍在此延續。</div>
+  </header>
+
+  <section class="panel">
+
+    <div class="chapter" id="chapter"></div>
+    <h2 class="chapter-title" id="chapterTitle"></h2>
+    <div class="story fade" id="story"></div>
+
+    <div class="progress" id="progress"></div>
+
+    <div class="controls">
+      <button class="previous" id="previousButton">
+        上一幕
+      </button>
+
+      <button class="next" id="nextButton">
+        下一幕
+      </button>
+    </div>
+
+  </section>
+
+  <button class="skip" id="skipButton">
+    略過前導 · 直接入城
+  </button>
+
+  <div class="footer">
+    長明府 · 示籙核驗完成 · 准予入城
+  </div>
+
+</main>
+
+<script>
+const playerKey = "fuyanshu_player";
+
+let player = null;
+
+try {
+  player = JSON.parse(localStorage.getItem(playerKey));
+} catch (error) {}
+
+if (
+  !player ||
+  typeof player.name !== "string" ||
+  !player.name.trim()
+) {
+  window.location.replace("index.html");
+}
+
+const chapters = [
+  {
+    label: "第一幕 · 國境",
+    title: "世界革新之後",
+    text: `咸陵位於亞洲以北的地域，是世界革新後仍保有完整華文文明體系的國度之一。`
+  },
+  {
+    label: "第二幕 · 四時",
+    title: "北境風物",
+    text: `咸陵地處北方，四季分明。
+
+春季多雨，夏季溫暖而潮濕，秋季乾爽，冬季則有長時間的低溫與降雪。`
+  },
+  {
+    label: "第三幕 · 水脈",
+    title: "天環江",
+    text: `境內大型河川較少，居民生活與城市發展所需的水源，長期以天環江及其支流水系為主。`
+  },
+  {
+    label: "第四幕 · 新朝",
+    title: "承光年間",
+    text: `長明府於其後建立，並以承光為年號，開啟新的時代。`
+  }
+];
+
+let current = 0;
+
+const chapter = document.getElementById("chapter");
+const chapterTitle = document.getElementById("chapterTitle");
+const story = document.getElementById("story");
+const progress = document.getElementById("progress");
+const previousButton = document.getElementById("previousButton");
+const nextButton = document.getElementById("nextButton");
+
+function renderChapter() {
+  const data = chapters[current];
+
+  chapter.textContent = data.label;
+  chapterTitle.textContent = data.title;
+  story.textContent = data.text;
+
+  story.classList.remove("fade");
+  void story.offsetWidth;
+  story.classList.add("fade");
+
+  progress.replaceChildren();
+
+  chapters.forEach((item, index) => {
+    const bar = document.createElement("div");
+    bar.className =
+      "progress-bar" + (index <= current ? " active" : "");
+    progress.appendChild(bar);
+  });
+
+  previousButton.disabled = current === 0;
+
+  nextButton.textContent =
+    current === chapters.length - 1
+      ? "閱畢 · 進入咸陵"
+      : "下一幕";
+}
+
+function enterCity() {
+  try {
+    sessionStorage.setItem("fuyanshu_intro_seen", "true");
+  } catch (error) {}
+
+  window.location.href = "city.html";
+}
+
+previousButton.addEventListener("click", () => {
+  if (current > 0) {
+    current--;
+    renderChapter();
+  }
+});
+
+nextButton.addEventListener("click", () => {
+  if (current < chapters.length - 1) {
+    current++;
+    renderChapter();
+  } else {
+    enterCity();
+  }
+});
+
+document.getElementById("skipButton")
+  .addEventListener("click", enterCity);
+
+renderChapter();
+</script>
+
 </body>
 </html>
