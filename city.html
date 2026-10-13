@@ -38,6 +38,13 @@ h2{font-size:19px;margin:29px 0 15px;text-shadow:0 0 9px rgba(223,193,133,.36),0
 .panel,.record{padding:19px}
 @media(max-width:750px){main{padding:12px 18px 50px}.hero{min-height:310px;padding:66px 15px}}
 @media(max-width:520px){.grid{grid-template-columns:1fr}.place{min-height:92px;padding:15px 17px}.story-entry{width:100%;min-height:92px}.hero h1{font-size:clamp(32px,9vw,45px)}}
+
+/* 長明府監測介面：標題旁的螢光藍時間戳 */
+h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.neon-timestamp{display:inline-flex;align-items:center;gap:7px;font-family:Consolas,"Courier New",monospace;font-size:11px;font-weight:normal;letter-spacing:1px;color:#67f2ff;text-shadow:0 0 5px #00dfff,0 0 13px rgba(0,213,255,.65);white-space:nowrap;border:1px solid rgba(67,218,247,.36);border-radius:3px;padding:2px 7px;background:rgba(4,40,49,.52);font-variant-numeric:tabular-nums}
+.neon-timestamp::before{content:"●";font-size:8px;color:#70f6ff;animation:stampPulse 2.5s ease-in-out infinite}
+@keyframes stampPulse{50%{opacity:.35}}
+@media(max-width:520px){.neon-timestamp{font-size:10px;letter-spacing:0;padding:1px 5px}}
 </style>
 </head>
 <body>
@@ -95,6 +102,27 @@ if(!player||!player.name){window.location.replace('index.html')}else{
 
 </script>
 <script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
+<script>
+/* 顯示玩家裝置的本地時間，每秒更新；不修改遊戲內時間線。 */
+(function(){
+  const headings=document.querySelectorAll('main h2');
+  const stamps=[];
+  headings.forEach(heading=>{
+    const stamp=document.createElement('time');
+    stamp.className='neon-timestamp';
+    stamp.setAttribute('aria-label','裝置本地時間');
+    heading.appendChild(stamp);
+    stamps.push(stamp);
+  });
+  function tick(){
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const value=pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+    stamps.forEach(stamp=>{stamp.textContent=value;stamp.dateTime=now.toISOString();});
+  }
+  tick();setInterval(tick,1000);
+})();
+</script>
 </body>
 </html>
 
