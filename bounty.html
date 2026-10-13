@@ -516,7 +516,7 @@ function createCaseCard(item, mode="board") {
   const mine = user && item.author_id === user.id;
   const members = caseMembers(item.id);
   const joined = !!user && members.some(p => p.user_id === user.id);
-  card.appendChild(makeElement("span",item.status || "待接取","status"));
+  card.appendChild(makeElement("span",closed ? "已結案" : (members.length > 0 ? "調查中" : "待接取"),"status"));
   card.appendChild(makeElement("h3",item.title));
   card.appendChild(makeElement("div",`地點：${item.location || "未註明"}｜類型：${item.type || "其他"}｜委託者：${item.author_name}｜報酬：${item.reward || "面議"}`,"meta"));
   card.appendChild(makeElement("div",`主理人：${item.lead_npc || "尚未指定"}｜登錄：${displayDate(item.created_at)}`,"meta"));
@@ -531,7 +531,7 @@ function createCaseCard(item, mode="board") {
     }
   }
   const actions = makeElement("div",undefined,"actions");
-  if (!closed && !mine && !joined && user && item.status === "待接取") {
+  if (!closed && !mine && !joined && user && ["待接取", "辦理中", "調查中"].includes(item.status)) {
     const canJoin = !!myProfile?.sect && myProfile.sect !== "無門無派";
     if (members.length < 3 && canJoin) {
       actions.appendChild(makeAction("接取委託", async () => {
