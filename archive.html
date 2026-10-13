@@ -1,13 +1,50 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>負驗書｜咸陵資料庫</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>負驗書｜咸陵公開典籍</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#091113;color:#ded6c5;font-family:"Microsoft JhengHei",serif;line-height:1.9}header{border-bottom:1px solid #37564e;padding:20px max(20px,calc((100vw - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.logo{color:#dfc899;font-size:22px;letter-spacing:4px}a{color:#a8d1c5;text-decoration:none}a:hover{text-decoration:underline}.hero{text-align:center;padding:55px 20px 38px;background:radial-gradient(ellipse at center,#1c3a35,#091113 72%)}.hero small{color:#8fbeb0;letter-spacing:3px}.hero h1{font-size:clamp(28px,5vw,44px);font-weight:normal;letter-spacing:6px;color:#dfc899;margin:12px 0}.hero p{color:#9db8ad;font-size:14px}main{max-width:1100px;margin:auto;padding:25px 20px 70px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}input{width:100%;background:#101f21;color:#f0e4c9;border:1px solid #45685e;border-radius:3px;padding:14px;font:inherit}input:focus{outline:1px solid #d5b87e}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}button{font:inherit;cursor:pointer}.filter{padding:8px 14px;border:1px solid #45685e;color:#aac4b9;background:#102326;border-radius:2px}.filter.active,.filter:hover{border-color:#d5b87e;color:#e9d3a0}.layout{display:grid;grid-template-columns:minmax(230px,350px) minmax(0,1fr);gap:18px}.list,.detail{border:1px solid #37564e;background:#101f21;min-height:330px}.list{padding:12px;max-height:650px;overflow:auto}.entry{display:block;width:100%;text-align:left;background:#152a2b;border:1px solid transparent;color:#e1cfa9;padding:14px;margin-bottom:8px}.entry:hover,.entry.selected{border-color:#bba16e;background:#1c3735}.entry small{display:block;color:#88b6a9;font-size:12px}.detail{padding:clamp(20px,4vw,36px)}.eyebrow{font-size:12px;color:#8fbeb0;letter-spacing:2px}.detail h2{font-weight:normal;color:#dfc899;margin:8px 0 20px;font-size:28px}.detail p{white-space:pre-line;margin:0 0 15px}.section-title{font-size:15px;color:#d9c08f;border-left:3px solid #bba16e;padding-left:10px;margin:25px 0 12px}.tag{display:inline-block;border:1px solid #45685e;color:#a9c8bc;padding:2px 9px;font-size:12px;margin:0 6px 8px 0}.note{color:#91a99f;font-size:13px}.empty{padding:20px;color:#9db8ad}.subentry{border-top:1px solid #304c45;padding:13px 0}.subentry strong{color:#dfc899}.subentry p{margin:4px 0;color:#c9d1c8}.footer{text-align:center;color:#66867d;font-size:12px;padding:25px}@media(max-width:700px){.layout{grid-template-columns:1fr}.list{max-height:300px}.hero{padding-top:40px}}
+</style>
 </head>
 <body>
-  <h1>長明府 · 咸陵資料庫</h1>
-  <p>示籙有名，萬象有錄。</p>
+<header><div class="logo">負驗書 · 公開典籍</div><nav><a href="city.html">← 返回咸陵主城</a></nav></header>
+<section class="hero"><small>長明府 · 公開文獻查詢</small><h1>咸陵典籍庫</h1><p>山河有跡，眾生有名。凡可公開之事，皆存卷中。</p></section>
+<main>
+<div class="toolbar"><input id="search" type="search" placeholder="搜尋機構、門派、人物或典籍……" aria-label="搜尋典籍"></div>
+<div class="filters" id="filters"></div>
+<div class="layout"><section class="list" id="list" aria-label="典籍條目"></section><article class="detail" id="detail" aria-live="polite"></article></div>
+</main>
+<footer class="footer">長明府 · 公開文獻 · 此庫不收錄涉密案牘</footer>
+<script>
+const records = [
+ {id:'changming',category:'機構',title:'長明府',summary:'咸陵新朝之政務體系',body:'舊朝淮苑府覆滅後，新政府以「長明」之名建立，並以承光為年號。\n長明府統轄咸陵的政務、秩序與制度，各機構分掌其職。',sections:[{title:'所屬機構',items:[['天監院','管理示籙、禁步等制度。'],['夜循司','負責城中秩序與巡察。'],['眾生院','處理法律與刑罰事務。'],['恆天樓','管理符機塔與地脈能量控制。']]}]},
+ {id:'tianjian',category:'機構',title:'天監院',summary:'示籙與禁步管理',body:'長明府所屬機構，掌理示籙與禁步相關制度。',sections:[{title:'職掌',items:[['示籙','記錄個人身分與相關登記事項。'],['禁步','與仁德值制度相連的隨身器物。']]}]},
+ {id:'yexun',category:'機構',title:'夜循司',summary:'城中秩序與巡察',body:'長明府所屬機構，負責秩序監察與巡查。',sections:[{title:'相關人物',items:[['紀不允','長明府中行事公允的符術之人，與夜循司事務有所關聯。詳細人物檔案可於「紀不允」條目查閱。']]}]},
+ {id:'zhongsheng',category:'機構',title:'眾生院',summary:'律法與刑罰',body:'長明府所屬機構，負責法律與刑罰相關事務。'},
+ {id:'hengtian',category:'機構',title:'恆天樓',summary:'符機塔與地脈控制',body:'長明府所屬機構，管理符機塔及地脈能量控制相關事務。紀不允亦會協助相關符術工作。'},
+ {id:'chi',category:'門派',title:'赤霄山莊',summary:'劍鋒隨心而向',body:'赤霄弟子多性情冷冽，少有迂迴試探。他們敢愛敢恨，敢勝敢敗，行事重視本心與抉擇。',sections:[{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
+ {id:'tianheng',category:'門派',title:'天衡門',summary:'器術與造物',body:'天衡門重視器術與創造，探究人與器物之間的關係。',sections:[{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
+ {id:'xuanshui',category:'門派',title:'玄水宮',summary:'醫道與流動',body:'玄水宮以醫道聞名，其修行與水、流動及執念相關。',sections:[{title:'重要地點',items:[['洗心池','玄水宮相關地點，詳細資料待補。']]},{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
+ {id:'wanxiang',category:'門派',title:'萬象樓',summary:'觀象知變',body:'萬象樓以觀象、推演見長，重視對變化的理解，並有不可妄斷言之戒。',sections:[{title:'重要地點',items:[['觀象塔','萬象樓相關地點，詳細資料待補。']]},{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
+ {id:'taiwei',category:'門派',title:'太微門',summary:'已覆亡的古老門派',body:'太微門已於舊年覆亡，相關記錄散佚。其與地脈舊事的關聯仍待釐清。',sections:[{title:'長老名錄',items:[['史料待補','尚無可公開的完整名錄。']]},{title:'門規',items:[['史料待補','尚無可公開的完整門規。']]}]},
+ {id:'jibuyun',category:'人物',title:'紀不允',summary:'長明府相關人員 · 符術',body:'太微門遺脈，擅長符術。行事公事公辦，情緒不輕易外露，卻有自己的判斷與堅持。\n目前與長明府事務有所關聯，亦協助符術相關工作。',sections:[{title:'機構關聯',items:[['夜循司','與其事務有所關聯。'],['恆天樓','協助符術相關工作。']]}]},
+ {id:'shilu',category:'制度',title:'示籙',summary:'咸陵居民的身分登記',body:'示籙是長明府施行的登記制度，記錄居民身分、家族、居所等資訊，並與城市生活的管理相連。'},
+ {id:'jinbu',category:'制度',title:'禁步',summary:'隨身佩戴的制度器物',body:'禁步是與仁德值相關的隨身器物，其記錄與顯示影響居民在咸陵的日常生活。'},
+ {id:'rende',category:'制度',title:'仁德值',summary:'規範言行的評量制度',body:'長明府以仁德值作為社會管理制度之一，其數值可能影響居民的身分待遇與通行等權益。'},
+ {id:'dimai',category:'典籍',title:'地脈',summary:'咸陵文明的根基',body:'地脈是咸陵世界的根本力量，城市透過符機與能量轉換技術利用地脈，使古老城脈與現代建設並存。'},
+ {id:'taiyi',category:'典籍',title:'《太一律》',summary:'世界革新前的古老典籍',body:'《太一律》流傳於世界革新以前，作者與原貌皆不可考。\n如今流傳於世的內容分為五部，分藏於五大門派，各自記錄對地脈的不同理解。'}
+];
+const categories=['全部','機構','門派','人物','制度','典籍'];
+let activeCategory='全部';let selectedId='changming';
+const filters=document.getElementById('filters');const list=document.getElementById('list');const detail=document.getElementById('detail');const search=document.getElementById('search');
+function el(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(className)node.className=className;return node;}
+function showDetail(item){detail.replaceChildren();if(!item){detail.appendChild(el('p','請選擇一筆典籍條目。','note'));return;}detail.appendChild(el('div','長明府 · '+item.category+'檔案','eyebrow'));detail.appendChild(el('h2',item.title));detail.appendChild(el('span',item.category,'tag'));detail.appendChild(el('p',item.body));(item.sections||[]).forEach(section=>{detail.appendChild(el('h3',section.title,'section-title'));section.items.forEach(pair=>{const box=el('div',undefined,'subentry');box.appendChild(el('strong',pair[0]));box.appendChild(el('p',pair[1]));detail.appendChild(box);});});}
+function render(){filters.replaceChildren();categories.forEach(cat=>{const button=el('button',cat,'filter'+(cat===activeCategory?' active':''));button.type='button';button.addEventListener('click',()=>{activeCategory=cat;render();});filters.appendChild(button);});const query=search.value.trim().toLocaleLowerCase();const found=records.filter(item=>(activeCategory==='全部'||item.category===activeCategory)&&[item.title,item.summary,item.body,...(item.sections||[]).flatMap(s=>[s.title,...s.items.flat()])].join(' ').toLocaleLowerCase().includes(query));list.replaceChildren();if(!found.length){list.appendChild(el('p','查無符合的公開條目。','empty'));showDetail(null);return;}if(!found.some(item=>item.id===selectedId))selectedId=found[0].id;found.forEach(item=>{const button=el('button',undefined,'entry'+(item.id===selectedId?' selected':''));button.type='button';button.appendChild(el('span',item.title));button.appendChild(el('small',item.category+' · '+item.summary));button.addEventListener('click',()=>{selectedId=item.id;render();if(window.innerWidth<=700)detail.scrollIntoView({behavior:'smooth',block:'start'});});list.appendChild(button);});showDetail(found.find(item=>item.id===selectedId));}
+search.addEventListener('input',render);
+const player=JSON.parse(localStorage.getItem('fuyanshu_player')||'null');if(!player||!player.name)window.location.replace('index.html');
+render();
+</script>
 </body>
 </html>
