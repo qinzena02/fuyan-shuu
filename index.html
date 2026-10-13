@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>負驗書｜長明府示籙系統</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at top, #17332f, #080e10 70%);
+    color: #e5ddc9;
+    font-family: "Microsoft JhengHei", serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .panel {
+    width: 100%;
+    max-width: 460px;
+    padding: 38px 28px;
+    border: 1px solid #56766a;
+    background: rgba(8, 19, 21, .92);
+    box-shadow: 0 0 45px #1d55402a;
+    text-align: center;
+  }
+  .small {
+    color: #86b9a9;
+    font-size: 12px;
+    letter-spacing: 4px;
+  }
+  h1 {
+    color: #d7bb83;
+    font-size: 36px;
+    letter-spacing: 8px;
+    font-weight: normal;
+    margin: 26px 0 10px;
+  }
+  p { line-height: 2; color: #a9bcb4; }
+  input {
+    width: 100%;
+    padding: 15px;
+    margin: 20px 0;
+    background: #0e2020;
+    border: 1px solid #527c70;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+  }
+  button {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #bfa677;
+    background: #254c43;
+    color: #f0e3c5;
+    font-size: 16px;
+    cursor: pointer;
+    letter-spacing: 3px;
+  }
+  button:hover { background: #35685b; }
+  .hidden { display: none; }
+  .notice { font-size: 12px; color: #7e9d94; }
+</style>
+</head>
+<body>
+  <main class="panel">
+    <div class="small">咸陵 · 長明府 · 天監院</div>
+
+    <section id="register">
+      <h1>示籙登記</h1>
+      <p>凡入咸陵者，皆須有籙可循。<br>
+      姓名既錄，行跡自明。</p>
+
+      <form id="registerForm">
+        <input id="playerName" type="text"
+          maxlength="20" placeholder="請輸入登記姓名"
+          required>
+        <button type="submit">核驗身分 · 入城</button>
+      </form>
+      <p class="notice">此為本機登記，無須提供真實姓名。</p>
+    </section>
+
+    <section id="welcome" class="hidden">
+      <h1>准予入城</h1>
+      <p>示籙核驗完成。</p>
+      <p>登記姓名：<strong id="displayName"></strong></p>
+      <p>所屬：未登錄<br>禁步：待核發<br>仁德值：待評定</p>
+      <button id="enterButton">進入咸陵</button>
+      <p class="notice" id="status"></p>
+    </section>
+  </main>
+
+<script>
+  const key = "fuyanshu_player";
+  const register = document.getElementById("register");
+  const welcome = document.getElementById("welcome");
+  const displayName = document.getElementById("displayName");
+
+  function showPlayer(name) {
+    displayName.textContent = name;
+    register.classList.add("hidden");
+    welcome.classList.remove("hidden");
+  }
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(key));
+    if (saved && typeof saved.name === "string" && saved.name) {
+      showPlayer(saved.name);
+    }
+  } catch (error) {
+    console.log("尚無有效的示籙紀錄");
+  }
+
+  document.getElementById("registerForm")
+    .addEventListener("submit", function(event) {
+      event.preventDefault();
+      const name = document.getElementById("playerName").value.trim();
+      if (!name) return;
+      try {
+        localStorage.setItem(key, JSON.stringify({ name: name }));
+        showPlayer(name);
+      } catch (error) {
+        alert("瀏覽器無法儲存示籙，請確認儲存設定。");
+      }
+    });
+
+  document.getElementById("enterButton")
+    .addEventListener("click", function() {
+      document.getElementById("status").textContent =
+        "咸陵城門將於下一階段開啟。";
+    });
+</script>
+</body>
+</html>
+  
