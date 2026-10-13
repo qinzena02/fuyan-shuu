@@ -85,6 +85,7 @@ async function fetchVirtue(){
  if(error)throw error;
  if(!data||typeof data.virtue_points!=='number')throw new Error('無法讀取線上示籙仁德值');
  showVirtue(data.virtue_points);
+ if(window.FYSVirtue)window.FYSVirtue.syncCloud(data.virtue_points);
 }
 async function choose(target,effect){
  if(busy||!cloudReady||!scenes[target])return;
@@ -93,6 +94,7 @@ async function choose(target,effect){
  busy=true;render();status('長明府正在核驗行跡與仁德值，請稍候……');
  try{
   const from=state.node,key=from+'>'+target;
+  const virtueBefore=state.virtue;
   const {data,error}=await db.rpc('advance_story',{p_story_id:STORY_ID,p_to_node:target});
   if(error)throw error;
   if(!data||!data.progress||data.progress.current_node!==target)throw new Error('雲端回傳進度異常');
@@ -100,6 +102,10 @@ async function choose(target,effect){
    state.visited.push(key);state.jiu+=Number(effect.jiu||0);state.wei+=Number(effect.wei||0);
   }
   state.node=target;showVirtue(data.virtue_points);enterNode();
+  if(window.FYSVirtue){
+   window.FYSVirtue.syncCloud(data.virtue_points);
+   window.FYSVirtue.notifyDeduction(virtueBefore,data.virtue_points);
+  }
   status('行跡已寫入雲端，仁德值已同步。人物關係與線索另保存在本機。');
  }catch(e){status('雲端保存失敗，未切換劇情：'+(e.message||String(e)));}
  finally{busy=false;render();}
