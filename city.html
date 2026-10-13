@@ -92,14 +92,36 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 .case summary::after{content:'＋';position:absolute;right:5px;color:#8fbeb0}
 .case[open] summary::after{content:'－'}
 .case small{padding:0 6px 12px}
-.journey-overview{margin:10px 0 35px}.journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.journey-item{padding:23px 20px;background:linear-gradient(140deg,#112827,#0d1d1e);border:1px solid #47645a;min-height:160px;display:flex;flex-direction:column;gap:8px}.journey-item small{color:#92bdb0;font-size:13px}.journey-item strong{color:#e5ce9e;font-size:21px;font-weight:normal}.journey-item span,.journey-note{color:#8eaaa1;font-size:12px}.journey-note{margin-top:14px}@media(max-width:700px){.journey-grid{grid-template-columns:1fr}.journey-item{min-height:110px;padding:16px}}
+/* 行旅紀錄：單一圓角資訊面板 */
+.journey-overview{margin:10px 0 35px;padding:24px 28px 17px;background:linear-gradient(135deg,rgba(17,40,39,.88),rgba(10,26,28,.94));border:1px solid #47645a;border-radius:16px}
+.journey-overview h2{margin:0 0 6px}
+.journey-overview .intro{margin:0 0 20px}
+.journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.journey-item{min-width:0;padding:4px 22px;display:flex;flex-direction:column;gap:7px}
+.journey-item:first-child{padding-left:0}
+.journey-item:not(:last-child){border-right:1px solid #36524c}
+.journey-item small{color:#92bdb0;font-size:12px;letter-spacing:1px}
+.journey-item strong{color:#e5ce9e;font-size:19px;font-weight:normal;overflow-wrap:anywhere}
+.journey-item span{color:#8eaaa1;font-size:12px}
+.journey-note{margin:19px 0 0;color:#78978e;font-size:11px}
+@media(max-width:700px){.journey-overview{padding:20px 19px 16px}.journey-grid{grid-template-columns:1fr}.journey-item,.journey-item:first-child{padding:13px 0}.journey-item:not(:last-child){border-right:0;border-bottom:1px solid #36524c}.journey-item:first-child{padding-top:0}.journey-item:last-child{padding-bottom:0}}
+
 </style>
 </head>
 <body>
 <header><div class="logo">負驗書</div><div class="player"><div id="player">示籙核驗中</div><div>禁步 · 仁德值：<span id="virtue">讀取中…</span></div></div></header>
 <section class="hero"><p class="eyebrow">承光年間 · 咸陵</p><h1>天下地脈</h1><p>鋼鐵築城，符機行世。</p><p>舊朝已逝，而人間依舊燈火長明。</p></section>
 <main>
-<section class="journey-overview" aria-label="行旅紀錄"><h2>行旅紀錄</h2><p class="intro">山河萬里，所行皆有跡可循。</p><div class="journey-grid"><div class="journey-item"><small>已協辦懸賞</small><strong id="assistedCount">讀取中…</strong><span>以線上鏢局接案紀錄為準</span></div><div class="journey-item"><small>主線進度</small><strong id="mainProgress">讀取中…</strong><span>《天地不問來處》</span></div><div class="journey-item"><small>支線進度</small><strong id="sideProgress">讀取中…</strong><span>《江上無歸人》</span></div></div><p class="journey-note" id="journeyNote">雲端協辦數量與劇情存檔會分別讀取；尚未開始的案件顯示未開始。</p></section>
+<section class="journey-overview" aria-label="行旅紀錄">
+  <h2>行旅紀錄</h2>
+  <p class="intro">山河萬里，所行皆有跡可循。</p>
+  <div class="journey-grid">
+    <div class="journey-item"><small>已協辦懸賞</small><strong id="assistedCount">讀取中…</strong><span>鏢局委託</span></div>
+    <div class="journey-item"><small>主線進度</small><strong id="mainProgress">讀取中…</strong><span>《天地不問來處》</span></div>
+    <div class="journey-item"><small>支線進度</small><strong id="sideProgress">讀取中…</strong><span>《江上無歸人》</span></div>
+  </div>
+  <p class="journey-note" id="journeyNote">進度依目前已連接的雲端與本機存檔顯示。</p>
+</section>
 <section class="story-portal" aria-label="江湖演繹入口">
   <div class="story-portal-heading"><em>INTERACTIVE STORY · 江湖演繹</em><strong>入世</strong><span>人間萬象，各有其途。</span></div>
   <div class="story-portal-actions">
