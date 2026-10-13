@@ -270,6 +270,49 @@ a.story-card:hover h3, a.story-card:focus-visible h3 { color: #ffe2a9; }
 @media(max-width:650px) {
   #publish.panel { border-radius: 16px; padding: 23px 19px; }
 }
+
+/* 玩家委託：圓角、可展開的獨立案牘卡片 */
+.case {
+  border: 1px solid rgba(176, 151, 103, .55);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(20, 48, 47, .93), rgba(9, 28, 32, .95));
+  margin: 13px 0;
+  padding: 0;
+  box-shadow: 0 8px 22px rgba(0,0,0,.19);
+  overflow: hidden;
+}
+.case:first-child { border-top: 1px solid rgba(176, 151, 103, .55); }
+.case-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 19px 21px;
+  border: 0;
+  background: transparent;
+  color: #e9d2a0;
+  font: inherit;
+  font-size: 17px;
+  text-align: left;
+  cursor: pointer;
+}
+.case-toggle:hover, .case-toggle:focus-visible { background: rgba(109, 153, 132, .13); outline: 2px solid transparent; }
+.case-toggle:focus-visible { box-shadow: inset 0 0 0 2px #bca577; }
+.case-toggle .case-arrow { color: #a8c9bd; font-size: 16px; flex: none; transition: transform .2s; }
+.case-toggle[aria-expanded="true"] .case-arrow { transform: rotate(180deg); }
+.case-details { padding: 4px 21px 22px; border-top: 1px solid rgba(108, 139, 123, .35); }
+.case-details[hidden] { display: none; }
+.case-details .status { margin-top: 15px; }
+.case-details .actions { margin-top: 17px; }
+@media(max-width:650px) {
+  .case { border-radius: 13px; }
+  .case-toggle { padding: 16px; font-size: 15px; }
+  .case-details { padding: 3px 16px 18px; }
+}
+/* 支線卷宗預覽僅顯示標題 */
+.story-card .story-main p { display: none; }
+
 </style>
 </head>
 
@@ -516,18 +559,31 @@ function createCaseCard(item, mode="board") {
   const mine = user && item.author_id === user.id;
   const members = caseMembers(item.id);
   const joined = !!user && members.some(p => p.user_id === user.id);
-  card.appendChild(makeElement("span",closed ? "已結案" : (members.length > 0 ? "調查中" : "待接取"),"status"));
-  card.appendChild(makeElement("h3",item.title));
-  card.appendChild(makeElement("div",`地點：${item.location || "未註明"}｜類型：${item.type || "其他"}｜委託者：${item.author_name}｜報酬：${item.reward || "面議"}`,"meta"));
-  card.appendChild(makeElement("div",`主理人：${item.lead_npc || "尚未指定"}｜登錄：${displayDate(item.created_at)}`,"meta"));
-  card.appendChild(makeElement("p",item.description));
+  const toggle = makeElement("button",undefined,"case-toggle");
+  toggle.type = "button";
+  toggle.setAttribute("aria-expanded","false");
+  const titleText = makeElement("span",item.title);
+  const arrow = makeElement("span","⌄","case-arrow");
+  arrow.setAttribute("aria-hidden","true");
+  toggle.append(titleText,arrow);
+  const details = makeElement("div",undefined,"case-details");
+  details.hidden = true;
+  toggle.addEventListener("click",()=>{
+    details.hidden = !details.hidden;
+    toggle.setAttribute("aria-expanded",String(!details.hidden));
+  });
+  card.append(toggle,details);
+  details.appendChild(makeElement("span",closed ? "已結案" : (members.length > 0 ? "調查中" : "待接取"),"status"));
+  details.appendChild(makeElement("div",`地點：${item.location || "未註明"}｜類型：${item.type || "其他"}｜委託者：${item.author_name}｜報酬：${item.reward || "面議"}`,"meta"));
+  details.appendChild(makeElement("div",`主理人：${item.lead_npc || "尚未指定"}｜登錄：${displayDate(item.created_at)}`,"meta"));
+  details.appendChild(makeElement("p",item.description));
   const roster = makeElement("div",rosterText(item),"roster");
-  card.appendChild(roster);
+  details.appendChild(roster);
   if (closed) {
     const record = caseClosure(item.id);
     if (record) {
       const names = Array.isArray(record.participants) ? record.participants.map(p => `${p.character_name || "未署名"}（${p.sect || "未註明門派"}）`).join("、") : "";
-      card.appendChild(makeElement("div",`結案結果：${record.outcome || "舊卷宗（未記錄結果）"}｜歸檔主理人：${record.lead_npc}｜協辦：${names || "無"}｜結案：${displayDate(record.closed_at)}`,"roster"));
+      details.appendChild(makeElement("div",`結案結果：${record.outcome || "舊卷宗（未記錄結果）"}｜歸檔主理人：${record.lead_npc}｜協辦：${names || "無"}｜結案：${displayDate(record.closed_at)}`,"roster"));
     }
   }
   const actions = makeElement("div",undefined,"actions");
@@ -544,7 +600,7 @@ function createCaseCard(item, mode="board") {
     else actions.appendChild(makeElement("span","協辦名額已滿。","notice"));
   } else if (joined && !closed) actions.appendChild(makeElement("span","你已參與此案。","notice"));
   if (mine && !closed) {
-    actions.appendChild(makeAction("修改委託",async () => openEditForm(card,item)));
+    actions.appendChild(makeAction("修改委託",async () => openEditForm(details,item)));
     const success=makeAction("成功結案 · 全體 +3",async () => settleBounty(item,"成功"));
     success.classList.add("outcome-success");
     const failed=makeAction("失敗結案 · 全體 −2",async () => settleBounty(item,"失敗"));
@@ -553,7 +609,7 @@ function createCaseCard(item, mode="board") {
     actions.appendChild(makeElement("span","只有原發案人可結案；結算包含發案人與最多三名協辦玩家。","outcome-label"));
   }
   if (!user && !closed && mode === "board") actions.appendChild(makeElement("span","登入線上帳號後可接取委託。","notice"));
-  if (actions.childNodes.length) card.appendChild(actions);
+  if (actions.childNodes.length) details.appendChild(actions);
   return card;
 }
 function render() {
@@ -681,14 +737,20 @@ const archiveList = document.getElementById("archiveList");
 
 archiveCases.forEach(item => {
   const card = makeElement("article", undefined, "case");
-  card.appendChild(makeElement("span", item.year + " · 已結案", "status"));
-  card.appendChild(makeElement("h3", item.title));
-  
-card.appendChild(
-  makeElement("div", "負責調查人：" + item.investigator, "meta")
-);
-
-  card.appendChild(makeElement("p", item.result));
+  const toggle = makeElement("button",undefined,"case-toggle");
+  toggle.type = "button";
+  toggle.setAttribute("aria-expanded","false");
+  toggle.append(makeElement("span",item.title),makeElement("span","⌄","case-arrow"));
+  const details = makeElement("div",undefined,"case-details");
+  details.hidden = true;
+  toggle.addEventListener("click",()=>{
+    details.hidden = !details.hidden;
+    toggle.setAttribute("aria-expanded",String(!details.hidden));
+  });
+  details.appendChild(makeElement("span",item.year + " · 已結案","status"));
+  details.appendChild(makeElement("div","負責調查人：" + item.investigator,"meta"));
+  details.appendChild(makeElement("p",item.result));
+  card.append(toggle,details);
   archiveList.appendChild(card);
 });
 
