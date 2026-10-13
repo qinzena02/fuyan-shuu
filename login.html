@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>負驗書｜示籙身分核驗</title>
+<style>
+:root{color-scheme:dark;--bg:#091113;--panel:#102123;--line:#38594f;--gold:#dfc899;--cyan:#79e8ee;--muted:#9db6ab;--text:#ded6c5}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 14%,#1c3937 0%,#091113 68%);color:var(--text);font-family:"Microsoft JhengHei","Noto Serif TC",serif;line-height:1.8}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:17px max(20px,calc((100vw - 1050px)/2));border-bottom:1px solid #2f4c45;background:#0b181a}.brand{font-size:22px;letter-spacing:5px;color:var(--gold);text-shadow:0 0 18px #d9bc744a}.back{font-size:13px;color:#9bbcb2}
+main{max-width:490px;margin:55px auto 70px;padding:0 18px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:3px;text-align:center}.heading{font-size:clamp(28px,5vw,37px);font-weight:normal;color:var(--gold);letter-spacing:5px;text-align:center;text-shadow:0 0 22px #e0bd726b;margin:10px 0}.lead{text-align:center;font-size:13px;color:var(--muted);margin:0 0 27px}.panel{border:1px solid var(--line);background:linear-gradient(155deg,#142b2a,#0c191b);padding:clamp(20px,5vw,32px);box-shadow:0 20px 65px #0006}.tabs{display:flex;border-bottom:1px solid #37574e;margin-bottom:24px}.tab{flex:1;padding:10px;border:0;border-bottom:2px solid transparent;background:transparent;color:#90b0a5;font:inherit;cursor:pointer}.tab[aria-selected=true]{color:var(--gold);border-color:#d4b778}.field{margin-bottom:16px}.field label{display:block;color:#b6cbbd;font-size:13px;margin-bottom:6px}input{width:100%;padding:12px 13px;border:1px solid #4b6a60;background:#09191b;color:#f0e8d5;border-radius:2px;font:inherit;font-size:15px}input:focus{outline:1px solid var(--cyan);border-color:var(--cyan)}input::placeholder{color:#78948b}.help{color:#91a89f;font-size:12px;margin:-6px 0 18px}.action{width:100%;padding:11px 16px;border:1px solid #bfa674;background:#263a35;color:#f1dba9;font:inherit;letter-spacing:2px;cursor:pointer;transition:.2s}.action:hover:not(:disabled){background:#31534a;box-shadow:0 0 16px #c4ac6538}.action:disabled{opacity:.55;cursor:wait}.secondary{background:transparent;border-color:#53786b;color:#a8d4c5;letter-spacing:1px}.links{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:19px;font-size:12px}.status{margin-top:19px;padding:11px 13px;border-left:3px solid #6fae9f;background:#102b2b;color:#c8e5da;font-size:13px;white-space:pre-line}.status.error{border-color:#ff6b79;background:#30191f;color:#ffc0c8}.status[hidden], [hidden]{display:none!important}.account{font-size:14px;color:#c5d7ca;overflow-wrap:anywhere}.account strong{color:var(--gold)}.divider{height:1px;background:#37574e;margin:20px 0}.foot{text-align:center;color:#6f9286;font-size:12px;margin-top:25px}@media(max-width:520px){main{margin-top:35px}.panel{padding:21px}}
+</style>
+</head>
+<body>
+<header><div class="brand">負驗書</div><a class="back" href="bounty.html">← 返回江湖懸賞榜</a></header>
+<main>
+<div class="eyebrow">CHANGMING AUTHENTICATION · 天監院</div>
+<h1 class="heading">示籙身分核驗</h1>
+<p class="lead">凡入咸陵者，須留其名。凡行江湖者，須驗其身。</p>
+<section class="panel" aria-label="玩家帳號">
+<div id="loading">正在核驗線上帳號……</div>
+<div id="authView" hidden>
+<div class="tabs" role="tablist" aria-label="登入或註冊">
+<button class="tab" id="loginTab" type="button" role="tab" aria-selected="true">登入</button>
+<button class="tab" id="registerTab" type="button" role="tab" aria-selected="false">註冊</button>
+</div>
+<form id="authForm">
+<div class="field"><label for="email">電子郵件</label><input id="email" type="email" autocomplete="email" placeholder="請輸入電子郵件" required maxlength="254"></div>
+<div class="field"><label for="password">密碼</label><input id="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" required minlength="6"></div>
+<div class="field" id="confirmField" hidden><label for="confirmPassword">確認密碼</label><input id="confirmPassword" type="password" autocomplete="new-password" placeholder="再次輸入密碼" minlength="6"></div>
+<p class="help" id="formHelp">登入後可使用你的線上玩家帳號。</p>
+<button class="action" id="submitButton" type="submit">核驗身分 · 登入</button>
+</form>
+<div class="links"><button type="button" id="forgotButton" class="tab" style="flex:initial;padding:0;border:0">忘記密碼？</button><a href="index.html">尚未建立示籙？</a></div>
+</div>
+<div id="resetView" hidden>
+<p class="account">請設定新的登入密碼。</p>
+<form id="resetForm"><div class="field"><label for="newPassword">新密碼</label><input id="newPassword" type="password" autocomplete="new-password" minlength="6" required></div><div class="field"><label for="newPasswordAgain">再次輸入新密碼</label><input id="newPasswordAgain" type="password" autocomplete="new-password" minlength="6" required></div><button class="action" id="resetButton" type="submit">更新密碼</button></form>
+</div>
+<div id="accountView" hidden>
+<div class="eyebrow" style="text-align:left">ACCOUNT VERIFIED · 已通過核驗</div>
+<p class="account">目前登入帳號：<br><strong id="accountEmail"></strong></p>
+<p class="help">你的線上帳號已建立。示籙角色與雲端委託的正式綁定將在後續啟用。</p>
+<a class="action" style="display:block;text-align:center;text-decoration:none" href="bounty.html">前往江湖懸賞榜 →</a>
+<div class="divider"></div>
+<button type="button" class="action secondary" id="logoutButton">登出線上帳號</button>
+</div>
+<div class="status" id="status" role="status" aria-live="polite" hidden></div>
+</section>
+<p class="foot">長明府 · 天監院　｜　此頁僅供線上帳號核驗</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-client.js"></script>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const status=$('status');
+function message(text,error=false){status.textContent=text;status.classList.toggle('error',error);status.hidden=!text;}
+function show(which){['loading','authView','resetView','accountView'].forEach(id=>$(id).hidden=id!==which);}
+function busy(value){$('submitButton').disabled=value;$('resetButton').disabled=value;$('logoutButton').disabled=value;}
+let db;
+try{db=window.fuyanshuDB;if(!db||typeof db.auth?.signInWithPassword!=='function')throw Error('連線尚未建立');}
+catch(e){show('loading');$('loading').textContent='無法連線至長明府帳號系統。請確認 supabase-client.js 已上傳且 Publishable key 正確。';return;}
+let mode='login';let recovery=false;
+function setMode(next){mode=next;const register=mode==='register';$('loginTab').setAttribute('aria-selected',String(!register));$('registerTab').setAttribute('aria-selected',String(register));$('confirmField').hidden=!register;$('confirmPassword').required=register;$('password').autocomplete=register?'new-password':'current-password';$('submitButton').textContent=register?'建立線上帳號':'核驗身分 · 登入';$('formHelp').textContent=register?'註冊後可能需要先到電子郵件收取驗證信。密碼至少 6 個字元。':'登入後可使用你的線上玩家帳號。';message('');}
+$('loginTab').addEventListener('click',()=>setMode('login'));
+$('registerTab').addEventListener('click',()=>setMode('register'));
+function displaySession(session){if(recovery){show('resetView');return;}if(session?.user){$('accountEmail').textContent=session.user.email||'已驗證玩家';show('accountView');}else show('authView');}
+$('authForm').addEventListener('submit',async e=>{e.preventDefault();message('');const email=$('email').value.trim(),password=$('password').value;if(mode==='register'&&password!==$('confirmPassword').value){message('兩次輸入的密碼不一致。',true);return;}busy(true);try{
+if(mode==='register'){
+const redirectTo=new URL('login.html',location.href).href;
+const {data,error}=await db.auth.signUp({email,password,options:{emailRedirectTo:redirectTo}});if(error)throw error;
+if(data.session){displaySession(data.session);message('線上帳號已建立並登入。');}
+else message('已送出註冊申請。若此信箱可以註冊，請前往信箱點擊驗證連結，再回來登入。請同時檢查垃圾郵件。');
+}else{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;displaySession(data.session);message('身分核驗成功，歡迎回到咸陵。');}
+}catch(err){message('核驗未完成：'+(err.message||'請稍後重試'),true);}finally{busy(false);}});
+$('forgotButton').addEventListener('click',async()=>{const email=$('email').value.trim();if(!email){message('請先在電子郵件欄輸入信箱，再點擊「忘記密碼」。',true);$('email').focus();return;}busy(true);try{const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:new URL('login.html',location.href).href});if(error)throw error;message('如果此信箱有註冊帳號，系統會寄送密碼重設郵件。請查看收件匣及垃圾郵件。');}catch(err){message('無法寄送重設郵件：'+(err.message||'請稍後重試'),true);}finally{busy(false);}});
+$('resetForm').addEventListener('submit',async e=>{e.preventDefault();const pass=$('newPassword').value;if(pass!==$('newPasswordAgain').value){message('兩次輸入的密碼不一致。',true);return;}busy(true);try{const {error}=await db.auth.updateUser({password:pass});if(error)throw error;recovery=false;const {data}=await db.auth.getSession();displaySession(data.session);message('密碼已更新。');}catch(err){message('更新失敗：'+(err.message||'請稍後重試'),true);}finally{busy(false);}});
+$('logoutButton').addEventListener('click',async()=>{busy(true);try{const {error}=await db.auth.signOut();if(error)throw error;displaySession(null);setMode('login');message('已安全登出線上帳號。');}catch(err){message('登出失敗：'+(err.message||'請稍後重試'),true);}finally{busy(false);}});
+db.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'){recovery=true;show('resetView');message('請設定新的密碼。');}else if(event==='SIGNED_OUT'){recovery=false;displaySession(null);}else if(event==='SIGNED_IN'&&!recovery){displaySession(session);}});
+(async()=>{try{const {data,error}=await db.auth.getSession();if(error)throw error;displaySession(data.session);if(new URLSearchParams(location.search).has('error'))message('電子郵件驗證連結無法使用，請重新申請或檢查連結是否過期。',true);}catch(err){show('authView');message('連線異常：'+(err.message||'請重新整理'),true);}})();
+})();
+</script>
+</body>
+</html>
