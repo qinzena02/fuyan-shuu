@@ -2,36 +2,513 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>負驗書｜鏢局懸賞</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #0b191d;
-      color: #e0c58e;
-      font-family: "Microsoft JhengHei", serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-    h1 {
-      letter-spacing: 8px;
-    }
-    p {
-      color: #91b7aa;
-      line-height: 2;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>負驗書｜鏢局懸賞</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: #e8dfcb;
+  font-family: "Noto Serif TC", "Microsoft JhengHei", serif;
+  background:
+    linear-gradient(rgba(5,13,18,.83),rgba(5,13,18,.96)),
+    url("images/xianling-bg.jpg.jpg") center / cover fixed no-repeat;
+}
+
+.container {
+  max-width: 1050px;
+  margin: auto;
+  padding: 35px 18px 70px;
+}
+
+header { text-align: center; padding: 30px 0; }
+
+.eyebrow {
+  color: #8fc4b8;
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+
+h1 {
+  color: #dec38b;
+  font-size: clamp(30px,5vw,48px);
+  letter-spacing: 8px;
+  font-weight: 500;
+}
+
+.subtitle { color: #9cb7ad; font-size: 13px; }
+
+nav {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 9px;
+  margin: 25px 0;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nav-btn, .action-btn {
+  background: #193632;
+  border: 1px solid #72846d;
+  color: #e6d1a2;
+  padding: 13px;
+  transition: .2s;
+}
+
+.nav-btn:hover, .action-btn:hover {
+  background: #315e53;
+}
+
+.nav-btn.active {
+  background: #3a6658;
+  border-color: #d6b77b;
+}
+
+.panel {
+  background: rgba(9,25,29,.94);
+  border: 1px solid #927a52;
+  padding: 28px;
+  box-shadow: 0 15px 45px #0008;
+}
+
+.hidden { display: none; }
+
+h2 {
+  color: #dec38b;
+  font-weight: 500;
+  letter-spacing: 3px;
+}
+
+.description {
+  color: #9cb7ad;
+  line-height: 1.9;
+  font-size: 13px;
+}
+
+.case {
+  border: 1px solid #4a675d;
+  background: rgba(17,39,41,.8);
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.case h3 {
+  color: #e1c58d;
+  margin-top: 0;
+}
+
+.case p {
+  color: #b7c9c1;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  font-size: 12px;
+  color: #8eb4a6;
+  line-height: 2;
+}
+
+.status {
+  display: inline-block;
+  color: #dfc38c;
+  border: 1px solid #9b8254;
+  padding: 4px 9px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.action-btn { padding: 10px 18px; }
+
+label {
+  display: block;
+  color: #d7bf8c;
+  margin: 20px 0 8px;
+}
+
+input, select, textarea {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  background: #102328;
+  border: 1px solid #456b62;
+  color: #f2e8d4;
+  font: inherit;
+}
+
+textarea { min-height: 130px; resize: vertical; }
+
+.submit-btn {
+  margin-top: 24px;
+  padding: 15px;
+  width: 100%;
+  background: #315e53;
+  color: #f2e8d4;
+  border: 1px solid #b7a276;
+}
+
+.empty {
+  padding: 25px;
+  color: #9cb7ad;
+  text-align: center;
+  border: 1px dashed #456b62;
+}
+
+.back {
+  display: inline-block;
+  color: #b5d3c8;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+footer {
+  color: #819f94;
+  text-align: center;
+  padding: 30px;
+  font-size: 12px;
+}
+
+@media(max-width:650px) {
+  nav { grid-template-columns: repeat(2,1fr); }
+  .panel { padding: 18px; }
+}
+</style>
 </head>
+
 <body>
-  <main>
-    <p>咸陵 · 長明府 · 鏢局委託終端</p>
-    <h1>江湖懸賞榜</h1>
-    <p>天下事，皆有跡可循。</p>
-    <p>委託系統正在建立中……</p>
-  </main>
+<div class="container">
+
+<a class="back" href="city.html">← 返回咸陵主城</a>
+
+<header>
+  <div class="eyebrow">咸陵 · 長明府 · 鏢局委託終端</div>
+  <h1>江湖懸賞榜</h1>
+  <div class="subtitle">天下事，皆有跡可循。</div>
+  <p id="identity" class="description"></p>
+</header>
+
+<nav>
+  <button class="nav-btn active" data-tab="board">懸賞榜</button>
+  <button class="nav-btn" data-tab="publish">發布委託</button>
+  <button class="nav-btn" data-tab="mine">我的案件</button>
+  <button class="nav-btn" data-tab="archive">公開案牘</button>
+</nav>
+
+<section id="board" class="panel">
+  <h2>鏢局懸賞告示</h2>
+  <p class="description">凡有委託，皆可登錄。憑示籙接取，同行者亦可申請參與。</p>
+  <div id="caseList"></div>
+</section>
+
+<section id="publish" class="panel hidden">
+  <h2>登錄新委託</h2>
+  <p class="description">委託一經登錄，便列於鏢局告示之上。</p>
+
+  <form id="caseForm">
+    <label for="caseTitle">案件名稱</label>
+    <input id="caseTitle" maxlength="80" required placeholder="例如：天環江失蹤案">
+
+    <label for="caseLocation">案件地點</label>
+    <select id="caseLocation" required>
+      <option value="">請選擇地點</option>
+      <option>咸陵主城</option>
+      <option>天環江沿岸</option>
+      <option>四大門派周邊</option>
+      <option>咸陵邊境</option>
+    </select>
+
+    <label for="caseType">委託類型</label>
+    <select id="caseType" required>
+      <option value="">請選擇類型</option>
+      <option>尋人</option>
+      <option>護送</option>
+      <option>調查</option>
+      <option>尋物</option>
+      <option>其他</option>
+    </select>
+
+    <label for="caseReward">委託報酬</label>
+    <input id="caseReward" maxlength="60" required placeholder="例如：報酬面議">
+
+    <label for="caseDescription">委託內容</label>
+    <textarea id="caseDescription" maxlength="3000" required placeholder="請描述事件、線索及委託條件……"></textarea>
+
+    <button class="submit-btn" type="submit">提交委託 · 登錄懸賞榜</button>
+  </form>
+</section>
+
+<section id="mine" class="panel hidden">
+  <h2>我的案件</h2>
+  <p class="description">此處記錄你發布、接取或參與的委託。</p>
+  <div id="myCaseList"></div>
+</section>
+
+<section id="archive" class="panel hidden">
+  <h2>長明府 · 公開案牘</h2>
+  <p class="description">
+    依長明府公開紀錄整理之歷年結案資料。
+    以下為測試用虛構案件，並非已確立的正式世界觀史實。
+  </p>
+  <div id="archiveList"></div>
+</section>
+
+<footer>長明府 · 鏢局委託終端｜承光年間</footer>
+</div>
+
+<script>
+const playerKey = "fuyanshu_player";
+const casesKey = "fuyanshu_bounties_v1";
+
+let player = null;
+let cases = [];
+
+try {
+  player = JSON.parse(localStorage.getItem(playerKey));
+} catch (e) {}
+
+try {
+  const saved = JSON.parse(localStorage.getItem(casesKey));
+  if (Array.isArray(saved)) cases = saved;
+} catch (e) {}
+
+const playerName =
+  player && typeof player.name === "string"
+    ? player.name.trim()
+    : "";
+
+document.getElementById("identity").textContent =
+  playerName
+    ? "示籙持有人：" + playerName
+    : "尚未建立示籙，請先返回登記頁。";
+
+function saveCases() {
+  try {
+    localStorage.setItem(casesKey, JSON.stringify(cases));
+    return true;
+  } catch (e) {
+    alert("無法儲存案件，請檢查瀏覽器儲存設定。");
+    return false;
+  }
+}
+
+function makeId() {
+  if (window.crypto && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Date.now() + "-" + Math.random().toString(36).slice(2);
+}
+
+function makeElement(tag, text, className) {
+  const el = document.createElement(tag);
+  if (text !== undefined) el.textContent = String(text);
+  if (className) el.className = className;
+  return el;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll(".panel").forEach(panel => {
+    panel.classList.toggle("hidden", panel.id !== tab);
+  });
+
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === tab);
+  });
+
+  render();
+}
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+function createCaseCard(item, isMine = false) {
+  const card = makeElement("article", undefined, "case");
+
+  card.appendChild(makeElement("span", item.status, "status"));
+  card.appendChild(makeElement("h3", item.title));
+
+  const meta = makeElement(
+    "div",
+    "地點：" + item.location +
+    "｜類型：" + item.type +
+    "｜委託者：" + item.owner +
+    "｜報酬：" + item.reward,
+    "meta"
+  );
+  card.appendChild(meta);
+  card.appendChild(makeElement("p", item.description));
+
+  const members = Array.isArray(item.members) ? item.members : [];
+  const memberText = makeElement(
+    "div",
+    "接取者：" + (item.taker || "尚無") +
+    "｜參與者：" + (members.join("、") || "尚無"),
+    "meta"
+  );
+  card.appendChild(memberText);
+
+  const actions = makeElement("div", undefined, "actions");
+
+  if (!isMine && item.status !== "已結案" && playerName) {
+    if (!item.taker && item.owner !== playerName) {
+      const take = makeElement("button", "接取委託", "action-btn");
+      take.addEventListener("click", () => {
+        item.taker = playerName;
+        item.status = "進行中";
+        if (saveCases()) render();
+      });
+      actions.appendChild(take);
+    }
+
+    if (
+      item.owner !== playerName &&
+      item.taker !== playerName &&
+      !members.includes(playerName)
+    ) {
+      const join = makeElement("button", "參與委託", "action-btn");
+      join.addEventListener("click", () => {
+        item.members = [...members, playerName];
+        if (saveCases()) render();
+      });
+      actions.appendChild(join);
+    }
+  }
+
+  if (
+    isMine &&
+    item.owner === playerName &&
+    item.status !== "已結案"
+  ) {
+    const close = makeElement("button", "標記結案", "action-btn");
+    close.addEventListener("click", () => {
+      if (!confirm("確定將此委託標記為已結案？")) return;
+      item.status = "已結案";
+      item.closedAt = new Date().toISOString();
+      if (saveCases()) render();
+    });
+    actions.appendChild(close);
+  }
+
+  card.appendChild(actions);
+  return card;
+}
+
+function render() {
+  const list = document.getElementById("caseList");
+  const myList = document.getElementById("myCaseList");
+  list.replaceChildren();
+  myList.replaceChildren();
+
+  const openCases = cases.filter(c => c.status !== "已結案");
+
+  if (!openCases.length) {
+    list.appendChild(makeElement("div", "目前尚無公開委託。", "empty"));
+  }
+
+  openCases.forEach(item => {
+    list.appendChild(createCaseCard(item));
+  });
+
+  const mine = cases.filter(item => {
+    const members = Array.isArray(item.members) ? item.members : [];
+    return playerName && (
+      item.owner === playerName ||
+      item.taker === playerName ||
+      members.includes(playerName)
+    );
+  });
+
+  if (!mine.length) {
+    myList.appendChild(makeElement("div", "尚無相關案件紀錄。", "empty"));
+  }
+
+  mine.forEach(item => {
+    myList.appendChild(createCaseCard(item, true));
+  });
+}
+
+document.getElementById("caseForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  if (!playerName) {
+    alert("請先建立示籙，才能發布委託。");
+    window.location.href = "index.html";
+    return;
+  }
+
+  const item = {
+    id: makeId(),
+    title: document.getElementById("caseTitle").value.trim(),
+    location: document.getElementById("caseLocation").value,
+    type: document.getElementById("caseType").value,
+    reward: document.getElementById("caseReward").value.trim(),
+    description: document.getElementById("caseDescription").value.trim(),
+    owner: playerName,
+    taker: "",
+    members: [],
+    status: "招募中",
+    createdAt: new Date().toISOString()
+  };
+
+  if (!item.title || !item.reward || !item.description) return;
+
+  cases.unshift(item);
+
+  if (saveCases()) {
+    e.target.reset();
+    switchTab("board");
+    alert("委託已登錄鏢局懸賞榜。");
+  }
+});
+
+const archiveCases = [
+  {
+    year: "承光三年",
+    title: "天環江商旅失蹤紀錄",
+    location: "天環江沿岸",
+    result: "官方記錄：案件已結，相關細節不予公開。"
+  },
+  {
+    year: "承光五年",
+    title: "咸陵城南符機失竊案",
+    location: "咸陵主城",
+    result: "官方記錄：失竊物品已尋回，涉案人員已移交處置。"
+  },
+  {
+    year: "承光七年",
+    title: "邊境舊驛道異常調查",
+    location: "咸陵邊境",
+    result: "官方記錄：異常原因已排除，驛道恢復通行。"
+  }
+];
+
+const archiveList = document.getElementById("archiveList");
+
+archiveCases.forEach(item => {
+  const card = makeElement("article", undefined, "case");
+  card.appendChild(makeElement("span", item.year + " · 已結案", "status"));
+  card.appendChild(makeElement("h3", item.title));
+  card.appendChild(makeElement("div", "地點：" + item.location, "meta"));
+  card.appendChild(makeElement("p", item.result));
+  archiveList.appendChild(card);
+});
+
+render();
+</script>
 </body>
 </html>
