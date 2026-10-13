@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>負驗書｜咸陵行旅</title>
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:#091113;color:#e2d2af;font-family:"Microsoft JhengHei",serif}
+#page{display:block;width:100%;height:100%;height:100dvh;border:0;background:#091113}
+#controls{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;align-items:center;gap:8px;background:rgba(9,23,25,.94);border:1px solid #806f50;padding:9px 12px;box-shadow:0 5px 22px #0008;border-radius:4px}
+#toggle{background:transparent;color:#dfc899;border:0;cursor:pointer;font:inherit;font-size:13px;padding:4px}
+#hint{color:#8fbeb0;font-size:11px;max-width:150px}
+@media(max-width:500px){#controls{bottom:10px;right:10px;padding:6px 9px}#hint{display:none}}
+</style>
+</head>
+<body>
+<iframe id="page" title="負驗書遊戲內容" src="city.html"></iframe>
+<div id="controls"><button id="toggle" type="button" aria-pressed="false">♫ 開啟主城音樂</button><span id="hint">咸陵行旅 · 背景配樂</span></div>
+<audio id="music" src="music/lv_0_20260927142906.mp3" preload="auto" loop></audio>
+<script>
+'use strict';
+const allowed=new Set(['city.html','archive.html','bounty.html','story.html']);
+const frame=document.getElementById('page'),music=document.getElementById('music'),toggle=document.getElementById('toggle'),controls=document.getElementById('controls'),hint=document.getElementById('hint');
+const initial=new URLSearchParams(location.search).get('page');
+frame.src=allowed.has(initial)?initial:'city.html';
+music.volume=.22;
+let enabled=localStorage.getItem('fuyanshu_city_music')!=='off';
+let isCase=false;
+function update(){toggle.textContent=enabled?(music.paused?'♫ 播放主城音樂':'♫ 暫停主城音樂'):'♫ 開啟主城音樂';toggle.setAttribute('aria-pressed',String(enabled&&!music.paused));}
+async function play(){if(!enabled||isCase)return;try{await music.play();hint.textContent='咸陵行旅 · 背景配樂';}catch(e){hint.textContent='點擊音樂按鈕開始播放';}update();}
+function currentPage(){try{return new URL(frame.contentWindow.location.href).pathname.split('/').pop()||'city.html';}catch(e){return 'city.html';}}
+frame.addEventListener('load',()=>{
+ const page=currentPage();isCase=page==='story.html';
+ controls.style.display=isCase?'none':'flex';
+ if(isCase)music.pause();else play();
+ update();
+ // 讓玩家從案件返回鏢局後恢復主城音樂。
+ try{if(allowed.has(page))history.replaceState(null,'','?page='+encodeURIComponent(page));}catch(e){}
+});
+toggle.addEventListener('click',()=>{
+ if(enabled&&!music.paused){enabled=false;music.pause();}
+ else{enabled=true;play();}
+ localStorage.setItem('fuyanshu_city_music',enabled?'on':'off');update();
+});
+// 玩家在頁面內首次互動時，解除瀏覽器的自動播放限制。
+window.addEventListener('message',e=>{if(e.source===frame.contentWindow&&e.data==='fuyanshu-interaction')play();});
+music.addEventListener('error',()=>{hint.textContent='找不到音樂檔案';});
+update();play();
+</script>
+</body></html>
