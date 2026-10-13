@@ -1,40 +1,54 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>負驗書｜委託演繹</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>負驗書｜江上無歸人</title>
 <style>
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: #091113;
-  color: #ded6c5;
-  font-family: "Microsoft JhengHei", serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-main {
-  width: min(720px, 90%);
-  padding: 40px;
-  background: #101f21;
-  border: 1px solid #927a52;
-}
-small { color: #8fc4b8; letter-spacing: 3px; }
-h1 { color: #dfc899; font-weight: normal; }
-p { line-height: 2.4; }
-a { color: #8fc4b8; }
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#091113;color:#ded6c5;font-family:'Microsoft JhengHei',serif;line-height:1.95}button,a{font:inherit}a{color:#a8d3c4;text-decoration:none}button{cursor:pointer}header{border-bottom:1px solid #37564e;background:#0c191b;padding:16px max(20px,calc((100vw - 1050px)/2));display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}.brand{letter-spacing:5px;color:#dfc899;font-size:21px}.topnav{font-size:13px;display:flex;gap:18px;align-items:center}.shell{max-width:1050px;margin:0 auto;padding:30px 20px 75px}.masthead{text-align:center;padding:48px 10px 34px;background:linear-gradient(#09111366,#091113),url('images/2348cf388a953656a1c09268fad62cde.jpg') center/cover;border:1px solid #37564e}.eyebrow{color:#9bc5b7;font-size:12px;letter-spacing:4px}.masthead h1{font-size:clamp(30px,6vw,52px);color:#dfc899;letter-spacing:8px;font-weight:normal;margin:10px 0}.masthead p{margin:0;color:#d0d7cd}.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;margin-top:20px}.panel{background:#102123;border:1px solid #37564e;padding:25px}.chapter{font-size:12px;letter-spacing:3px;color:#8fc4b8}.scene-title{font-size:24px;font-weight:normal;color:#e1c998;margin:10px 0 20px}.prose{white-space:pre-line;font-size:16px;line-height:2.3;min-height:190px}.choices{display:grid;gap:11px;margin-top:26px}.choice{border:1px solid #547569;background:#142b2b;color:#e7ddc8;text-align:left;padding:14px 18px;transition:.15s}.choice:hover,.choice:focus-visible{border-color:#d9c08f;background:#203b39}.aside-title{font-size:16px;color:#d9c08f;margin:0 0 15px;font-weight:normal}.stat{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #29473f;padding:9px 0;font-size:13px}.stat span:last-child{color:#c5dbd0}.clues{list-style:none;margin:10px 0 0;padding:0;font-size:13px;color:#c6d5cb}.clues li{padding:7px 0;border-bottom:1px solid #29473f}.muted{color:#8faea3;font-size:13px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.smallbtn{background:transparent;border:1px solid #806f50;color:#d9c08f;padding:8px 13px;font-size:13px}.smallbtn:hover{background:#20302e}.note{font-size:12px;color:#88a69a;margin-top:14px}.end{color:#e1c998;border-top:1px solid #6e6047;margin-top:20px;padding-top:15px}footer{text-align:center;color:#66867d;font-size:12px;padding:25px}@media(max-width:750px){.layout{grid-template-columns:1fr}.masthead{padding:35px 10px}.panel{padding:19px}}
 </style>
 </head>
 <body>
-<main>
-  <small>咸陵鏢局 · 委託演繹</small>
-  <h1>江上無歸人</h1>
-  <p>天環江商旅失蹤案</p>
-  <p>案卷已啟封，故事即將開始。</p>
-  <a href="bounty.html">← 返回鏢局委託榜</a>
+<header><div class="brand">負驗書</div><nav class="topnav"><a href="city.html">咸陵主城</a><a href="bounty.html">鏢局委託榜</a></nav></header>
+<div class="shell">
+<section class="masthead"><div class="eyebrow">咸陵鏢局 · 委託演繹 · 卷一</div><h1>江上無歸人</h1><p>天環江商旅失蹤案</p></section>
+<div class="layout">
+<main class="panel" aria-live="polite"><div class="chapter" id="chapter">案卷啟封</div><h2 class="scene-title" id="sceneTitle">渡口初逢</h2><div class="prose" id="prose"></div><div class="choices" id="choices"></div><div class="toolbar"><button class="smallbtn" id="restart">重新調查</button><a class="smallbtn" href="bounty.html">返回委託榜</a></div><div class="note" id="saveNote">進度會自動儲存在這台裝置的瀏覽器中。</div></main>
+<aside class="panel"><h3 class="aside-title">示籙 · 行旅狀態</h3><div class="stat"><span>持有人</span><span id="playerName">旅人</span></div><div class="stat"><span>仁德值</span><span id="virtue">50</span></div><div class="stat"><span>紀玖年 · 親近</span><span id="jiu">0</span></div><div class="stat"><span>魏應舟 · 信任</span><span id="wei">0</span></div><h3 class="aside-title" style="margin-top:28px">已獲線索</h3><ul class="clues" id="clues"><li class="muted">尚無線索</li></ul><p class="note">仁德值代表制度評價；人物關係與線索將隨調查推進。</p></aside>
+</div></div><footer>長明府 · 示籙已錄 · 行跡有循</footer>
+<script>
+'use strict';
+const SAVE_KEY='fuyanshu_story_jiang_v1';
+const PLAYER_KEY='fuyanshu_player';
+let player=null;try{player=JSON.parse(localStorage.getItem(PLAYER_KEY)||'null')}catch(e){}
+if(!player||!player.name){location.replace('index.html')}
+const $=id=>document.getElementById(id);
+const name=player&&player.name?String(player.name):'旅人';
+const initialVirtue=()=>{let n=Number(localStorage.getItem('fuyanshu_virtue')??player?.virtue??50);return Number.isFinite(n)?n:50};
+const newState=()=>({node:'start',virtue:initialVirtue(),jiu:0,wei:0,clues:[],visited:[],done:false});
+let state=newState();
+try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&typeof saved.node==='string'&&Array.isArray(saved.clues)&&Array.isArray(saved.visited))state={...newState(),...saved}}catch(e){}
+const scenes={
+start:{chapter:'卷一 · 渡口初逢',title:'江水無聲',text:`承光年間，天環江渡口。\n\n暮色將盡，脈軌的光影掠過江面。一支本該在三日前抵達城南的商隊，連人帶貨消失在江上。奇怪的是，天監院的示籙紀錄卻顯示：他們已經入城。\n\n碼頭旁，紀玖年蹲在濕冷的石階上，正端詳一截斷裂的繩索。魏應舟站在燈下，手中捏著鏢局的委託文書。\n\n「你就是接了案子的人？」紀玖年抬頭。`,choices:[['先詢問紀玖年發現了什麼','rope',{jiu:1}],['向魏應舟索取正式案卷','register',{wei:1}],['先觀察渡口周圍','dock',{}]]},
+rope:{chapter:'卷一 · 初步查驗',title:'斷索',text:`紀玖年將繩索遞來。斷面並不整齊，卻也不像尋常拉扯所致。\n\n「這是從舊泊位撿到的。」她說，「那晚有人見過商船靠岸，但沒人看見卸貨。」\n\n魏應舟提醒：「傳聞不能當證據。先核對案卷。」`,clue:'異常斷索',choices:[['與魏應舟核對示籙紀錄','register',{}],['前往舊泊位尋找目擊者','witness',{jiu:1}]]},
+register:{chapter:'卷一 · 初步查驗',title:'紙上入城',text:`魏應舟攤開案卷。商隊七人的示籙在三日前子夜同時留下入城紀錄，卻沒有任何城門守衛的交接簽記。\n\n「紀錄是真的，未必代表人真的進來了。」他說。\n\n紀玖年忽然指向一行細字：七人的通行核驗，竟由同一座早已停用的舊式符機完成。`,clue:'異常示籙紀錄',choices:[['先去舊泊位查訪','witness',{wei:1}],['向長明府呈報可疑核驗','official',{virtue:3}],['私下追查停用符機','machine',{virtue:-2,jiu:1}]]},
+dock:{chapter:'卷一 · 渡口查探',title:'潮痕',text:`你沿著泊位緩緩走過。江風裡混著機油與潮濕木屑的氣味。\n\n一處石階上的水痕高得異常，旁邊留有被拖行的淺痕。碼頭的貨物簿卻沒有那夜的卸貨記錄。\n\n你記下位置，返回二人身旁。`,clue:'舊泊位拖痕',choices:[['請紀玖年檢查斷索','rope',{}],['查閱魏應舟的案卷','register',{}],['尋找渡口證人','witness',{}]]},
+witness:{chapter:'卷二 · 江上疑雲',title:'夜半船燈',text:`老船夫隔著茶盞打量你。\n\n「船確實來過。」他低聲說，「可那夜沒有靠岸的鑼聲。船燈滅了以後，我看見有人從舊倉庫方向搬走一只黑箱。」\n\n他不願留下姓名，只反覆叮囑你：別把他說過的話交給巡查的人。`,clue:'船夫證言',choices:[['答應保護船夫身分，追查舊倉庫','machine',{jiu:2,virtue:-2}],['將證言如實寫入正式案卷','official',{wei:2,virtue:2}],['先回頭比對示籙紀錄','register',{}]]},
+machine:{chapter:'卷二 · 江上疑雲',title:'停用的符機',text:`舊倉庫深處，一座本應報廢的示籙核驗符機仍亮著微光。機匣被人重新接上地脈支線，內部殘留七次連續通行的刻痕。\n\n紀玖年蹲下，指尖掠過符紋：「有人借它偽造入城，讓失蹤的人在紙面上消失。」\n\n角落的黑箱早已空了。箱底只剩一枚沾水的商隊銅牌。`,clue:'私接地脈的舊符機',choices:[['保留證物，交由長明府依法查驗','official',{wei:1,virtue:2}],['先將銅牌交給紀玖年，循江追人','private',{jiu:2,virtue:-3}]]},
+official:{chapter:'卷三 · 案牘歸處',title:'依律移交',text:`你將已取得的線索整理成案卷，交由長明府受理。魏應舟逐項核對證物，沒有放過任何一處矛盾。\n\n「至少，這份紀錄不會再被當作尋常失蹤案草草歸檔。」他說。\n\n紀玖年望向江面。她知道，真正帶走商隊的人或許仍在暗處。`,choices:[['簽署移交文書，正式結案','end_official',{}],['暫緩移交，沿江繼續追查','private',{jiu:1,virtue:-2}]]},
+private:{chapter:'卷三 · 案牘歸處',title:'江水向東',text:`你決定暫時不將所有證物交出。紀玖年帶你循著江岸舊路追去，魏應舟則留下來守住已取得的案卷。\n\n一艘無燈小舟泊在蘆葦後方。船上沒有人，只有一張濕透的貨運路引，目的地被人刻意刮去。\n\n線索指向更遠的江段；今晚，已無法追上。`,clue:'被塗改的貨運路引',choices:[['保存線索，繼續追查失蹤者','end_private',{}],['返回鏢局，承認案件尚未查明','end_open',{}]]},
+end_official:{chapter:'終卷 · 案件紀錄',title:'結局一 · 依法結案',text:`案卷獲准移交。長明府將此事列為待續查的符機異常案件，鏢局委託在程序上暫告一段落。\n\n你保住了能夠呈堂的證據，也接受了制度所能給出的答案。\n\n至於商隊七人究竟身在何處，江水沒有回答。`,ending:true},
+end_private:{chapter:'終卷 · 案件紀錄',title:'結局二 · 江上未歸',text:`你沒有放棄尋找活人的可能。紀玖年將那張路引收進袖中，說改日還要再走一趟江岸。\n\n鏢局的案卷仍未封存，長明府的通行紀錄依舊寫著七人已入城。\n\n你知道那是謊言，也知道下一步會更難。`,ending:true},
+end_open:{chapter:'終卷 · 案件紀錄',title:'結局三 · 真相未明',text:`你帶著未能串成完整答案的線索回到鏢局。魏應舟在案卷末尾寫下「尚待查證」，紀玖年則把江岸的位置圈了起來。\n\n沒有足夠的證據，就不該假裝已經看見真相。\n\n夜色深處，天環江仍有船燈緩緩遠去。`,ending:true}
+};
+function persist(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));localStorage.setItem('fuyanshu_virtue',String(state.virtue));}
+function choose(target,effect){if(!scenes[target])return;const key=state.node+'>'+target;if(!state.visited.includes(key)){state.visited.push(key);state.virtue+=(effect.virtue||0);state.jiu+=(effect.jiu||0);state.wei+=(effect.wei||0)}state.node=target;enterNode();}
+function enterNode(){const scene=scenes[state.node]||scenes.start;if(scene.clue&&!state.clues.includes(scene.clue))state.clues.push(scene.clue);if(scene.ending)state.done=true;persist();render();}
+function render(){const scene=scenes[state.node]||scenes.start;$('playerName').textContent=name;$('virtue').textContent=state.virtue;$('jiu').textContent=state.jiu;$('wei').textContent=state.wei;$('chapter').textContent=scene.chapter;$('sceneTitle').textContent=scene.title;$('prose').textContent=scene.text;const list=$('clues');list.replaceChildren();if(!state.clues.length){const li=document.createElement('li');li.textContent='尚無線索';li.className='muted';list.append(li)}else state.clues.forEach(c=>{const li=document.createElement('li');li.textContent='◇ '+c;list.append(li)});const choices=$('choices');choices.replaceChildren();if(scene.ending){const p=document.createElement('p');p.className='end';p.textContent='本次調查已結束。你可以返回鏢局，或重新調查，尋找另一種結局。';choices.append(p)}else scene.choices.forEach(([label,target,effect])=>{const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='› '+label;b.addEventListener('click',()=>choose(target,effect));choices.append(b)});}
+$('restart').addEventListener('click',()=>{if(!confirm('要重新開始《江上無歸人》嗎？本案進度、線索與本案人物關係會重設。'))return;state=newState();enterNode();window.scrollTo({top:0,behavior:'smooth'})});
+enterNode();
+</script>
+</body></html>
+
 </main>
 </body>
 </html>
