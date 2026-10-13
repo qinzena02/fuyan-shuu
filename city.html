@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>負驗書｜咸陵</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #091113;
+  color: #ded6c5;
+  font-family: "Microsoft JhengHei", serif;
+}
+header {
+  padding: 18px 6%;
+  border-bottom: 1px solid #37564e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+.logo { color: #d9c08f; letter-spacing: 5px; font-size: 22px; }
+.player { color: #8fbeb0; font-size: 13px; }
+.hero {
+  min-height: 360px;
+  padding: 90px 20px;
+  text-align: center;
+  background:
+    linear-gradient(#09111355, #091113),
+    radial-gradient(ellipse at center, #28594c, #091113 70%);
+}
+.hero h1 {
+  font-size: clamp(32px, 7vw, 58px);
+  font-weight: normal;
+  letter-spacing: 12px;
+  color: #dfc899;
+}
+.hero p { color: #9db8ad; line-height: 2; }
+main { max-width: 1050px; margin: auto; padding: 35px 20px; }
+h2 {
+  font-weight: normal;
+  color: #d6bf91;
+  border-left: 3px solid #bba16e;
+  padding-left: 15px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin: 25px 0 45px;
+}
+.place {
+  background: linear-gradient(145deg, #152a2b, #0c1719);
+  border: 1px solid #3a6056;
+  padding: 25px;
+  cursor: pointer;
+  min-height: 150px;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+.place:hover {
+  border-color: #d0b681;
+  background: #1b3735;
+}
+.place strong { display: block; color: #dfc899; font-size: 21px; }
+.place span { color: #8faea5; font-size: 13px; line-height: 2; }
+.story {
+  background: #101f21;
+  border: 1px solid #37564e;
+  padding: 28px;
+  line-height: 2.2;
+  min-height: 190px;
+}
+.back {
+  margin-top: 15px;
+  background: transparent;
+  color: #d6bf91;
+  border: 1px solid #806f50;
+  padding: 12px 22px;
+  cursor: pointer;
+}
+footer {
+  text-align: center;
+  color: #66867d;
+  font-size: 12px;
+  padding: 30px;
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">負驗書</div>
+  <div class="player" id="player">示籙核驗中</div>
+</header>
+
+<section class="hero">
+  <p>承光年間 · 咸陵</p>
+  <h1>天下地脈</h1>
+  <p>鋼鐵築城，符機行世。<br>
+  舊朝已逝，而人間依舊燈火長明。</p>
+</section>
+
+<main>
+  <h2>咸陵輿圖 · 擇路而行</h2>
+  <div class="grid">
+    <button class="place" onclick="explore('府')">
+      <strong>長明府</strong><span>新朝律令 · 城中秩序</span>
+    </button>
+    <button class="place" onclick="explore('江')">
+      <strong>天環江</strong><span>煙波千里 · 人間風月</span>
+    </button>
+    <button class="place" onclick="explore('派')">
+      <strong>五大門派</strong><span>太一律 · 江湖百家</span>
+    </button>
+    <button class="place" onclick="explore('人')">
+      <strong>人物檔案</strong><span>眾生有名 · 各有所行</span>
+    </button>
+  </div>
+
+  <h2>行旅紀錄</h2>
+  <div class="story" id="story">
+    城門在身後緩緩閉合。<br>
+    霓虹自古老的飛簷下亮起，脈軌穿過高樓。<br>
+    你已踏入咸陵。此後所見，皆由你親自選擇。
+  </div>
+  <button class="back" onclick="resetStory()">返回主城</button>
+</main>
+
+<footer>長明府 · 示籙已錄 · 行跡有循</footer>
+
+<script>
+const player = JSON.parse(localStorage.getItem("fuyanshu_player") || "null");
+
+if (!player || !player.name) {
+  window.location.replace("index.html");
+} else {
+  document.getElementById("player").textContent =
+    "示籙持有人：" + player.name;
+}
+
+const stories = {
+  "府": `長明府坐鎮咸陵，承舊朝淮苑府之後，
+  以新律維繫城中秩序。天監院掌示籙與禁步，
+  夜循司巡察城中動靜，眾生院斷刑律之事。
+  而恆天樓之下，地脈與符機仍在運轉。`,
+
+  "江": `天環江水浩蕩，沿岸燈火終夜不息。
+  有人登樓飲酒，有人泛舟聽曲。
+  江風掠過霓虹與舊朝的瓦簷，
+  江湖人來人往，誰也不問誰的歸處。`,
+
+  "派": `江湖門派各有其道。
+  赤霄山莊以劍隨心，天衡門精研器術，
+  玄水宮行醫濟世，萬象樓觀象知變。
+  至於太微門，早已湮沒於舊年的灰燼。
+  五門所承的太一律，至今仍有不同的解讀。`,
+
+  "人": `紀不允，長明府中行事公允的符術之人。
+  紀玖年，與機關符術有著異常親和的少女。
+  二人的命運，終將與咸陵深處的舊事交會。
+  然而此刻，他們尚不知前路將往何方。`
+};
+
+function explore(id) {
+  document.getElementById("story").textContent = stories[id];
+  document.getElementById("story").scrollIntoView({
+    behavior: "smooth", block: "center"
+  });
+}
+function resetStory() {
+  document.getElementById("story").textContent =
+    "你回到了咸陵主城。街燈未熄，城中依舊人聲鼎沸。";
+}
+</script>
+</body>
+</html>
