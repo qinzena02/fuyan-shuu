@@ -12,7 +12,7 @@ main{max-width:490px;margin:55px auto 70px;padding:0 18px}.eyebrow{color:var(--c
 </style>
 </head>
 <body>
-<header><div class="brand">負驗書</div><a class="back" href="bounty.html">← 返回江湖懸賞榜</a></header>
+<header><div class="brand">負驗書</div><a class="back" href="world.html?page=city.html">← 返回咸陵主城</a></header>
 <main>
 <div class="eyebrow">CHANGMING AUTHENTICATION · 天監院</div>
 <h1 class="heading">示籙身分核驗</h1>
@@ -41,7 +41,7 @@ main{max-width:490px;margin:55px auto 70px;padding:0 18px}.eyebrow{color:var(--c
 <div class="eyebrow" style="text-align:left">ACCOUNT VERIFIED · 已通過核驗</div>
 <p class="account">目前登入帳號：<br><strong id="accountEmail"></strong></p>
 <p class="help">你的線上帳號已建立。示籙角色與雲端委託的正式綁定將在後續啟用。</p>
-<a class="action" style="display:block;text-align:center;text-decoration:none" href="bounty.html">前往江湖懸賞榜 →</a>
+<a class="action" style="display:block;text-align:center;text-decoration:none" href="world.html?page=city.html">進入咸陵主城 →</a>
 <div class="divider"></div>
 <button type="button" class="action secondary" id="logoutButton">登出線上帳號</button>
 </div>
@@ -63,6 +63,8 @@ let db;
 try{db=window.fuyanshuDB;if(!db||typeof db.auth?.signInWithPassword!=='function')throw Error('連線尚未建立');}
 catch(e){show('loading');$('loading').textContent='無法連線至長明府帳號系統。請確認 supabase-client.js 已上傳且 Publishable key 正確。';return;}
 let mode='login';let recovery=false;
+const CITY_URL='world.html?page=city.html';
+function enterCity(){window.location.assign(CITY_URL);}
 function setMode(next){mode=next;const register=mode==='register';$('loginTab').setAttribute('aria-selected',String(!register));$('registerTab').setAttribute('aria-selected',String(register));$('confirmField').hidden=!register;$('confirmPassword').required=register;$('password').autocomplete=register?'new-password':'current-password';$('submitButton').textContent=register?'建立線上帳號':'核驗身分 · 登入';$('formHelp').textContent=register?'註冊後可能需要先到電子郵件收取驗證信。密碼至少 6 個字元。':'登入後可使用你的線上玩家帳號。';message('');}
 $('loginTab').addEventListener('click',()=>setMode('login'));
 $('registerTab').addEventListener('click',()=>setMode('register'));
@@ -71,9 +73,9 @@ $('authForm').addEventListener('submit',async e=>{e.preventDefault();message('')
 if(mode==='register'){
 const redirectTo=new URL('login.html',location.href).href;
 const {data,error}=await db.auth.signUp({email,password,options:{emailRedirectTo:redirectTo}});if(error)throw error;
-if(data.session){displaySession(data.session);message('線上帳號已建立並登入。');}
+if(data.session){enterCity();return;}
 else message('已送出註冊申請。若此信箱可以註冊，請前往信箱點擊驗證連結，再回來登入。請同時檢查垃圾郵件。');
-}else{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;displaySession(data.session);message('身分核驗成功，歡迎回到咸陵。');}
+}else{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;if(data.session){enterCity();return;}displaySession(data.session);}
 }catch(err){message('核驗未完成：'+(err.message||'請稍後重試'),true);}finally{busy(false);}});
 $('forgotButton').addEventListener('click',async()=>{const email=$('email').value.trim();if(!email){message('請先在電子郵件欄輸入信箱，再點擊「忘記密碼」。',true);$('email').focus();return;}busy(true);try{const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:new URL('login.html',location.href).href});if(error)throw error;message('如果此信箱有註冊帳號，系統會寄送密碼重設郵件。請查看收件匣及垃圾郵件。');}catch(err){message('無法寄送重設郵件：'+(err.message||'請稍後重試'),true);}finally{busy(false);}});
 $('resetForm').addEventListener('submit',async e=>{e.preventDefault();const pass=$('newPassword').value;if(pass!==$('newPasswordAgain').value){message('兩次輸入的密碼不一致。',true);return;}busy(true);try{const {error}=await db.auth.updateUser({password:pass});if(error)throw error;recovery=false;const {data}=await db.auth.getSession();displaySession(data.session);message('密碼已更新。');}catch(err){message('更新失敗：'+(err.message||'請稍後重試'),true);}finally{busy(false);}});
@@ -84,3 +86,4 @@ db.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'){reco
 </script>
 </body>
 </html>
+
