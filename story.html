@@ -39,7 +39,7 @@ const name=player&&player.name?String(player.name):'旅人';
 const initialVirtue=()=>{let n=Number(localStorage.getItem('fuyanshu_virtue')??player?.virtue??50);return Number.isFinite(n)?n:50};
 const newState=()=>({node:'start',virtue:initialVirtue(),jiu:0,wei:0,clues:[],visited:[],done:false});
 let state=newState();
-try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&typeof saved.node==='string'&&Array.isArray(saved.clues)&&Array.isArray(saved.visited))state={...newState(),...saved}}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&typeof saved.node==='string'&&Array.isArray(saved.clues)&&Array.isArray(saved.visited))state={...newState(),...saved,virtue:initialVirtue()}}catch(e){}
 const scenes={
 start:{chapter:'卷一 · 渡口初逢',title:'江水無聲',text:`承光年間，天環江渡口。\n\n暮色將盡，脈軌的光影掠過江面。一支本該在三日前抵達城南的商隊，連人帶貨消失在江上。奇怪的是，天監院的示籙紀錄卻顯示：他們已經入城。\n\n碼頭旁，紀玖年蹲在濕冷的石階上，正端詳一截斷裂的繩索。魏應舟站在燈下，手中捏著鏢局的委託文書。\n\n「你就是接了案子的人？」紀玖年抬頭。`,choices:[['先詢問紀玖年發現了什麼','rope',{jiu:1}],['向魏應舟索取正式案卷','register',{wei:1}],['先觀察渡口周圍','dock',{}]]},
 rope:{chapter:'卷一 · 初步查驗',title:'斷索',text:`紀玖年將繩索遞來。斷面並不整齊，卻也不像尋常拉扯所致。\n\n「這是從舊泊位撿到的。」她說，「那晚有人見過商船靠岸，但沒人看見卸貨。」\n\n魏應舟提醒：「傳聞不能當證據。先核對案卷。」`,clue:'異常斷索',choices:[['與魏應舟核對示籙紀錄','register',{}],['前往舊泊位尋找目擊者','witness',{jiu:1}]]},
@@ -53,8 +53,8 @@ end_official:{chapter:'終卷 · 案件紀錄',title:'結局一 · 依法結案'
 end_private:{chapter:'終卷 · 案件紀錄',title:'結局二 · 江上未歸',text:`你沒有放棄尋找活人的可能。紀玖年將那張路引收進袖中，說改日還要再走一趟江岸。\n\n鏢局的案卷仍未封存，長明府的通行紀錄依舊寫著七人已入城。\n\n你知道那是謊言，也知道下一步會更難。`,ending:true},
 end_open:{chapter:'終卷 · 案件紀錄',title:'結局三 · 真相未明',text:`你帶著未能串成完整答案的線索回到鏢局。魏應舟在案卷末尾寫下「尚待查證」，紀玖年則把江岸的位置圈了起來。\n\n沒有足夠的證據，就不該假裝已經看見真相。\n\n夜色深處，天環江仍有船燈緩緩遠去。`,ending:true}
 };
-function persist(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));localStorage.setItem('fuyanshu_virtue',String(state.virtue));}
-function choose(target,effect){if(!scenes[target])return;const key=state.node+'>'+target;if(!state.visited.includes(key)){state.visited.push(key);state.virtue+=(effect.virtue||0);state.jiu+=(effect.jiu||0);state.wei+=(effect.wei||0)}state.node=target;enterNode();}
+function persist(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));if(window.FYSVirtue)window.FYSVirtue.set(state.virtue);else localStorage.setItem('fuyanshu_virtue',String(state.virtue));}
+function choose(target,effect){if(!scenes[target])return;const key=state.node+'>'+target;if(!state.visited.includes(key)){state.visited.push(key);state.virtue=Math.max(0,Math.min(100,state.virtue+(effect.virtue||0))); state.jiu+=(effect.jiu||0);state.wei+=(effect.wei||0)}state.node=target;enterNode();}
 function enterNode(){const scene=scenes[state.node]||scenes.start;if(scene.clue&&!state.clues.includes(scene.clue))state.clues.push(scene.clue);if(scene.ending)state.done=true;persist();render();}
 function render(){const scene=scenes[state.node]||scenes.start;$('playerName').textContent=name;$('virtue').textContent=state.virtue;$('jiu').textContent=state.jiu;$('wei').textContent=state.wei;$('chapter').textContent=scene.chapter;$('sceneTitle').textContent=scene.title;$('prose').textContent=scene.text;for(const el of [$('chapter'),$('sceneTitle'),$('prose'),$('choices')]){el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in');}const list=$('clues');list.replaceChildren();if(!state.clues.length){const li=document.createElement('li');li.textContent='尚無線索';li.className='muted';list.append(li)}else state.clues.forEach(c=>{const li=document.createElement('li');li.textContent='◇ '+c;list.append(li)});const choices=$('choices');choices.replaceChildren();if(scene.ending){const p=document.createElement('p');p.className='end';p.textContent='本次調查已結束。你可以返回鏢局，或重新調查，尋找另一種結局。';choices.append(p)}else scene.choices.forEach(([label,target,effect])=>{const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='› '+label;b.addEventListener('click',()=>choose(target,effect));choices.append(b)});}
 // 行旅狀態抽屜：可用按鈕、遮罩或 Escape 關閉
@@ -68,5 +68,5 @@ $('restart').addEventListener('click',()=>{if(!confirm('要重新開始《江上
 enterNode();
 </script>
 <script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
+<script src="virtue-system.js"></script>
 </body></html>
-

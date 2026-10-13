@@ -88,7 +88,7 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 </style>
 </head>
 <body>
-<header><div class="logo">負驗書</div><div class="player"><div id="player">示籙核驗中</div><div>禁步 · 仁德值：<span id="virtue">90</span></div></div></header>
+<header><div class="logo">負驗書</div><div class="player"><div id="player">示籙核驗中</div><div>禁步 · 仁德值：<span id="virtue">50</span></div></div></header>
 <section class="hero"><p class="eyebrow">承光年間 · 咸陵</p><h1>天下地脈</h1><p>鋼鐵築城，符機行世。</p><p>舊朝已逝，而人間依舊燈火長明。</p></section>
 <main>
 <h2>示籙 · 個人通行憑證</h2>
@@ -144,7 +144,7 @@ if(!player||!player.name){window.location.replace('index.html')}else{
  document.getElementById('name').textContent=name;
  document.getElementById('sect').textContent=player.sect||'未登記';
  document.getElementById('origin').textContent=player.origin||'未登記';
- const storedVirtue=Number(player.virtue ?? localStorage.getItem('fuyanshu_virtue') ?? 50);
+ const storedVirtue=Number(localStorage.getItem('fuyanshu_virtue') ?? player.virtue ?? 50);
  const virtue=Number.isFinite(storedVirtue)?storedVirtue:50;
  document.getElementById('virtue').textContent=virtue;
  document.getElementById('virtueCard').textContent=virtue;
@@ -188,6 +188,6 @@ if(!player||!player.name){window.location.replace('index.html')}else{
  side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setOpen(false)));
 })();
 </script>
+<script src="virtue-system.js"></script>
 </body>
 </html>
-

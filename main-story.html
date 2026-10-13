@@ -87,4 +87,5 @@ if(!player||!player.name){$('game').classList.add('hidden');$('error').classList
  try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&scenes[saved.scene]&&Array.isArray(saved.clues)&&Array.isArray(saved.relations))state={scene:saved.scene,clues:saved.clues.filter(x=>typeof x==='string'),relations:saved.relations.filter(x=>typeof x==='string')};}catch(e){}
  render();}
 </script>
+<script src="virtue-system.js"></script>
 </body></html>
