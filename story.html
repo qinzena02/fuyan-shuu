@@ -25,9 +25,11 @@ footer{text-align:center;color:#66867d;font-size:12px;padding:25px}@media(prefer
 <div class="shell">
 <section class="masthead"><div class="eyebrow">咸陵鏢局 · 委託演繹 · 卷一</div><h1>江上無歸人</h1><p>天環江商旅失蹤案</p></section>
 <div class="layout">
-<main class="panel" aria-live="polite"><div class="chapter" id="chapter">案卷啟封</div><h2 class="scene-title" id="sceneTitle">渡口初逢</h2><div class="prose" id="prose"></div><div class="choices" id="choices"></div><div class="toolbar"><button class="smallbtn" id="restart">重新調查</button><a class="smallbtn" href="bounty.html">返回委託榜</a></div><div class="note" id="saveNote">進度會自動儲存在這台裝置的瀏覽器中。</div></main>
+<main class="panel" aria-live="polite"><div class="chapter" id="chapter">案卷啟封</div><h2 class="scene-title" id="sceneTitle">渡口初逢</h2><div class="prose" id="prose"></div><div class="choices" id="choices"></div><div class="toolbar"><button class="smallbtn" id="restart">重新調查</button><a class="smallbtn" href="bounty.html">返回委託榜</a></div><div class="note" id="saveNote">正在連線雲端示籙……</div></main>
 <aside class="status-sidebar" id="statusSidebar" aria-label="行旅狀態" aria-hidden="true"><div class="sidebar-top"><h3 class="aside-title" style="margin:0">示籙 · 行旅狀態</h3><button class="sidebar-close" id="closeStatus" type="button">收合 ×</button></div><div class="stat"><span>持有人</span><span id="playerName">旅人</span></div><div class="stat"><span>仁德值</span><span id="virtue">50</span></div><div class="stat"><span>紀玖年 · 親近</span><span id="jiu">0</span></div><div class="stat"><span>魏應舟 · 信任</span><span id="wei">0</span></div><h3 class="aside-title" style="margin-top:28px">已獲線索</h3><ul class="clues" id="clues"><li class="muted">尚無線索</li></ul><p class="note">仁德值代表制度評價；人物關係與線索將隨調查推進。</p></aside>
 </div></div><button type="button" class="status-toggle" id="statusToggle" aria-expanded="false" aria-controls="statusSidebar">行旅狀態 ◇</button><div class="sidebar-backdrop" id="statusBackdrop"></div><footer>長明府 · 示籙已錄 · 行跡有循</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-client.js"></script>
 <script>
 'use strict';
 const SAVE_KEY='fuyanshu_story_jiang_v1';
@@ -53,10 +55,82 @@ end_official:{chapter:'終卷 · 案件紀錄',title:'結局一 · 依法結案'
 end_private:{chapter:'終卷 · 案件紀錄',title:'結局二 · 江上未歸',text:`你沒有放棄尋找活人的可能。紀玖年將那張路引收進袖中，說改日還要再走一趟江岸。\n\n鏢局的案卷仍未封存，長明府的通行紀錄依舊寫著七人已入城。\n\n你知道那是謊言，也知道下一步會更難。`,ending:true},
 end_open:{chapter:'終卷 · 案件紀錄',title:'結局三 · 真相未明',text:`你帶著未能串成完整答案的線索回到鏢局。魏應舟在案卷末尾寫下「尚待查證」，紀玖年則把江岸的位置圈了起來。\n\n沒有足夠的證據，就不該假裝已經看見真相。\n\n夜色深處，天環江仍有船燈緩緩遠去。`,ending:true}
 };
-function persist(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));if(window.FYSVirtue)window.FYSVirtue.set(state.virtue);else localStorage.setItem('fuyanshu_virtue',String(state.virtue));}
-function choose(target,effect){if(!scenes[target])return;const key=state.node+'>'+target;if(!state.visited.includes(key)){state.visited.push(key);state.virtue=Math.max(0,Math.min(100,state.virtue+(effect.virtue||0))); state.jiu+=(effect.jiu||0);state.wei+=(effect.wei||0)}state.node=target;enterNode();}
-function enterNode(){const scene=scenes[state.node]||scenes.start;if(scene.clue&&!state.clues.includes(scene.clue))state.clues.push(scene.clue);if(scene.ending)state.done=true;persist();render();}
-function render(){const scene=scenes[state.node]||scenes.start;$('playerName').textContent=name;$('virtue').textContent=state.virtue;$('jiu').textContent=state.jiu;$('wei').textContent=state.wei;$('chapter').textContent=scene.chapter;$('sceneTitle').textContent=scene.title;$('prose').textContent=scene.text;for(const el of [$('chapter'),$('sceneTitle'),$('prose'),$('choices')]){el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in');}const list=$('clues');list.replaceChildren();if(!state.clues.length){const li=document.createElement('li');li.textContent='尚無線索';li.className='muted';list.append(li)}else state.clues.forEach(c=>{const li=document.createElement('li');li.textContent='◇ '+c;list.append(li)});const choices=$('choices');choices.replaceChildren();if(scene.ending){const p=document.createElement('p');p.className='end';p.textContent='本次調查已結束。你可以返回鏢局，或重新調查，尋找另一種結局。';choices.append(p)}else scene.choices.forEach(([label,target,effect])=>{const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='› '+label;b.addEventListener('click',()=>choose(target,effect));choices.append(b)});}
+// 雲端進度是節點與仁德值的權威來源；舊本機進度先備份，不會覆蓋雲端。
+const STORY_ID='jiang';
+const OLD_BACKUP_KEY='fuyanshu_story_jiang_before_cloud';
+let db=null,cloudReady=false,busy=true;
+let localOriginal=null;
+try{localOriginal=JSON.parse(localStorage.getItem(SAVE_KEY)||'null')}catch(e){}
+if(localOriginal && !localStorage.getItem(OLD_BACKUP_KEY))localStorage.setItem(OLD_BACKUP_KEY,JSON.stringify(localOriginal));
+const note=$('saveNote');
+function status(message){note.textContent=message;}
+function persist(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));}
+function showVirtue(n){if(Number.isFinite(Number(n))){state.virtue=Number(n);localStorage.setItem('fuyanshu_virtue',String(state.virtue));}}
+function enterNode(){const scene=scenes[state.node]||scenes.start;if(scene.clue&&!state.clues.includes(scene.clue))state.clues.push(scene.clue);state.done=!!scene.ending;persist();render();}
+function render(){
+ const scene=scenes[state.node]||scenes.start;
+ $('playerName').textContent=name;$('virtue').textContent=state.virtue;$('jiu').textContent=state.jiu;$('wei').textContent=state.wei;
+ $('chapter').textContent=scene.chapter;$('sceneTitle').textContent=scene.title;$('prose').textContent=scene.text;
+ for(const el of [$('chapter'),$('sceneTitle'),$('prose'),$('choices')]){el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in');}
+ const list=$('clues');list.replaceChildren();
+ if(!state.clues.length){const li=document.createElement('li');li.textContent='尚無線索';li.className='muted';list.append(li)}
+ else state.clues.forEach(c=>{const li=document.createElement('li');li.textContent='◇ '+c;list.append(li)});
+ const choices=$('choices');choices.replaceChildren();
+ if(scene.ending){const p=document.createElement('p');p.className='end';p.textContent='本次調查已結束。你可以返回鏢局，或重新調查，尋找另一種結局。';choices.append(p)}
+ else scene.choices.forEach(([label,target,effect])=>{const b=document.createElement('button');b.type='button';b.className='choice';b.disabled=busy||!cloudReady;b.textContent='› '+label;b.addEventListener('click',()=>choose(target,effect));choices.append(b)});
+ $('restart').disabled=busy||!cloudReady;
+}
+async function fetchVirtue(){
+ const {data,error}=await db.from('player_profiles').select('virtue_points').single();
+ if(error)throw error;
+ if(!data||typeof data.virtue_points!=='number')throw new Error('無法讀取線上示籙仁德值');
+ showVirtue(data.virtue_points);
+}
+async function choose(target,effect){
+ if(busy||!cloudReady||!scenes[target])return;
+ const current=scenes[state.node];
+ if(!current.choices||!current.choices.some(x=>x[1]===target))return;
+ busy=true;render();status('長明府正在核驗行跡與仁德值，請稍候……');
+ try{
+  const from=state.node,key=from+'>'+target;
+  const {data,error}=await db.rpc('advance_story',{p_story_id:STORY_ID,p_to_node:target});
+  if(error)throw error;
+  if(!data||!data.progress||data.progress.current_node!==target)throw new Error('雲端回傳進度異常');
+  if(!state.visited.includes(key)){
+   state.visited.push(key);state.jiu+=Number(effect.jiu||0);state.wei+=Number(effect.wei||0);
+  }
+  state.node=target;showVirtue(data.virtue_points);enterNode();
+  status('行跡已寫入雲端，仁德值已同步。人物關係與線索另保存在本機。');
+ }catch(e){status('雲端保存失敗，未切換劇情：'+(e.message||String(e)));}
+ finally{busy=false;render();}
+}
+async function initializeCloud(){
+ status('正在核對線上示籙與雲端劇情存檔……');render();
+ try{
+  db=window.fuyanshuDB;
+  if(!db)throw new Error('找不到 Supabase 連線，請確認 supabase-client.js 已上傳');
+  const {data:auth,error:authError}=await db.auth.getUser();
+  if(authError)throw authError;
+  if(!auth||!auth.user)throw new Error('尚未登入 Supabase 線上帳號，請先返回主城登入');
+  const {data:progress,error}=await db.rpc('start_story',{p_story_id:STORY_ID});
+  if(error)throw error;
+  if(!progress||!scenes[progress.current_node])throw new Error('雲端進度無法辨識');
+  await fetchVirtue();
+  const previous=state;
+  const cloudNode=progress.current_node;
+  // 本機與雲端節點一致時，保留本機好感度與線索；不同則以雲端節點為準。
+  // 舊本機存檔永久備份在 OLD_BACKUP_KEY，避免被默默覆蓋。
+  if(previous.node===cloudNode){state={...previous,node:cloudNode,virtue:state.virtue};}
+  else {state={...newState(),node:cloudNode,virtue:state.virtue};}
+  if(Array.isArray(progress.visited)&&progress.visited.length>1&&previous.node!==cloudNode){
+   status('已載入雲端進度；舊本機進度已備份，人物關係與線索可能需要重新整理。');
+  }else if(previous.node!==cloudNode && previous.node!=='start'){
+   status('偵測到舊本機存檔，已備份至 '+OLD_BACKUP_KEY+'；雲端目前從 '+cloudNode+' 開始。舊進度不會自動取得獎懲。');
+  }else status('已連上雲端示籙，劇情選擇將同步仁德值。');
+  cloudReady=true;enterNode();
+ }catch(e){cloudReady=false;status('無法啟用雲端劇情：'+(e.message||String(e))+'。為保護資料，暫時禁止選擇與重新調查。');}
+ finally{busy=false;render();}
+}
 // 行旅狀態抽屜：可用按鈕、遮罩或 Escape 關閉
 const sidebar=$('statusSidebar'),toggle=$('statusToggle'),backdrop=$('statusBackdrop');
 function setSidebar(open){sidebar.classList.toggle('open',open);backdrop.classList.toggle('open',open);sidebar.setAttribute('aria-hidden',String(!open));toggle.setAttribute('aria-expanded',String(open));if(open)$('closeStatus').focus();else toggle.focus();}
@@ -64,8 +138,20 @@ toggle.addEventListener('click',()=>setSidebar(true));
 $('closeStatus').addEventListener('click',()=>setSidebar(false));
 backdrop.addEventListener('click',()=>setSidebar(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sidebar.classList.contains('open'))setSidebar(false)});
-$('restart').addEventListener('click',()=>{if(!confirm('要重新開始《江上無歸人》嗎？本案進度、線索與本案人物關係會重設。'))return;state=newState();enterNode();window.scrollTo({top:0,behavior:'smooth'})});
-enterNode();
+$('restart').addEventListener('click',async()=>{
+ if(busy||!cloudReady)return;
+ if(!confirm('重新調查會將本案雲端節點重設為起點，線索與本案人物關係歸零；已領取的仁德值獎懲不會重複結算。確定嗎？'))return;
+ busy=true;render();status('正在重新開啟案卷……');
+ try{
+  const {data,error}=await db.rpc('restart_story',{p_story_id:STORY_ID});
+  if(error)throw error;
+  if(!data||data.current_node!=='start')throw new Error('重新調查未完成');
+  const currentVirtue=state.virtue;state={...newState(),virtue:currentVirtue};enterNode();
+  status('已重新調查；過去的仁德值獎懲不會重複發放。');window.scrollTo({top:0,behavior:'smooth'});
+ }catch(e){status('無法重新調查：'+(e.message||String(e))+'。請確認已執行配套 SQL。');}
+ finally{busy=false;render();}
+});
+initializeCloud();
 </script>
 <script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
 <script src="virtue-system.js"></script>
