@@ -18,6 +18,26 @@ main{max-width:1100px;margin:auto;padding:20px 20px 70px}h2{font-weight:normal;c
 .story-entry:hover,.story-entry:focus-visible{border-color:#f0d59a;background:#244540;box-shadow:0 0 22px #c5a87533;transform:translateY(-2px)}
 .story-entry:focus-visible{outline:2px solid #f0d59a;outline-offset:4px}
 @media(max-width:520px){.story-entry{width:100%;min-height:105px;padding:17px 22px;margin:22px auto 35px}.story-entry strong{letter-spacing:2px}}
+
+/* 咸陵主城・留白與柔金光暈優化 */
+main{max-width:980px;padding:14px 24px 62px}
+h2{font-size:19px;margin:29px 0 15px;text-shadow:0 0 9px rgba(223,193,133,.36),0 0 23px rgba(185,146,70,.14)}
+.logo,.hero h1,.identity-top,.place strong,.story-entry strong,.panel-heading>span,.case strong,.news-title{ text-shadow:0 0 8px rgba(236,202,135,.36),0 0 19px rgba(218,172,91,.14)}
+.hero{min-height:355px;padding:78px 20px}
+.hero h1{text-shadow:0 2px 16px #091113,0 0 17px rgba(241,203,133,.56),0 0 39px rgba(227,176,81,.22)}
+.identity{padding:17px 21px}
+.identity-grid{gap:10px;margin-top:12px}
+.grid{gap:12px}
+.place{padding:17px 20px;min-height:105px;gap:4px}
+.place strong{font-size:18px}
+.place span{font-size:12px}
+.place em{font-size:10px}
+.story-entry{width:min(76%,420px);min-height:94px;padding:14px 25px;margin:24px auto 30px}
+.story-entry strong{font-size:20px}
+.news-layout{gap:14px}
+.panel,.record{padding:19px}
+@media(max-width:750px){main{padding:12px 18px 50px}.hero{min-height:310px;padding:66px 15px}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.place{min-height:92px;padding:15px 17px}.story-entry{width:100%;min-height:92px}.hero h1{font-size:clamp(32px,9vw,45px)}}
 </style>
 </head>
 <body>
