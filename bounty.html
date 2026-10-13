@@ -133,7 +133,13 @@ h2 {
   margin-top: 15px;
 }
 
-.action-btn { padding: 10px 18px; }
+ .action-btn { padding: 10px 18px; }
+.edit-form { margin-top: 16px; padding-top: 12px; border-top: 1px solid #456b62; }
+.edit-form label { margin: 12px 0 5px; font-size: 13px; }
+.edit-form .actions { margin-top: 18px; }
+.edit-form .action-btn:disabled { opacity: .5; cursor: wait; }
+.edit-note { color: #8fc4b8; font-size: 12px; margin-top: 8px; }
+
 
 label {
   display: block;
@@ -367,8 +373,75 @@ function createCaseCard(item, isMine=false) {
   card.appendChild(makeElement("div", `地點：${item.location || "未註明"}｜類型：${item.type || "其他"}｜委託者：${item.author_name}｜報酬：${item.reward || "面議"}`, "meta"));
   card.appendChild(makeElement("div", `登錄時間：${displayDate(item.created_at)}`, "meta"));
   card.appendChild(makeElement("p", item.description));
-  if (isMine && item.author_id === user?.id && item.status !== "已結案") {
+  if (isMine && item.author_id === user?.id) {
     const actions = makeElement("div", undefined, "actions");
+    const edit = makeElement("button", "編輯委託", "action-btn");
+    edit.type = "button";
+    edit.addEventListener("click", () => {
+      const existing = card.querySelector(".edit-form");
+      if (existing) { existing.remove(); edit.textContent = "編輯委託"; return; }
+      const form = makeElement("form", undefined, "edit-form");
+      const fields = [
+        {name:"title", label:"案件名稱", tag:"input", max:80},
+        {name:"location", label:"案件地點", tag:"select", options:["咸陵主城","天環江沿岸","四大門派周邊","咸陵邊境"]},
+        {name:"type", label:"委託類型", tag:"select", options:["尋人","護送","調查","尋物","其他"]},
+        {name:"reward", label:"委託報酬", tag:"input", max:60},
+        {name:"description", label:"委託內容", tag:"textarea", max:3000}
+      ];
+      const controls = {};
+      for (const f of fields) {
+        const label = makeElement("label", f.label);
+        const field = document.createElement(f.tag);
+        field.required = true;
+        if (f.max) field.maxLength = f.max;
+        if (f.options) {
+          const values = f.options.includes(item[f.name]) ? f.options : [item[f.name] || "未註明", ...f.options];
+          for (const value of values) {
+            const option = document.createElement("option");
+            option.value = value; option.textContent = value;
+            field.appendChild(option);
+          }
+        }
+        field.value = item[f.name] || "";
+        label.appendChild(field);
+        form.appendChild(label);
+        controls[f.name] = field;
+      }
+      const buttons = makeElement("div", undefined, "actions");
+      const save = makeElement("button", "儲存修改", "action-btn");
+      save.type = "submit";
+      const cancel = makeElement("button", "取消", "action-btn");
+      cancel.type = "button";
+      cancel.addEventListener("click", () => { form.remove(); edit.textContent = "編輯委託"; });
+      buttons.append(save, cancel);
+      form.appendChild(buttons);
+      form.appendChild(makeElement("p", "只有委託發布者能儲存修改，更新後所有玩家都會看到新內容。", "edit-note"));
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        if (!user || !db) return;
+        const updates = {};
+        for (const f of fields) {
+          updates[f.name] = controls[f.name].value.trim();
+          if (!updates[f.name]) { alert("請完整填寫所有欄位。"); return; }
+        }
+        save.disabled = true;
+        save.textContent = "儲存中……";
+        const {data,error} = await db.from("bounties")
+          .update(updates).eq("id", item.id).eq("author_id", user.id)
+          .select("id");
+        if (error || !data?.length) {
+          alert("修改失敗：" + (error?.message || "找不到可修改的案件，請確認登入身分。"));
+          save.disabled = false; save.textContent = "儲存修改";
+          return;
+        }
+        await loadCases();
+        alert("委託已更新，所有玩家重新載入懸賞榜後都能看到修改。 ");
+      });
+      card.appendChild(form);
+      edit.textContent = "收起編輯";
+    });
+    actions.appendChild(edit);
+    if (item.status !== "已結案") {
     const close = makeElement("button", "標記結案", "action-btn");
     close.type = "button";
     close.addEventListener("click", async () => {
@@ -379,7 +452,8 @@ function createCaseCard(item, isMine=false) {
       await loadCases();
     });
     actions.appendChild(close);
-    card.appendChild(actions);
+    }
+    card.insertBefore(actions, card.querySelector(".edit-form"));
   }
   return card;
 }
