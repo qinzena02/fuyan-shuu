@@ -186,6 +186,8 @@ if(!player||!player.name){window.location.replace('index.html')}else{
  side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setOpen(false)));
 })();
 </script>
+<script>window.FYS_VIRTUE_CLOUD_PENDING=true;</script>
+<script src="virtue-system.js"></script>
 <!-- 與登入頁及懸賞榜共用同一份 Supabase 客戶端設定 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="supabase-client.js"></script>
@@ -222,7 +224,8 @@ if(!player||!player.name){window.location.replace('index.html')}else{
      }
      const points=Number(profile.virtue_points);
      if(!Number.isFinite(points))throw new Error('仁德值資料無效');
-     setPoints(points);
+     if(window.FYSVirtue)window.FYSVirtue.syncCloud(points);
+     else setPoints(points);
      if(profile.character_name){
        document.getElementById('player').textContent='示籙持有人：'+profile.character_name;
        document.getElementById('name').textContent=profile.character_name;
