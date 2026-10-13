@@ -21,7 +21,8 @@ body {
       rgba(5, 13, 18, 0.72),
       rgba(5, 13, 18, 0.93)
     ),
-    url("images/xianling-bg.jpg.jpg") center / cover fixed no-repeat;
+    url("images/xianling-bg.jpg.jpg")
+    center / cover fixed no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -138,6 +139,36 @@ h1 {
   }
 }
 
+/* 第四幕的地脈異常警報 */
+.warning-box {
+  display: none;
+  margin-top: 25px;
+  padding: 18px 15px;
+  background: rgba(9, 25, 29, 0.93);
+  border: 1px solid #b52e35;
+  color: #ff454b;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  line-height: 2;
+  text-shadow: 0 0 12px rgba(255, 40, 40, 0.8);
+}
+
+.warning-box.visible {
+  display: block;
+  animation: alertBlink 1.1s infinite;
+}
+
+@keyframes alertBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
 .progress {
   display: flex;
   gap: 8px;
@@ -211,10 +242,12 @@ button:disabled {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fade {
+  .fade,
+  .warning-box.visible {
     animation: none;
   }
 }
+
 </style>
 </head>
 
@@ -225,14 +258,22 @@ button:disabled {
   <header class="heading">
     <div class="eyebrow">長明府 · 地理志 · 卷首</div>
     <h1>咸陵</h1>
-    <div class="subtitle">世界革新之後，文明仍在此延續。</div>
+    <div class="subtitle">
+      世界革新之後，文明仍在此延續。
+    </div>
   </header>
 
   <section class="panel">
 
     <div class="chapter" id="chapter"></div>
+
     <h2 class="chapter-title" id="chapterTitle"></h2>
+
     <div class="story fade" id="story"></div>
+
+    <div class="warning-box" id="warningBox" role="alert">
+      警告：地脈異常，請民眾盡速避難。
+    </div>
 
     <div class="progress" id="progress"></div>
 
@@ -279,38 +320,51 @@ const chapters = [
   {
     label: "第一幕 · 國境",
     title: "世界革新之後",
-    text: `咸陵位於亞洲以北的地域，是世界革新後仍保有完整華文文明體系的國度之一。`
-  },
-  {
-    label: "第二幕 · 四時",
-    title: "北境風物",
-    text: `咸陵地處北方，四季分明。
+    text: `咸陵位於亞洲以北的地域，是世界革新後仍保有完整華文文明體系的國度之一。
 
-春季多雨，夏季溫暖而潮濕，秋季乾爽，冬季則有長時間的低溫與降雪。`
+咸陵地處北方，四季分明。春季多雨，夏季溫暖而潮濕，秋季乾爽，冬季則有長時間的低溫與降雪。`
   },
   {
-    label: "第三幕 · 水脈",
+    label: "第二幕 · 水脈",
     title: "天環江",
     text: `境內大型河川較少，居民生活與城市發展所需的水源，長期以天環江及其支流水系為主。`
   },
   {
+    label: "第三幕 · 門派",
+    title: "太一律",
+    text: `《太一律》是流傳於世界革新以前的一部古老典籍。
+
+沒有人知道它最初由誰寫成，也沒有人能確定它是否曾經完整存在過。如今流傳於世的《太一律》，早已被拆分成五部，分別藏於五大門派之中。
+
+每一派所持有的部分，記錄的都不是同一種力量，而是對地脈截然不同的理解。`
+  },
+  {
     label: "第四幕 · 新朝",
     title: "承光年間",
-    text: `長明府於其後建立，並以承光為年號，開啟新的時代。`
+    text: `古昔日的宮牆尚未完全褪色，新的高塔已經越過城闕，直入雲端。
+
+人們以地脈為源，符機為術，讓沉睡於大地深處的力量化作城市不熄的燈火。
+
+新朝與首都因此得名——「長明」。長明府於其後建立，並以承光為年號，開啟新的時代。`
   }
 ];
 
 let current = 0;
+let warningTimer = null;
 
 const chapter = document.getElementById("chapter");
 const chapterTitle = document.getElementById("chapterTitle");
 const story = document.getElementById("story");
 const progress = document.getElementById("progress");
+const warningBox = document.getElementById("warningBox");
 const previousButton = document.getElementById("previousButton");
 const nextButton = document.getElementById("nextButton");
 
 function renderChapter() {
   const data = chapters[current];
+
+  clearTimeout(warningTimer);
+  warningBox.classList.remove("visible");
 
   chapter.textContent = data.label;
   chapterTitle.textContent = data.title;
@@ -324,8 +378,10 @@ function renderChapter() {
 
   chapters.forEach((item, index) => {
     const bar = document.createElement("div");
+
     bar.className =
       "progress-bar" + (index <= current ? " active" : "");
+
     progress.appendChild(bar);
   });
 
@@ -335,9 +391,18 @@ function renderChapter() {
     current === chapters.length - 1
       ? "閱畢 · 進入咸陵"
       : "下一幕";
+
+  // 第四幕：等待 1.5 秒後顯示地脈異常警報
+  if (current === 3) {
+    warningTimer = setTimeout(() => {
+      warningBox.classList.add("visible");
+    }, 1500);
+  }
 }
 
 function enterCity() {
+  clearTimeout(warningTimer);
+
   try {
     sessionStorage.setItem("fuyanshu_intro_seen", "true");
   } catch (error) {}
