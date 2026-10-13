@@ -21,7 +21,7 @@ footer{text-align:center;color:#66867d;font-size:12px;padding:25px}@media(prefer
 </style>
 </head>
 <body>
-<header><div class="brand">負驗書</div><nav class="topnav"><a href="city.html">咸陵主城</a><a href="bounty.html">鏢局委託榜</a><button type="button" class="music-toggle" id="musicToggle" aria-pressed="false">♫ 開啟輕音樂</button></nav></header>
+<header><div class="brand">負驗書</div><nav class="topnav"><a href="city.html">咸陵主城</a><a href="bounty.html">鏢局委託榜</a></nav></header>
 <div class="shell">
 <section class="masthead"><div class="eyebrow">咸陵鏢局 · 委託演繹 · 卷一</div><h1>江上無歸人</h1><p>天環江商旅失蹤案</p></section>
 <div class="layout">
@@ -64,16 +64,8 @@ toggle.addEventListener('click',()=>setSidebar(true));
 $('closeStatus').addEventListener('click',()=>setSidebar(false));
 backdrop.addEventListener('click',()=>setSidebar(false));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sidebar.classList.contains('open'))setSidebar(false)});
-// 由瀏覽器即時合成的柔和器樂，不需音樂檔；必須由玩家點擊開啟
-let audioCtx=null,musicTimer=null,musicStep=0;
-const notes=[261.63,329.63,392,493.88,440,349.23,293.66,392];
-function playNote(){if(!audioCtx||audioCtx.state!=='running')return;const now=audioCtx.currentTime;const frequency=notes[musicStep++%notes.length];for(const [ratio,volume] of [[1,.035],[.5,.014]]){const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type='sine';osc.frequency.value=frequency*ratio;gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(volume,now+.12);gain.gain.exponentialRampToValueAtTime(.0001,now+2.2);osc.connect(gain).connect(audioCtx.destination);osc.start(now);osc.stop(now+2.25)}}
-$('musicToggle').addEventListener('click',async()=>{const button=$('musicToggle');try{if(musicTimer){clearInterval(musicTimer);musicTimer=null;await audioCtx.suspend();button.textContent='♫ 開啟輕音樂';button.setAttribute('aria-pressed','false');return}const AC=window.AudioContext||window.webkitAudioContext;if(!AC){button.textContent='瀏覽器不支援音樂';return}audioCtx??=new AC();await audioCtx.resume();playNote();musicTimer=setInterval(playNote,2100);button.textContent='♫ 關閉輕音樂';button.setAttribute('aria-pressed','true')}catch(e){button.textContent='無法播放音樂'}});
 $('restart').addEventListener('click',()=>{if(!confirm('要重新開始《江上無歸人》嗎？本案進度、線索與本案人物關係會重設。'))return;state=newState();enterNode();window.scrollTo({top:0,behavior:'smooth'})});
 enterNode();
 </script>
 </body></html>
 
-</main>
-</body>
-</html>
