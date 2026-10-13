@@ -69,6 +69,22 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
   .nav-shade:not([hidden]){display:block;position:fixed;inset:0;background:#0009;z-index:69}
 }
 @media(max-width:520px){.nav-open{top:72px;right:10px;padding:7px 12px;font-size:12px}}
+
+/* 示籙下方的雙路線入世入口 */
+.story-portal{max-width:620px;margin:25px auto 30px;text-align:center}
+.story-portal-heading{display:flex;flex-direction:column;align-items:center;gap:3px;margin-bottom:14px}
+.story-portal-heading em,.story-route em{font-style:normal;color:#70eaff;font-size:10px;letter-spacing:2px;text-shadow:0 0 9px #45cde066}
+.story-portal-heading strong{font-size:23px;font-weight:normal;letter-spacing:6px;color:#e4ca94;text-shadow:0 0 12px #e4ca9466}
+.story-portal-heading span{font-size:12px;color:#9db6ae}
+.story-portal-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.story-route{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:118px;padding:16px 14px;border:1px solid #bda16f;border-radius:999px;background:linear-gradient(135deg,#193633,#0d1b1e);transition:transform .2s,box-shadow .2s,border-color .2s}
+.story-route strong{font-size:18px;font-weight:normal;letter-spacing:2px;color:#e4ca94;text-shadow:0 0 10px #e4ca9455}
+.story-route span{font-size:12px;color:#abc0b5}
+.story-route small{font-size:11px;color:#82d7db}
+.story-route:not(.story-route-pending):hover,.story-route:not(.story-route-pending):focus-visible{transform:translateY(-2px);border-color:#f1d6a3;box-shadow:0 0 20px #d9b77933}
+.story-route:focus-visible{outline:2px solid #7ae8f4;outline-offset:3px}
+.story-route-pending{opacity:.68;cursor:default;border-color:#657d70}
+@media(max-width:520px){.story-portal-actions{gap:9px}.story-route{min-height:113px;padding:13px 8px}.story-route strong{font-size:16px;letter-spacing:1px}.story-route span{font-size:11px}.story-route small{font-size:10px}}
 </style>
 </head>
 <body>
@@ -77,11 +93,17 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 <main>
 <h2>示籙 · 個人通行憑證</h2>
 <div class="identity"><div class="identity-top"><span>長明府 · 示籙登記</span><span class="status">● 核驗通過</span></div><div class="identity-grid"><div><small>姓名</small><strong id="name">—</strong></div><div><small>所屬門派</small><strong id="sect">—</strong></div><div><small>籍貫</small><strong id="origin">—</strong></div><div><small>仁德值</small><strong id="virtueCard">50</strong></div></div></div>
-<a class="story-entry" href="story.html" aria-label="進入江湖演繹，第一卷江上無歸人">
-  <em>INTERACTIVE STORY</em>
-  <strong>江湖演繹 · 入世 →</strong>
-  <span>第一卷《江上無歸人》</span>
-</a>
+<section class="story-portal" aria-label="江湖演繹入口">
+  <div class="story-portal-heading"><em>INTERACTIVE STORY · 江湖演繹</em><strong>入世</strong><span>人間萬象，各有其途。</span></div>
+  <div class="story-portal-actions">
+    <div class="story-route story-route-pending" aria-label="主線第一卷天地不問來處，籌備中">
+      <em>MAIN STORY</em><strong>主線啟卷</strong><span>卷一《天地不問來處》</span><small>籌備中 · 尚未開放</small>
+    </div>
+    <a class="story-route" href="bounty.html" aria-label="進入江湖委託，查看鏢局懸賞與案件">
+      <em>SIDE QUEST</em><strong>江湖委託 →</strong><span>鏢局懸賞 · 案件調查</span><small>前往委託所</small>
+    </a>
+  </div>
+</section>
 <button class="nav-open" id="navOpen" type="button" aria-controls="citySidebar" aria-expanded="false">☷ 城中通行</button>
 <div class="nav-shade" id="navShade" hidden></div>
 <aside class="city-sidebar" id="citySidebar" aria-label="城中通行選單">
