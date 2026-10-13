@@ -19,29 +19,28 @@
 
       background:
         linear-gradient(
-          rgba(5, 13, 18, 0.72),
-          rgba(5, 13, 18, 0.91)
+          rgba(5, 13, 18, 0.75),
+          rgba(5, 13, 18, 0.93)
         ),
         url("images/xianling-bg.jpg.jpg") center / cover fixed no-repeat;
 
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 30px 18px;
+      padding: 35px 18px;
     }
 
-    /* 頁面裝飾 */
     body::before {
       content: "";
       position: fixed;
       inset: 16px;
-      border: 1px solid rgba(191, 161, 100, 0.24);
+      border: 1px solid rgba(191, 161, 100, 0.25);
       pointer-events: none;
     }
 
     .container {
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
       position: relative;
       z-index: 1;
     }
@@ -50,7 +49,7 @@
       text-align: center;
       color: #8fc4b8;
       font-size: 12px;
-      letter-spacing: 5px;
+      letter-spacing: 4px;
       margin-bottom: 15px;
     }
 
@@ -72,11 +71,10 @@
       margin-bottom: 34px;
     }
 
-    /* 示籙核驗面板 */
     .panel {
       position: relative;
       padding: 38px 35px;
-      background: rgba(9, 25, 29, 0.9);
+      background: rgba(9, 25, 29, 0.92);
       border: 1px solid #927a52;
       box-shadow:
         0 0 40px rgba(0, 0, 0, 0.55),
@@ -109,8 +107,8 @@
 
     .panel-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      gap: 12px;
       color: #8bc5b7;
       font-size: 11px;
       letter-spacing: 2px;
@@ -120,7 +118,7 @@
 
     .seal {
       text-align: center;
-      padding: 30px 0 15px;
+      padding: 28px 0 12px;
     }
 
     .seal-symbol {
@@ -133,9 +131,6 @@
       justify-content: center;
       font-size: 36px;
       color: #d9c18e;
-      box-shadow:
-        0 0 25px rgba(92, 180, 162, 0.15),
-        inset 0 0 18px rgba(92, 180, 162, 0.12);
       animation: sealGlow 4s ease-in-out infinite;
     }
 
@@ -152,7 +147,7 @@
       text-align: center;
       font-size: 25px;
       color: #e4ca94;
-      letter-spacing: 7px;
+      letter-spacing: 6px;
       margin: 12px 0;
     }
 
@@ -164,45 +159,58 @@
       margin-bottom: 28px;
     }
 
+    .field {
+      margin-bottom: 24px;
+    }
+
     label {
       display: block;
       font-size: 13px;
       color: #c4b58e;
-      margin-bottom: 12px;
+      margin-bottom: 11px;
       letter-spacing: 2px;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       padding: 15px;
-      background: rgba(3, 15, 19, 0.75);
+      background: #102328;
       border: 1px solid #456b62;
       color: #f2e8d4;
-      font-size: 16px;
+      font-size: 15px;
       font-family: inherit;
       outline: none;
       transition: 0.3s;
     }
 
-    input:focus {
+    input:focus,
+    select:focus {
       border-color: #bca06b;
       box-shadow: 0 0 15px rgba(105, 193, 175, 0.18);
     }
 
     input::placeholder {
-      color: #607c75;
+      color: #78928a;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #829d94;
+      margin-top: 9px;
+      line-height: 1.8;
     }
 
     button {
       width: 100%;
       padding: 16px;
-      margin-top: 22px;
+      margin-top: 14px;
       background: linear-gradient(135deg, #244d47, #397467);
       border: 1px solid #9c936d;
       color: #f3e6c8;
       font-family: inherit;
       font-size: 15px;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
       cursor: pointer;
       transition: 0.3s;
     }
@@ -213,22 +221,54 @@
       transform: translateY(-2px);
     }
 
+    .secondary-button {
+      background: transparent;
+      border: 1px solid #607e74;
+      color: #a9c7bb;
+    }
+
+    .secondary-button:hover {
+      background: rgba(77, 123, 111, 0.2);
+    }
+
     .hidden {
       display: none;
     }
 
-    .welcome-name {
-      text-align: center;
-      color: #e3c78f;
-      font-size: 25px;
-      letter-spacing: 3px;
+    .profile {
       margin: 20px 0;
+      padding: 20px;
+      border: 1px solid rgba(190, 161, 104, 0.3);
+      background: rgba(5, 18, 21, 0.55);
+    }
+
+    .profile-row {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(125, 157, 145, 0.2);
+    }
+
+    .profile-row:last-child {
+      border-bottom: none;
+    }
+
+    .profile-label {
+      display: block;
+      color: #8caea2;
+      font-size: 11px;
+      margin-bottom: 7px;
+      letter-spacing: 2px;
+    }
+
+    .profile-value {
+      display: block;
+      color: #e4ca94;
+      font-size: 18px;
       overflow-wrap: anywhere;
     }
 
     .status {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 22px;
       color: #8da79e;
       font-size: 12px;
       line-height: 2;
@@ -238,8 +278,9 @@
       margin-top: 25px;
       text-align: center;
       font-size: 11px;
-      color: #718d84;
+      color: #91aca3;
       letter-spacing: 2px;
+      line-height: 2;
     }
 
     @media (max-width: 480px) {
@@ -300,29 +341,58 @@
       <p class="description">
         天下地脈，皆有所循。<br>
         凡入咸陵者，須先立籙。<br>
-        請留下你的姓名。
+        姓名、師承、來處，皆錄於此。
       </p>
 
-      <!-- 新玩家登記 -->
-      <div id="register">
+      <!-- 角色建立與修改表單 -->
+      <div id="register" class="hidden">
 
         <form id="registerForm">
 
-          <label for="playerName">
-            示籙姓名
-          </label>
+          <div class="field">
+            <label for="playerName">壹 · 示籙姓名</label>
 
-          <input
-            type="text"
-            id="playerName"
-            placeholder="請輸入你的姓名"
-            maxlength="20"
-            autocomplete="off"
-            required
-          >
+            <input
+              type="text"
+              id="playerName"
+              placeholder="請輸入你的姓名"
+              maxlength="20"
+              autocomplete="off"
+              required
+            >
+          </div>
 
-          <button type="submit">
-            建立示籙
+          <div class="field">
+            <label for="playerSect">貳 · 所屬門派</label>
+
+            <select id="playerSect" required>
+              <option value="">請選擇所屬門派</option>
+              <option value="赤霄山莊">赤霄山莊</option>
+              <option value="天衡門">天衡門</option>
+              <option value="玄水宮">玄水宮</option>
+              <option value="萬象樓">萬象樓</option>
+              <option value="無門無派">無門無派</option>
+            </select>
+
+            <div class="hint">
+              太微門已覆亡，暫不開放一般示籙登記。
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="playerOrigin">參 · 初始出生地</label>
+
+            <select id="playerOrigin" required>
+              <option value="">請選擇出生地</option>
+              <option value="咸陵主城">咸陵主城</option>
+              <option value="天環江沿岸">天環江沿岸</option>
+              <option value="四大門派周邊">四大門派周邊</option>
+              <option value="咸陵邊境">咸陵邊境</option>
+            </select>
+          </div>
+
+          <button type="submit" id="saveButton">
+            核准示籙 · 保存身分
           </button>
 
         </form>
@@ -333,21 +403,41 @@
       <div id="welcome" class="hidden">
 
         <p class="description">
-          示籙核驗完成。
+          示籙核驗完成。<br>
           長明府已收錄你的身分。
         </p>
 
-        <div class="welcome-name" id="displayName"></div>
+        <div class="profile">
+
+          <div class="profile-row">
+            <span class="profile-label">示籙姓名</span>
+            <span class="profile-value" id="displayName"></span>
+          </div>
+
+          <div class="profile-row">
+            <span class="profile-label">所屬門派</span>
+            <span class="profile-value" id="displaySect"></span>
+          </div>
+
+          <div class="profile-row">
+            <span class="profile-label">初始出生地</span>
+            <span class="profile-value" id="displayOrigin"></span>
+          </div>
+
+        </div>
 
         <button type="button" id="enterButton">
           進入咸陵
         </button>
 
+        <button type="button" id="editButton" class="secondary-button">
+          修改示籙資料
+        </button>
+
       </div>
 
       <div class="status" id="status">
-        天監院示籙終端已啟動。<br>
-        等待身分核驗。
+        天監院示籙終端已啟動。等待身分核驗。
       </div>
 
     </section>
@@ -364,58 +454,152 @@
 
     const register = document.getElementById("register");
     const welcome = document.getElementById("welcome");
-    const displayName = document.getElementById("displayName");
-    const status = document.getElementById("status");
 
-    function showPlayer(name) {
-      displayName.textContent = name;
+    const playerName = document.getElementById("playerName");
+    const playerSect = document.getElementById("playerSect");
+    const playerOrigin = document.getElementById("playerOrigin");
+
+    const displayName = document.getElementById("displayName");
+    const displaySect = document.getElementById("displaySect");
+    const displayOrigin = document.getElementById("displayOrigin");
+
+    const statusText = document.getElementById("status");
+    const saveButton = document.getElementById("saveButton");
+
+    const validSects = [
+      "赤霄山莊",
+      "天衡門",
+      "玄水宮",
+      "萬象樓",
+      "無門無派"
+    ];
+
+    const validOrigins = [
+      "咸陵主城",
+      "天環江沿岸",
+      "四大門派周邊",
+      "咸陵邊境"
+    ];
+
+    let currentPlayer = null;
+
+    // 顯示玩家示籙
+    function showPlayer(player) {
+      currentPlayer = player;
+
+      displayName.textContent = player.name;
+      displaySect.textContent =
+        validSects.includes(player.sect)
+          ? player.sect
+          : "尚未登記";
+
+      displayOrigin.textContent =
+        validOrigins.includes(player.origin)
+          ? player.origin
+          : "尚未登記";
+
       register.classList.add("hidden");
       welcome.classList.remove("hidden");
-      status.textContent = "身分核驗通過，准予入城。";
+
+      statusText.textContent = "身分核驗通過，准予入城。";
     }
 
-    // 檢查玩家是否已有示籙
+    // 開啟編輯模式
+    function editPlayer() {
+      if (currentPlayer) {
+        playerName.value = currentPlayer.name || "";
+        playerSect.value =
+          validSects.includes(currentPlayer.sect)
+            ? currentPlayer.sect
+            : "";
+
+        playerOrigin.value =
+          validOrigins.includes(currentPlayer.origin)
+            ? currentPlayer.origin
+            : "";
+
+        saveButton.textContent = "核准修改 · 保存示籙";
+      } else {
+        playerName.value = "";
+        playerSect.value = "";
+        playerOrigin.value = "";
+        saveButton.textContent = "核准示籙 · 保存身分";
+      }
+
+      welcome.classList.add("hidden");
+      register.classList.remove("hidden");
+
+      statusText.textContent = "請核對示籙資料。";
+    }
+
+    // 讀取舊玩家資料
     try {
       const saved = JSON.parse(localStorage.getItem(key));
 
       if (
         saved &&
         typeof saved.name === "string" &&
-        saved.name
+        saved.name.trim()
       ) {
-        showPlayer(saved.name);
+        showPlayer(saved);
+      } else {
+        editPlayer();
       }
     } catch (error) {
-      console.log("尚無有效的示籙紀錄");
+      editPlayer();
     }
 
-    // 建立示籙
+    // 建立或修改示籙
     document.getElementById("registerForm")
       .addEventListener("submit", function(event) {
 
         event.preventDefault();
 
-        const name = document
-          .getElementById("playerName")
-          .value
-          .trim();
+        const name = playerName.value.trim();
+        const sect = playerSect.value;
+        const origin = playerOrigin.value;
 
-        if (!name) return;
+        if (!name) {
+          alert("請填寫示籙姓名。");
+          return;
+        }
+
+        if (!validSects.includes(sect)) {
+          alert("請選擇所屬門派。");
+          return;
+        }
+
+        if (!validOrigins.includes(origin)) {
+          alert("請選擇初始出生地。");
+          return;
+        }
+
+        // 保留原有玩家其他資料
+        const player = {
+          ...(currentPlayer || {}),
+          name: name,
+          sect: sect,
+          origin: origin
+        };
 
         try {
           localStorage.setItem(
             key,
-            JSON.stringify({ name: name })
+            JSON.stringify(player)
           );
 
-          showPlayer(name);
+          showPlayer(player);
 
         } catch (error) {
           alert("無法儲存示籙，請檢查瀏覽器設定。");
         }
       });
 
-    // 進入咸陵主城
+    // 修改資料
+    document.getElementById("editButton")
+      .addEventListener("click", editPlayer);
+
+    // 進入咸陵
     document.getElementById("enterButton")
       .addEventListener("click", function() {
         window.location.href = "city.html";
@@ -424,3 +608,4 @@
 
 </body>
 </html>
+
