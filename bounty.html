@@ -481,19 +481,29 @@ const archiveCases = [
     year: "承光三年",
     title: "天環江商旅失蹤紀錄",
     location: "天環江沿岸",
+    investigator: "紀玖年",
     result: "官方記錄：案件已結，相關細節不予公開。"
   },
   {
     year: "承光五年",
     title: "咸陵城南符機失竊案",
     location: "咸陵主城",
+    investigator: "紀玖年、魏應舟",
     result: "官方記錄：失竊物品已尋回，涉案人員已移交處置。"
   },
   {
     year: "承光七年",
     title: "邊境舊驛道異常調查",
     location: "咸陵邊境",
+    investigator: "紀玖年",
     result: "官方記錄：異常原因已排除，驛道恢復通行。"
+  }
+    {
+    year: "承光七年",
+    title: "咸陵邊境分屍案",
+    location: "咸陵邊境",
+    investigator: "紀玖年、魏應舟",
+    result: "官方記錄：案件已結，相關細節不予公開。"
   }
 ];
 
@@ -503,7 +513,11 @@ archiveCases.forEach(item => {
   const card = makeElement("article", undefined, "case");
   card.appendChild(makeElement("span", item.year + " · 已結案", "status"));
   card.appendChild(makeElement("h3", item.title));
-  card.appendChild(makeElement("div", "地點：" + item.location, "meta"));
+  
+card.appendChild(
+  makeElement("div", "負責調查人：" + item.investigator, "meta")
+);
+
   card.appendChild(makeElement("p", item.result));
   archiveList.appendChild(card);
 });
