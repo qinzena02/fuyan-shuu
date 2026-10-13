@@ -406,7 +406,7 @@
 
         <p class="description">
           示籙核驗完成。<br>
-          長明府已收錄你的身分。
+          長明府已收錄你的身分。<br>請繼續完成線上帳號核驗。
         </p>
 
         <div class="profile">
@@ -429,7 +429,7 @@
         </div>
 
         <button type="button" id="enterButton">
-          進入咸陵
+          下一步 · 帳號核驗
         </button>
 
         <button type="button" id="editButton" class="secondary-button">
@@ -505,7 +505,7 @@
       register.classList.add("hidden");
       welcome.classList.remove("hidden");
 
-      statusText.textContent = "身分核驗通過，准予入城。";
+      statusText.textContent = "示籙已保存。請進行線上帳號核驗。";
     }
 
     // 開啟編輯模式
@@ -603,10 +603,10 @@
     document.getElementById("editButton")
       .addEventListener("click", editPlayer);
 
-    // 進入咸陵
+    // 示籙登記後，前往 Supabase 帳號核驗
     document.getElementById("enterButton")
       .addEventListener("click", function() {
-        window.location.href = "intro.html";
+        window.location.href = "login.html";
       });
   </script>
 
