@@ -104,10 +104,26 @@ main{max-width:1240px;padding:32px 24px 85px}
 .comment-thread.nested{border-top:0;padding-top:0}
 .comment-replies .comment-replies{margin-left:12px;padding-left:12px}
 .focused-post{outline:1px solid #c6a66f;outline-offset:3px;scroll-margin-top:24px}.name a{color:inherit;text-decoration:none}.name a:hover{text-decoration:underline}
+
+/* 萬象傳書：站內傳書通知 */
+.header-nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.notification-wrap{position:relative}
+.notification-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:39px;height:39px;background:transparent;border:1px solid #49695e;border-radius:50%;color:#e5c993;cursor:pointer;font-size:20px}
+.notification-bell:hover,.notification-bell:focus-visible{border-color:#d9bc84;background:#18312d}
+.notification-count{position:absolute;top:-7px;right:-8px;min-width:19px;height:19px;border-radius:12px;background:#b78a64;color:#091315;font-size:10px;font-weight:bold;line-height:19px;text-align:center;padding:0 4px}
+.notification-panel{position:absolute;z-index:100;right:0;top:48px;width:min(380px,calc(100vw - 30px));max-height:min(490px,70vh);overflow-y:auto;background:#102322;border:1px solid #577267;border-radius:12px;box-shadow:0 14px 35px #000a;padding:13px}
+.notification-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#e5ca93;margin-bottom:10px}
+.notification-read-all{border:0;background:none;color:#a9c9bb;cursor:pointer;font:inherit;font-size:12px}
+.notification-item{display:block;width:100%;text-align:left;border:0;border-top:1px solid #28443d;background:transparent;color:#dedbd0;padding:11px 6px;cursor:pointer;font:inherit}
+.notification-item:hover{background:#1b3430}.notification-item.unread{background:#17312d}
+.notification-item-title{font-size:13px;color:#e7d2a5}.notification-item-meta{font-size:11px;color:#83a499;margin-top:3px}
+.notification-empty{font-size:12px;color:#91b1a4;padding:12px 4px}.notification-error{color:#efb5aa;font-size:12px;padding:6px}
+.notification-toast{position:fixed;right:20px;bottom:22px;z-index:110;max-width:min(360px,calc(100vw - 40px));padding:13px 17px;border:1px solid #ac9667;background:#16302c;color:#e9d7b3;border-radius:9px;box-shadow:0 8px 30px #0008;font-size:13px;cursor:pointer}
+@media(max-width:700px){.header-nav{gap:10px}.notification-panel{position:fixed;top:75px;right:12px;width:calc(100vw - 24px);max-height:65vh}}
 </style>
 </head>
 <body>
-<header><div class="brand">負驗書 <span class="small">／ 萬象傳書</span></div><nav><a href="personal.html">我的示籙與書札</a>　<a href="city.html">返回咸陵主城 ↗</a></nav></header>
+<header><div class="brand">負驗書 <span class="small">／ 萬象傳書</span></div><nav class="header-nav"><div id="notificationWrap" class="notification-wrap hidden"><button id="notificationBell" class="notification-bell" type="button" aria-label="傳書通知" aria-expanded="false" aria-controls="notificationPanel">♢<span id="notificationCount" class="notification-count hidden">0</span></button><div id="notificationPanel" class="notification-panel hidden"><div class="notification-panel-head"><strong>傳書通知</strong><button id="notificationReadAll" type="button" class="notification-read-all">全部標記已讀</button></div><div id="notificationList" aria-live="polite"></div></div></div><a href="personal.html">我的示籙與書札</a><a href="city.html">返回咸陵主城 ↗</a></nav></header><div id="notificationToast" class="notification-toast hidden" role="status" aria-live="polite"></div>
 <main>
 <div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1>
 <p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
@@ -302,6 +318,87 @@ async function toggleLike(postId,button){
  }catch(e){if(error)error.textContent='操作失敗：'+(e?.message||String(e));console.error('萬象傳書按讚失敗',e);}
  finally{likeBusy.delete(postId);button.disabled=false;}
 }
+
+ // 通知中心：全服新書札及個人留言通知；僅在已登入時啟用
+ let notificationItems=[],notificationRead=new Set(),notificationInitialized=false;
+ let notificationChannel=null,notificationPolling=null,notificationBusy=false,toastTimeout=null;
+ function notificationTitle(n){
+  const actor=n.actor_character_id?accounts.find(a=>a.character_id===n.actor_character_id)?.characters?.name:null;
+  const who=actor||(n.actor_user_id?'一位行旅者':'有人');
+  if(n.type==='new_post')return who+'發布了新書札';
+  if(n.type==='comment_reply')return who+'回覆了你的留言';
+  return who+'留言了你的書札';
+ }
+ function renderNotifications(){
+  const count=notificationItems.filter(n=>!notificationRead.has(n.id)).length;
+  $('notificationCount').textContent=count>99?'99+':String(count);
+  $('notificationCount').classList.toggle('hidden',count===0);
+  $('notificationBell').setAttribute('aria-label','傳書通知，'+count+' 則未讀');
+  const root=$('notificationList');root.replaceChildren();
+  if(!notificationItems.length){const empty=document.createElement('div');empty.className='notification-empty';empty.textContent='目前沒有傳書通知。';root.appendChild(empty);return;}
+  for(const n of notificationItems){
+   const btn=document.createElement('button');btn.type='button';btn.className='notification-item'+(notificationRead.has(n.id)?'':' unread');
+   const title=document.createElement('div');title.className='notification-item-title';title.textContent=notificationTitle(n);
+   const meta=document.createElement('div');meta.className='notification-item-meta';meta.textContent=timeText(n.created_at)+(notificationRead.has(n.id)?' · 已讀':' · 未讀');
+   btn.append(title,meta);btn.addEventListener('click',async()=>{
+    await markNotificationsRead([n.id]);$('notificationPanel').classList.add('hidden');$('notificationBell').setAttribute('aria-expanded','false');
+    if(n.post_id){location.href='social.html?post='+encodeURIComponent(n.post_id);}
+   });root.appendChild(btn);
+  }
+ }
+ async function markNotificationsRead(ids){
+  if(!currentUser||!ids.length)return;
+  const unread=ids.filter(id=>!notificationRead.has(id));if(!unread.length)return;
+  const rows=unread.map(notification_id=>({notification_id,user_id:currentUser.id}));
+  try{
+   const r=await db.from('social_notification_reads').upsert(rows,{onConflict:'notification_id,user_id',ignoreDuplicates:true});
+   if(r.error)throw r.error;
+   unread.forEach(id=>notificationRead.add(id));renderNotifications();
+  }catch(e){console.warn('通知已讀標記失敗',e);}
+ }
+ function showNotificationToast(n){
+  const toast=$('notificationToast');toast.textContent='✉ '+notificationTitle(n);toast.classList.remove('hidden');
+  toast.onclick=async()=>{await markNotificationsRead([n.id]);toast.classList.add('hidden');if(n.post_id)location.href='social.html?post='+encodeURIComponent(n.post_id);};
+  if(toastTimeout)clearTimeout(toastTimeout);
+  toastTimeout=setTimeout(()=>toast.classList.add('hidden'),6500);
+ }
+ async function syncNotifications(){
+  if(!currentUser||notificationBusy)return;notificationBusy=true;
+  try{
+   const r=await db.from('social_notifications').select('id,type,actor_user_id,actor_character_id,post_id,comment_id,created_at').order('created_at',{ascending:false}).limit(100);
+   if(r.error)throw r.error;
+   const incoming=r.data||[];
+   const reads=await db.from('social_notification_reads').select('notification_id').eq('user_id',currentUser.id).in('notification_id',incoming.length?incoming.map(n=>n.id):['00000000-0000-0000-0000-000000000000']);
+   if(reads.error)throw reads.error;
+   const freshRead=new Set((reads.data||[]).map(x=>x.notification_id));
+   const known=new Set(notificationItems.map(n=>n.id));
+   const fresh=notificationInitialized?incoming.filter(n=>!known.has(n.id)&&!freshRead.has(n.id)):[];
+   notificationItems=incoming;notificationRead=freshRead;notificationInitialized=true;
+   renderNotifications();if(fresh.length)showNotificationToast(fresh[fresh.length-1]);
+  }catch(e){
+   console.warn('萬象傳書通知讀取失敗',e);
+   const root=$('notificationList');if(!notificationInitialized){root.textContent='通知暫時無法讀取：'+(e?.message||String(e));root.className='notification-error';}
+  }finally{notificationBusy=false;}
+ }
+ function startNotifications(){
+  if(!currentUser){$('notificationWrap').classList.add('hidden');return;}
+  $('notificationWrap').classList.remove('hidden');
+  if(notificationPolling)return;
+  syncNotifications();notificationPolling=setInterval(()=>{if(!document.hidden)syncNotifications();},20000);
+  // Realtime 未啟用時仍有定期同步作為備援
+  try{notificationChannel=db.channel('social-notifications-'+currentUser.id)
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'social_notifications'},()=>syncNotifications())
+   .subscribe();}catch(e){console.warn('通知即時訂閱未啟用，使用定期同步',e);}
+ }
+ $('notificationBell').addEventListener('click',()=>{
+  const panel=$('notificationPanel');panel.classList.toggle('hidden');
+  $('notificationBell').setAttribute('aria-expanded',String(!panel.classList.contains('hidden')));
+  if(!panel.classList.contains('hidden'))syncNotifications();
+ });
+ $('notificationReadAll').addEventListener('click',()=>markNotificationsRead(notificationItems.map(n=>n.id)));
+ document.addEventListener('click',event=>{if(!$('notificationWrap').contains(event.target)){$('notificationPanel').classList.add('hidden');$('notificationBell').setAttribute('aria-expanded','false');}});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncNotifications();});
+
 // 玩家圖文書札：圖片選取、預覽與上傳
 function composerMessage(text,error=false){const el=$('composerStatus');el.textContent=text;el.classList.toggle('error',error);}
 function previewImages(){
@@ -362,7 +459,7 @@ async function load(){
   const result=await db.from('social_posts').select('id,author_character_id,author_user_id,body,image_paths,published_at,created_at').eq('status','published').eq('visibility','public').order('published_at',{ascending:false}).limit(100);
   if(result.error)throw result.error;const allowed=new Set(accounts.map(a=>a.character_id));posts=(result.data||[]).filter(p=>p.author_user_id||allowed.has(p.author_character_id));const uids=[...new Set(posts.map(p=>p.author_user_id).filter(Boolean))];if(uids.length){const names=await db.from('player_profiles').select('user_id,character_name').in('user_id',uids);if(!names.error){const map=new Map((names.data||[]).map(x=>[x.user_id,x.character_name]));for(const p of posts)if(p.author_user_id)p.player_name=map.get(p.author_user_id)||'行旅者';}}$('playerComposer').classList.toggle('hidden',!currentUser);
   try{await fetchLikes();}catch(e){console.warn('萬象傳書按讚紀錄讀取失敗',e);showState('書札已載入，但按讚紀錄暫時無法同步：'+(e?.message||String(e)),true);}
-  await fetchComments();renderFilters();renderPosts();const focusId=new URLSearchParams(location.search).get('post');if(focusId&&/^[0-9a-f-]{36}$/i.test(focusId)){const target=document.getElementById('post-'+focusId);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.classList.add('focused-post');}}
+  await fetchComments();renderFilters();renderPosts();startNotifications();const focusId=new URLSearchParams(location.search).get('post');if(focusId&&/^[0-9a-f-]{36}$/i.test(focusId)){if(selected!=='all'){selected='all';renderFilters();renderPosts();}const target=document.getElementById('post-'+focusId);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.classList.add('focused-post');}}
  }catch(e){$('feed').replaceChildren();showState('讀取失敗：'+(e?.message||String(e)),true);}
  finally{loading=false;}
 }
