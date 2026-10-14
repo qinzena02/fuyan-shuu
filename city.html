@@ -103,12 +103,33 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 .journey-overview .journey-item strong{font-size:clamp(15px,2vw,20px);line-height:1.5;overflow-wrap:anywhere}
 .journey-overview .journey-note{border-top:1px solid #29483f;padding-top:12px;margin:15px 0 0}
 @media(max-width:700px){.journey-overview{padding:19px 16px}.journey-overview .journey-grid{grid-template-columns:1fr}.journey-overview .journey-item,.journey-overview .journey-item:first-child,.journey-overview .journey-item:last-child{border-right:0;border-bottom:1px solid #36544b;padding:12px 2px;min-height:0}.journey-overview .journey-item:last-child{border-bottom:0}}
+
+/* 咸陵傳報：循環字條 */
+.city-bulletin{display:flex;align-items:center;gap:14px;min-width:0;margin:0 0 24px;padding:12px 15px;background:rgba(12,31,32,.88);border:1px solid #8b784f;box-shadow:0 0 18px #0e42452a}
+.bulletin-label{flex:none;color:#e4ca94;font-size:14px;letter-spacing:2px;border-right:1px solid #8b784f;padding-right:14px;white-space:nowrap}
+.bulletin-window{flex:1;min-width:0;overflow:hidden}
+.bulletin-track{display:flex;width:max-content;animation:cityBulletinScroll var(--bulletin-duration,100s) linear infinite}
+.bulletin-group{display:flex;align-items:center;flex-shrink:0;white-space:nowrap}
+.bulletin-message{color:#afd6cc;font-size:13px;padding-right:48px}
+.bulletin-message::before{content:'◆';color:#bba16e;font-size:9px;margin-right:12px}
+.bulletin-pause{flex:none;background:transparent;border:1px solid #46665c;color:#d9c08f;font:inherit;font-size:12px;padding:3px 8px;cursor:pointer}
+.bulletin-pause:focus-visible{outline:2px solid #70eaff;outline-offset:3px}
+.city-bulletin:hover .bulletin-track,.city-bulletin:focus-within .bulletin-track,.city-bulletin.is-paused .bulletin-track{animation-play-state:paused}
+@keyframes cityBulletinScroll{to{transform:translateX(-50%)}}
+@media(max-width:520px){.city-bulletin{gap:9px;padding:10px}.bulletin-label{font-size:12px;letter-spacing:1px;padding-right:9px}.bulletin-message{font-size:12px}.bulletin-pause{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.bulletin-track{animation:none}.bulletin-window{overflow-x:auto}.bulletin-group[aria-hidden]{display:none}.bulletin-pause{display:none}}
 </style>
 </head>
 <body>
 <header><div class="logo">負驗書</div><div class="player"><div id="player">示籙核驗中</div><div>禁步 · 仁德值：<span id="virtue">讀取中…</span></div></div></header>
 <section class="hero"><p class="eyebrow">承光年間 · 咸陵</p><h1>天下地脈</h1><p>鋼鐵築城，符機行世。</p><p>舊朝已逝，而人間依舊燈火長明。</p></section>
 <main>
+<section class="city-bulletin" aria-label="咸陵傳報">
+<span class="bulletin-label">咸陵傳報</span>
+<div class="bulletin-window"><div class="bulletin-track" id="cityBulletinTrack"></div></div>
+<button class="bulletin-pause" id="cityBulletinPause" type="button" aria-pressed="false" aria-label="暫停咸陵傳報">暫停</button>
+</section>
+
 <section class="journey-overview" aria-label="行旅紀錄"><h2>行旅紀錄</h2><p class="intro">山河萬里，所行皆有跡可循。</p><div class="journey-grid"><div class="journey-item"><small>已協辦懸賞</small><strong id="assistedCount">讀取中…</strong><span>以線上鏢局接案紀錄為準</span></div><div class="journey-item"><small>主線進度</small><strong id="mainProgress">讀取中…</strong><span>《天地不問來處》</span></div><div class="journey-item"><small>支線進度</small><strong id="sideProgress">讀取中…</strong><span>《江上無歸人》</span></div></div><p class="journey-note" id="journeyNote">雲端協辦數量與劇情存檔會分別讀取；尚未開始的案件顯示未開始。</p></section>
 <section class="story-portal" aria-label="江湖演繹入口">
   <div class="story-portal-heading"><em>INTERACTIVE STORY · 江湖演繹</em><strong>入世</strong><span>人間萬象，各有其途。</span></div>
@@ -293,6 +314,32 @@ if(!player||!player.name){window.location.replace('index.html')}else{
  }
  cloud();
  window.addEventListener('pageshow',cloud);
+})();
+</script>
+
+<script>
+(function(){
+  // 修改公告：每行引號內是一則消息，可新增或刪除整行。
+  // 這些是世界觀氛圍文案；實際更新時請同步修改公告內容。
+  const cityBulletinMessages = [
+    '【懸賞傳報】鏢局委託隨時更替，遠行前可前往查閱。',
+    '【主線啟卷】《第三更未盡》已入卷，北城舊案尚待追查。',
+    '【故事新錄】《江上無歸人》收錄於支線卷宗，江湖往事待君啟封。',
+    '【時令提醒】入夜江風漸寒，遠行者記得添衣，莫在橋頭久候。',
+    '【扶乩異常】天環江南岸近日乩文屢現重字，原因未明，請勿擅自解讀。',
+    '【脈軌通告】北城部分脈軌暫停通行，往來行旅請循引燈改道。',
+    '【市井傳聞】渡口有人拾得半幅無字符紙，正等一位識符之人。'
+  ];
+  const track=document.getElementById('cityBulletinTrack');
+  const group=document.createElement('div');group.className='bulletin-group';
+  cityBulletinMessages.forEach(message=>{const item=document.createElement('span');item.className='bulletin-message';item.textContent=message;group.appendChild(item)});
+  track.appendChild(group);
+  const duplicate=group.cloneNode(true);duplicate.setAttribute('aria-hidden','true');track.appendChild(duplicate);
+  const setSpeed=()=>track.style.setProperty('--bulletin-duration',Math.max(40,group.scrollWidth/38)+'s');
+  setSpeed();window.addEventListener('resize',setSpeed);
+  if(document.fonts)document.fonts.ready.then(setSpeed);
+  const button=document.getElementById('cityBulletinPause');
+  button.addEventListener('click',()=>{const paused=track.closest('.city-bulletin').classList.toggle('is-paused');button.setAttribute('aria-pressed',String(paused));button.textContent=paused?'播放':'暫停';button.setAttribute('aria-label',paused?'播放咸陵傳報':'暫停咸陵傳報')});
 })();
 </script>
 </body>
