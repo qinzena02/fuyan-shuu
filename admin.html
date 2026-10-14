@@ -95,19 +95,39 @@ async function loadAdminComments(){
  const visible=posts.filter(p=>p.status==='published'&&p.visibility==='public');
  if(!visible.length){root.textContent='目前沒有公開書札。';return;}
  const ids=visible.map(p=>p.id);
- const q=await db.from('social_comments').select('id,post_id,parent_id,author_user_id,author_character_id,body,created_at').in('post_id',ids).order('created_at',{ascending:false}).limit(300);
+ const q=await db.from('social_comments').select('id,post_id,parent_id,author_user_id,author_character_id,body,created_at,deleted_at').in('post_id',ids).order('created_at',{ascending:false}).limit(300);
  if(q.error){root.textContent='讀取留言失敗：'+errorText(q.error);return;}
  const rows=q.data||[];const originals=rows.filter(r=>r.author_user_id&&!r.parent_id);
  const uids=[...new Set(originals.map(r=>r.author_user_id))];let names=new Map();
  if(uids.length){const p=await db.from('player_profiles').select('user_id,character_name').in('user_id',uids);if(!p.error)names=new Map((p.data||[]).map(x=>[x.user_id,x.character_name]));}
- root.replaceChildren();if(!originals.length){root.textContent='目前還沒有玩家留言。';return;}
+ root.replaceChildren();
+ const officialTop=rows.filter(r=>r.author_character_id&&!r.parent_id);
+ if(officialTop.length){
+  const heading=document.createElement('h3');heading.textContent='官方角色留言管理';root.appendChild(heading);
+  for(const item of officialTop){const wrap=document.createElement('div');wrap.className='comment-admin-item';
+   const c=characters.find(x=>x.character_id===item.author_character_id);
+   const info=document.createElement('span');info.textContent=(c?.characters?.name||'官方角色')+'：'+(item.deleted_at?'此留言已刪除':item.body);
+   wrap.appendChild(info);
+   if(!item.deleted_at){const del=document.createElement('button');del.type='button';del.className='danger';del.textContent='刪除角色留言';del.style.marginLeft='12px';del.addEventListener('click',()=>deleteOfficialComment(item.id));wrap.appendChild(del);}
+   root.appendChild(wrap);
+  }
+ }
+ if(!originals.length){if(!officialTop.length)root.textContent='目前還沒有留言。';return;}
  for(const item of originals){
   const box=document.createElement('article');box.className='comment-admin-item';
   const source=visible.find(p=>p.id===item.post_id);const author=characters.find(c=>c.character_id===source?.author_character_id);
   const meta=document.createElement('div');meta.className='comment-admin-meta';meta.textContent=(names.get(item.author_user_id)||'行旅者')+' 留言於 '+(author?.characters?.name||'官方角色')+' 的書札 · '+new Date(item.created_at).toLocaleString('zh-TW');
-  const body=document.createElement('div');body.className='comment-admin-body';body.textContent=item.body;
+  const body=document.createElement('div');body.className='comment-admin-body';body.textContent=item.deleted_at?'此留言已刪除':item.body;
   const replies=document.createElement('div');replies.className='comment-admin-replies';
-  for(const reply of rows.filter(r=>r.parent_id===item.id)){const line=document.createElement('p');const c=characters.find(x=>x.character_id===reply.author_character_id);line.textContent=(c?.characters?.name||'官方角色')+'：'+reply.body;replies.appendChild(line);}
+  for(const reply of rows.filter(r=>r.parent_id===item.id)){
+   const line=document.createElement('p');const c=characters.find(x=>x.character_id===reply.author_character_id);
+   line.textContent=(c?.characters?.name||'官方角色')+'：'+(reply.deleted_at?'此留言已刪除':reply.body);
+   if(reply.author_character_id&&!reply.deleted_at){
+    const del=document.createElement('button');del.type='button';del.className='danger';del.textContent='刪除此角色回覆';del.style.marginLeft='12px';
+    del.addEventListener('click',()=>deleteOfficialComment(reply.id));line.appendChild(del);
+   }
+   replies.appendChild(line);
+  }
   const select=document.createElement('select');for(const c of characters){const opt=document.createElement('option');opt.value=c.character_id;opt.textContent='以 '+c.characters.name+' 回覆';select.appendChild(opt);}if(source?.author_character_id)select.value=source.author_character_id;
   const textarea=document.createElement('textarea');textarea.className='reply-text';textarea.maxLength=1000;textarea.placeholder='輸入角色回覆（最多 1000 字）';
   const btn=document.createElement('button');btn.type='button';btn.textContent='發布角色回覆';btn.className='primary';
@@ -122,6 +142,11 @@ async function loadAdminComments(){
   const tools=document.createElement('div');tools.className='reply-tools';tools.append(select,btn,msg);
   box.append(meta,body,replies,textarea,tools);root.appendChild(box);
  }
+}
+async function deleteOfficialComment(id){
+ if(!confirm('確定刪除這則官方角色留言？刪除後內容無法復原。'))return;
+ try{const r=await db.rpc('delete_social_comment',{p_comment_id:id});if(r.error)throw r.error;await loadAdminComments();notify('官方角色留言已刪除。','success');}
+ catch(e){notify('刪除失敗：'+errorText(e),'error');}
 }
 $('refreshComments').addEventListener('click',()=>loadAdminComments());
 

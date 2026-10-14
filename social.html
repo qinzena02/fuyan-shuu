@@ -69,6 +69,14 @@ main{max-width:1240px;padding:32px 24px 85px}
 .comment-replies .comment-author{color:#e3c991}
 .comment-thread+.comment-thread{padding-top:12px;border-top:1px solid #28453f}
 @media(max-width:760px){.comment-list{gap:14px}.comment-replies{margin-left:10px;padding-left:13px}.comment-thread+.comment-thread{padding-top:10px}}
+
+/* 留言刪除：無框樣式，僅作者可見 */
+.comment-item{padding-right:27px!important}
+.comment-more{position:absolute;right:0;top:-5px;border:0;background:transparent;color:#8aa99e;cursor:pointer;font:inherit;font-size:19px;line-height:1.4;padding:2px 6px}
+.comment-more:hover,.comment-more:focus-visible{color:#e3c991}
+.comment-menu{position:absolute;right:0;top:25px;z-index:5;background:#132b29;border:1px solid #4b6a5e;border-radius:8px;padding:5px;box-shadow:0 8px 18px #0008}
+.comment-delete{background:transparent;color:#efb7a9;border:0;font:inherit;font-size:12px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.comment-deleted .comment-body{color:#78968c;font-style:italic}
 </style>
 </head>
 <body>
@@ -142,8 +150,23 @@ function buildComments(post){
   const c=accounts.find(x=>x.character_id===item.author_character_id);
   who.textContent=item.author_character_id?(c?.characters?.name||'角色'):(item.player_profiles?.character_name||'行旅者');
   const when=document.createElement('time');when.className='comment-meta';when.textContent=timeText(item.created_at);when.dateTime=item.created_at;
-  const body=document.createElement('div');body.className='comment-body';body.textContent=item.body;
-  card.append(who,body,when);return card;
+  const body=document.createElement('div');body.className='comment-body';body.textContent=item.deleted_at?'此留言已刪除':item.body;
+  if(item.deleted_at)card.classList.add('comment-deleted');
+  card.append(who,body,when);
+  if(!item.deleted_at&&currentUser&&item.author_user_id===currentUser.id){
+   const more=document.createElement('button');more.type='button';more.className='comment-more';more.textContent='⋯';more.setAttribute('aria-label','留言操作');more.setAttribute('aria-expanded','false');
+   const menu=document.createElement('div');menu.className='comment-menu hidden';
+   const del=document.createElement('button');del.type='button';del.className='comment-delete';del.textContent='刪除留言';menu.appendChild(del);
+   more.addEventListener('click',()=>{menu.classList.toggle('hidden');more.setAttribute('aria-expanded',String(!menu.classList.contains('hidden')));});
+   del.addEventListener('click',async()=>{
+    if(!confirm('確定刪除這則留言？刪除後內容無法復原。'))return;
+    del.disabled=true;
+    try{const r=await db.rpc('delete_social_comment',{p_comment_id:item.id});if(r.error)throw r.error;await fetchComments();renderPosts();}
+    catch(e){alert('刪除失敗：'+(e?.message||String(e)));del.disabled=false;}
+   });
+   card.append(more,menu);
+  }
+  return card;
  };
  const top=rows.filter(c=>!c.parent_id||!rows.some(r=>r.id===c.parent_id));
  for(const c of top){
@@ -170,7 +193,7 @@ async function fetchComments(){
  commentsByPost=new Map();commentLoadError='';if(!posts.length)return;
  const ids=posts.map(p=>p.id);
  try{
-  const result=await db.from('social_comments').select('id,post_id,parent_id,author_user_id,author_character_id,body,created_at').in('post_id',ids).order('created_at',{ascending:true}).limit(1000);
+  const result=await db.from('social_comments').select('id,post_id,parent_id,author_user_id,author_character_id,body,created_at,deleted_at').in('post_id',ids).order('created_at',{ascending:true}).limit(1000);
   if(result.error)throw result.error;
   const rows=result.data||[];
   const userIds=[...new Set(rows.map(r=>r.author_user_id).filter(Boolean))];let names=new Map();
