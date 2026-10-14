@@ -282,6 +282,21 @@ function previewImages(){
   remove.addEventListener('click',()=>{pendingImages.splice(index,1);previewImages();});box.append(img,remove);root.appendChild(box);
  });
 }
+// 從咸陵日報轉來的公開新聞，先作為文字引述；劇情新聞不提供此入口。
+(function receiveCityNews(){
+ const params=new URLSearchParams(window.location.search);
+ const title=params.get('news_title');
+ if(!title)return;
+ const tag=params.get('news_tag')||'城中消息';
+ const body=params.get('news_body')||'';
+ const quote='【轉引咸陵日報｜'+tag+'】\n'+title+'\n'+body.slice(0,500)+'\n—— 來源：咸陵日報';
+ const editor=$('newPostBody');
+ if(editor&&!editor.value.trim())editor.value=quote;
+ const message=$('composerMessage');
+ if(message)message.textContent='已帶入公開新聞引文，可先寫下自己的看法，再發布書札。';
+ // 移除網址中的新聞正文，避免再次重新整理重複填入。
+ history.replaceState(null,'',window.location.pathname+window.location.hash);
+})();
 $('newPostImages').addEventListener('change',event=>{
  const selected=Array.from(event.target.files||[]);event.target.value='';
  for(const file of selected){
