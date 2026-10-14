@@ -20,127 +20,27 @@
 <footer class="footer">長明府 · 公開文獻 · 此庫不收錄涉密案牘</footer>
 <script>
 const records = [
-  {
-    id:'changming',
-    category:'機構',
-    title:'長明府',
-    summary:'咸陵新朝之政務體系',
-    body:`舊朝淮苑府覆滅後，新政府以「長明」之名建立，並以承光為年號。
-長明府統轄咸陵的政務、秩序與制度，各機構分掌其職。`,
-    sections:[{title:'所屬機構',items:[['天監院','管理示籙、禁步等制度。'],['夜循司','負責城中秩序與巡察。'],['眾生院','處理法律與刑罰事務。'],['恆天樓','管理符機塔與地脈能量控制。']]}]},
-  {
-    id:'tianjian',
-    category:'機構',
-    title:'天監院',
-    summary:'示籙與禁步管理',
-    body:`長明府所屬機構，掌理示籙與禁步相關制度。`,
-    sections:[{title:'職掌',items:[['示籙','記錄個人身分與相關登記事項。'],['禁步','與仁德值制度相連的隨身器物。']]}]},
-  {
-    id:'yexun',
-    category:'機構',
-    title:'夜循司',
-    summary:'城中秩序與巡察',
-    body:`長明府所屬機構，負責城中秩序監察與巡查。`},
-  {
-    id:'zhongsheng',
-    category:'機構',
-    title:'眾生院',
-    summary:'律法與刑罰',
-    body:`長明府所屬機構，負責法律與刑罰相關事務。`},
-  {
-    id:'hengtian',
-    category:'機構',
-    title:'恆天樓',
-    summary:'地脈能源與符機網絡 · 符機中樞',
-    body:`恆天樓為長明府所屬機構，統籌地脈能源與符機網絡，亦被稱為「符機中樞」。`,
-    sections:[{title:'相關人員',items:[['紀不允','任職於恆天樓，協助地脈能源與符機網絡相關符術工作。詳細資料見人物檔案。']]}]},
-  {
-    id:'chi',
-    category:'門派',
-    title:'赤霄山莊',
-    summary:'劍鋒隨心而向',
-    body:`赤霄弟子多性情冷冽，少有迂迴試探。他們敢愛敢恨，敢勝敢敗，行事重視本心與抉擇。`,
-    sections:[{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
-  {
-    id:'tianheng',
-    category:'門派',
-    title:'天衡門',
-    summary:'器術與造物',
-    body:`天衡門重視器術與創造，探究人與器物之間的關係。`,
-    sections:[{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
-  {
-    id:'xuanshui',
-    category:'門派',
-    title:'玄水宮',
-    summary:'醫道與流動',
-    body:`玄水宮以醫道聞名，其修行與水、流動及執念相關。`,
-    sections:[{title:'重要地點',items:[['洗心池','玄水宮相關地點，詳細資料待補。']]},{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
-  {
-    id:'wanxiang',
-    category:'門派',
-    title:'萬象樓',
-    summary:'觀象知變',
-    body:`萬象樓以觀象、推演見長，重視對變化的理解，並有不可妄斷言之戒。`,
-    sections:[{title:'重要地點',items:[['觀象塔','萬象樓相關地點，詳細資料待補。']]},{title:'長老名錄',items:[['待補','尚未登錄正式長老資料。']]},{title:'門規',items:[['待補','門規內容待後續補入。']]}]},
-  {
-    id:'taiwei',
-    category:'門派',
-    title:'太微門',
-    summary:'已覆亡的古老門派',
-    body:`太微門已於舊年覆亡，相關記錄散佚。其與地脈舊事的關聯仍待釐清。`,
-    sections:[{title:'長老名錄',items:[['史料待補','尚無可公開的完整名錄。']]},{title:'門規',items:[['史料待補','尚無可公開的完整門規。']]}]},
-  {
-    id:'jibuyun',
-    category:'人物',
-    title:'紀不允',
-    summary:'長明府 · 恆天樓 · 符術',
-    body:`太微門遺脈，擅長符術。行事公事公辦，情緒不輕易外露，卻有自己的判斷與堅持。`,
-    sections:[{title:'任職資料',items:[['所屬機構','長明府'],['任職單位','恆天樓（符機中樞）'],['工作內容','協助地脈能源與符機網絡相關的符術工作。']]},{title:'門派背景',items:[['太微門','太微門遺脈；太微門現已覆亡。']]}]},
-  {
-    id:'jijiunian',
-    category:'人物',
-    title:'紀玖年',
-    summary:'鏢局 · 赤霄山莊 · 案件調查',
-    body:`任職於鏢局，所屬門派為赤霄山莊。對機關符術有著異常的親和力。`,
-    sections:[{title:'任職資料',items:[['所屬機構','鏢局'],['所屬門派','赤霄山莊'],['工作內容','參與鏢局委託與案件調查。']]},{title:'相關案件',items:[['公開案牘','曾參與天環江商旅失蹤紀錄、咸陵城南符機失竊案、邊境舊驛道異常調查及咸陵邊境分屍案等案件。']]}]},
-  {
-    id:'weiyingzhou',
-    category:'人物',
-    title:'魏應舟',
-    summary:'鏢局 · 赤霄山莊 · 案件調查',
-    body:`任職於鏢局，所屬門派為赤霄山莊，曾與紀玖年共同參與案件調查。`,
-    sections:[{title:'任職資料',items:[['所屬機構','鏢局'],['所屬門派','赤霄山莊'],['工作內容','參與鏢局委託與案件調查。']]},{title:'相關案件',items:[['公開案牘','曾與紀玖年共同參與咸陵城南符機失竊案及咸陵邊境分屍案。']]}]},
-  {
-    id:'shilu',
-    category:'制度',
-    title:'示籙',
-    summary:'咸陵居民的身分登記',
-    body:`示籙為長明府於承光三百十二年正式接管並推行的官方身份憑證制度，前身為淮苑府時期所使用的戶籍符牒。長明府統一各地戶籍、身份與通行制度後，將傳統符牒改製為可與天眼、脈軌及各地官署符機連接的「示籙」，作為咸陵境內居民確認身份與使用公共制度的重要憑證。依長明府律令，嬰兒出生後三個月內，須由父母或法定監護人至所在地官署完成登錄。完成登錄後，示籙將記載其姓名、出生年月、籍貫、家屬關係與戶籍等基本資料，並由官署符機建立對應的身份檔案。`},
-  {
-    id:'jinbu',
-    category:'制度',
-    title:'禁步',
-    summary:'隨身佩戴的制度器物',
-    body:`佩禁步，知進退，明得失。禁步——咸陵人一生相隨之物。古時為佩玉，取「行有所止、進退有度」之意。長明府建立新制後，沿用其名，以符機與地脈技術重製，使其兼具身份識別、德數記錄之用。禁步中央嵌著一枚薄如蟬翼的明晶，平日只是溫潤的玉色。當持有者靠近天眼、查驗台或主城的公共設施時，禁步便會自行與其連接，玉面上的細密符紋會隨之亮起，以光紋的長短、明暗與完整程度呈現當前德數。`},
-  {
-    id:'rende',
-    category:'制度',
-    title:'仁德值',
-    summary:'規範言行的評量制度',
-    body:`長明府用於衡量個人社會貢獻與德行的數值，記錄於每個人所佩戴的禁步之中。其也細分成禮、仁、愛，它們並非單純代表財富或地位，而是由一個人在日常生活中的行為、工作、義務與對他人的付出共同累積。德數越高，可享有的公共資源與社會權限通常也越多。`},
-  {
-    id:'dimai',
-    category:'典籍',
-    title:'地脈',
-    summary:'咸陵文明的根基',
-    body:`祂存在於山川、河流與大地深處，由地下長年累積並流動的特殊能量構成。其分布並不固定，而是會隨地形、水系、季節與地質變化產生流動，因此自古便有「山有脈、水有源」之說。世界革新後，長明府逐步完成對地脈的探測與開發，將其轉化為可供城市使用的能源。如今，咸陵的脈軌、能源井、符機、城市照明與各類公共設施，皆建立於地脈系統之上。為確保地脈穩定運行，長明府在各地設置脈站與能源井，監測地脈流向與能量變化，再透過符術與機械進行轉換與輸送。地脈能源經由城市脈網分配，最終進入千家萬戶。`},
-  {
-    id:'taiyi',
-    category:'典籍',
-    title:'《太一律》',
-    summary:'世界革新前的古老典籍',
-    body:`《太一律》流傳於世界革新以前，作者與原貌皆不可考。
-如今流傳於世的內容分為五部，分藏於五大門派，各自記錄對地脈的不同理解。`}
+ {id:'changming',category:'機構',title:'長明府',summary:'咸陵新朝之政務體系',body:'舊朝淮苑府覆滅後，新政府以「長明」之名建立，並以承光為年號。\n長明府統轄咸陵的政務、秩序與制度，各機構分掌其職。',sections:[{title:'所屬機構',items:[['天監院','管理示籙、禁步等制度。'],['夜循司','負責城中秩序與巡察。'],['眾生院','處理法律與刑罰事務。'],['恆天樓','管理符機塔與地脈能量控制。']]}]},
+ {id:'tianjian',category:'機構',title:'天監院',summary:'示籙與禁步管理',body:'長明府所屬機構，掌理示籙與禁步相關制度。',sections:[{title:'職掌',items:[['示籙','記錄個人身分與相關登記事項。'],['禁步','與仁德值制度相連的隨身器物。']]}]},
+ {id:'yexun',category:'機構',title:'夜循司',summary:'城中秩序與巡察',body:'長明府所屬機構，負責城中秩序監察與巡查。'},
+ {id:'zhongsheng',category:'機構',title:'眾生院',summary:'律法與刑罰',body:'長明府所屬機構，負責法律與刑罰相關事務。'},
+ {id:'hengtian',category:'機構',title:'恆天樓',summary:'地脈能源與符機網絡 · 符機中樞',body:'恆天樓為長明府所屬機構，統籌地脈能源與符機網絡，亦被稱為「符機中樞」。',sections:[{title:'相關人員',items:[['紀不允','任職於恆天樓，協助地脈能源與符機網絡相關符術工作。詳細資料見人物檔案。']]}]},
+ {id:'sects',category:'門派',title:'五大門派',summary:'赤霄山莊、天衡門、玄水宮、萬象樓與太微門',body:'咸陵門派各循其道。現存四派與已覆亡的太微門，合稱五大門派；各派對修行與地脈的理解並不相同。',sections:[
+  {title:'赤霄山莊',items:[['理念','劍鋒隨心而向。赤霄弟子多性情冷冽，少有迂迴試探；敢愛敢恨，敢勝敢敗，重視本心與抉擇。'],['長老名錄與門規','尚未登錄正式資料。']]},
+  {title:'天衡門',items:[['理念','重視器術與創造，探究人與器物之間的關係。'],['長老名錄與門規','尚未登錄正式資料。']]},
+  {title:'玄水宮',items:[['理念','以醫道聞名，其修行與水、流動及執念相關。'],['重要地點','洗心池；詳細資料待補。'],['長老名錄與門規','尚未登錄正式資料。']]},
+  {title:'萬象樓',items:[['理念','以觀象、推演見長，重視對變化的理解，並有不可妄斷言之戒。'],['重要地點','觀象塔；詳細資料待補。'],['長老名錄與門規','尚未登錄正式資料。']]},
+  {title:'太微門',items:[['現況','已於舊年覆亡，相關記錄散佚；其與地脈舊事的關聯仍待釐清。'],['長老名錄與門規','史料散佚，尚無可公開的完整記錄。']]}
+ ]},
+ {id:'bia局',category:'機構',title:'鏢局',summary:'受長明府認證的民間運輸與護衛體系',body:'長明府建立後，鏢局被正式納入民間運輸與護衛體系，取得官府認證的鏢局可承接商旅、商會、門派乃至官府的委託，負責押送貨物、護送人員、傳遞機密文書、尋回失物及處理偏遠地區的突發事件。\n\n鏢局不屬於長明府官署，卻受到其制度約束。每一家正式登記的鏢局都必須持有鏢籍，鏢師則需以示籙登記身份與職業資格。部分高風險任務還需取得特殊通行權限，方可進入禁區或跨越門派領地。'},
+ {id:'jibuyun',category:'人物',title:'紀不允',summary:'長明府 · 恆天樓 · 符術',body:'太微門遺脈，擅長符術。行事公事公辦，情緒不輕易外露，卻有自己的判斷與堅持。',sections:[{title:'任職資料',items:[['所屬機構','長明府'],['任職單位','恆天樓（符機中樞）'],['工作內容','協助地脈能源與符機網絡相關的符術工作。']]},{title:'門派背景',items:[['太微門','太微門遺脈；太微門現已覆亡。']]}]},
+ {id:'jijiunian',category:'人物',title:'紀玖年',summary:'鏢局 · 赤霄山莊 · 案件調查',body:'任職於鏢局，所屬門派為赤霄山莊。對機關符術有著異常的親和力。',sections:[{title:'任職資料',items:[['所屬機構','鏢局'],['所屬門派','赤霄山莊'],['工作內容','參與鏢局委託與案件調查。']]},{title:'相關案件',items:[['公開案牘','曾參與天環江商旅失蹤紀錄、咸陵城南符機失竊案、邊境舊驛道異常調查及咸陵邊境分屍案等案件。']]}]},
+ {id:'weiyingzhou',category:'人物',title:'魏應舟',summary:'鏢局 · 赤霄山莊 · 案件調查',body:'任職於鏢局，所屬門派為赤霄山莊，曾與紀玖年共同參與案件調查。',sections:[{title:'任職資料',items:[['所屬機構','鏢局'],['所屬門派','赤霄山莊'],['工作內容','參與鏢局委託與案件調查。']]},{title:'相關案件',items:[['公開案牘','曾與紀玖年共同參與咸陵城南符機失竊案及咸陵邊境分屍案。']]}]},
+ {id:'shilu',category:'制度',title:'示籙',summary:'咸陵居民的身分登記',body:'示籙是長明府施行的登記制度，記錄居民身分、家族、居所等資訊，並與城市生活的管理相連。'},
+ {id:'jinbu',category:'制度',title:'禁步',summary:'隨身佩戴的制度器物',body:'禁步是與仁德值相關的隨身器物，其記錄與顯示影響居民在咸陵的日常生活。'},
+ {id:'rende',category:'制度',title:'仁德值',summary:'規範言行的評量制度',body:'長明府以仁德值作為社會管理制度之一，其數值可能影響居民的身分待遇與通行等權益。'},
+ {id:'dimai',category:'典籍',title:'地脈',summary:'咸陵文明的根基',body:'地脈是咸陵世界的根本力量，城市透過符機與能量轉換技術利用地脈，使古老城脈與現代建設並存。'},
+ {id:'taiyi',category:'典籍',title:'《太一律》',summary:'五部分藏於五大門派的古老典籍',body:'《太一律》流傳於世界革新以前，作者與原貌皆不可考。\n如今流傳於世的內容分為五部，分藏於五大門派，各自記錄對地脈的不同理解。',sections:[{title:'現存公開記錄',items:[['成書年代','世界革新以前；確切年代不可考。'],['作者與原貌','皆不可考。'],['傳世情形','分為五部，分藏於五大門派。'],['核心內容','各部記錄對地脈的不同理解；具體篇章尚未公開。']]}]}
 ];
 const categories=['全部','機構','門派','人物','制度','典籍'];
 let activeCategory='全部';let selectedId='changming';
@@ -149,12 +49,9 @@ function el(tag,text,className){const node=document.createElement(tag);if(text!=
 function showDetail(item){detail.replaceChildren();if(!item){detail.appendChild(el('p','請選擇一筆典籍條目。','note'));return;}detail.appendChild(el('div','長明府 · '+item.category+'檔案','eyebrow'));detail.appendChild(el('h2',item.title));detail.appendChild(el('span',item.category,'tag'));detail.appendChild(el('p',item.body));(item.sections||[]).forEach(section=>{detail.appendChild(el('h3',section.title,'section-title'));section.items.forEach(pair=>{const box=el('div',undefined,'subentry');box.appendChild(el('strong',pair[0]));box.appendChild(el('p',pair[1]));detail.appendChild(box);});});}
 function render(){filters.replaceChildren();categories.forEach(cat=>{const button=el('button',cat,'filter'+(cat===activeCategory?' active':''));button.type='button';button.addEventListener('click',()=>{activeCategory=cat;render();});filters.appendChild(button);});const query=search.value.trim().toLocaleLowerCase();const found=records.filter(item=>(activeCategory==='全部'||item.category===activeCategory)&&[item.title,item.summary,item.body,...(item.sections||[]).flatMap(s=>[s.title,...s.items.flat()])].join(' ').toLocaleLowerCase().includes(query));list.replaceChildren();if(!found.length){list.appendChild(el('p','查無符合的公開條目。','empty'));showDetail(null);return;}if(!found.some(item=>item.id===selectedId))selectedId=found[0].id;found.forEach(item=>{const button=el('button',undefined,'entry'+(item.id===selectedId?' selected':''));button.type='button';button.appendChild(el('span',item.title));button.appendChild(el('small',item.category+' · '+item.summary));button.addEventListener('click',()=>{selectedId=item.id;render();if(window.innerWidth<=700)detail.scrollIntoView({behavior:'smooth',block:'start'});});list.appendChild(button);});showDetail(found.find(item=>item.id===selectedId));}
 search.addEventListener('input',render);
-let player = null;
-try { player = JSON.parse(localStorage.getItem('fuyanshu_player') || 'null'); } catch (error) { console.warn('示籙資料格式錯誤', error); }
-if (!player || !player.name) window.location.replace('index.html');
+const player=JSON.parse(localStorage.getItem('fuyanshu_player')||'null');if(!player||!player.name)window.location.replace('index.html');
 render();
 </script>
 <script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
-<script src="virtue-system.js"></script>
 </body>
 </html>
