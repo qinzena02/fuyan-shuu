@@ -18,20 +18,21 @@
 <audio id="music" src="music/lv_0_20260927142906.mp3" preload="auto" loop></audio>
 <script>
 'use strict';
-const allowed=new Set(['city.html','archive.html','bounty.html','story.html','personal.html','travel.html']);
+const allowed=new Set(['city.html','archive.html','bounty.html','story.html','main-story.html','main-chapters.html','personal.html','travel.html']);
 const frame=document.getElementById('page'),music=document.getElementById('music'),toggle=document.getElementById('toggle'),controls=document.getElementById('controls'),hint=document.getElementById('hint');
 const initial=new URLSearchParams(location.search).get('page');
 frame.src=allowed.has(initial)?initial:'city.html';
 music.volume=.22;
 let enabled=localStorage.getItem('fuyanshu_city_music')!=='off';
 let isCase=false;
+const storyPages=new Set(['story.html','main-story.html','main-chapters.html']);
 function update(){toggle.textContent=enabled?(music.paused?'♫ 播放主城音樂':'♫ 暫停主城音樂'):'♫ 開啟主城音樂';toggle.setAttribute('aria-pressed',String(enabled&&!music.paused));}
 async function play(){if(!enabled||isCase)return;try{await music.play();hint.textContent='咸陵行旅 · 背景配樂';}catch(e){hint.textContent='點擊音樂按鈕開始播放';}update();}
 function currentPage(){try{return new URL(frame.contentWindow.location.href).pathname.split('/').pop()||'city.html';}catch(e){return 'city.html';}}
 frame.addEventListener('load',()=>{
- const page=currentPage();isCase=page==='story.html';
+ const page=currentPage();isCase=storyPages.has(page);
  controls.style.display=isCase?'none':'flex';
- if(isCase)music.pause();else play();
+ if(isCase){music.pause();music.currentTime=0;}else play();
  update();
  // 讓玩家從案件返回鏢局後恢復主城音樂。
  try{if(allowed.has(page))history.replaceState(null,'','?page='+encodeURIComponent(page));}catch(e){}
