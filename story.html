@@ -18,9 +18,23 @@
 .music-toggle{background:transparent;color:#a8d3c4;border:1px solid #547569;padding:5px 11px;font-size:13px}
 .music-toggle:hover{border-color:#dfc899}
 footer{text-align:center;color:#66867d;font-size:12px;padding:25px}@media(prefers-reduced-motion:reduce){.fade-in{animation:none}.status-sidebar{transition:none}}@media(max-width:750px){.layout{grid-template-columns:1fr}.masthead{min-height:290px;padding:65px 16px 85px}.panel{padding:19px}}
+
+/* 章節啟卷：只控制呈現，不修改存檔或遊戲狀態 */
+.chapter-cover{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;background:linear-gradient(180deg,rgba(5,13,15,.54),rgba(5,13,15,.77)),var(--cover-image,linear-gradient(135deg,#122d2d,#091113));background-size:cover;background-position:center;overflow:auto}
+.chapter-cover[hidden]{display:none!important}
+.cover-content{width:min(600px,100%);padding:clamp(25px,6vw,58px) 18px;border-top:1px solid #a98b58;border-bottom:1px solid #a98b58;background:rgba(5,16,18,.55);backdrop-filter:blur(3px)}
+.cover-kicker{color:#a8cbbd;letter-spacing:.28em;font-size:12px}
+.cover-title{font-weight:400;font-size:clamp(34px,7vw,60px);letter-spacing:.16em;color:#ead3a3;margin:20px 0 10px;text-shadow:0 5px 24px #000}
+.cover-desc{color:#c0c9bb;font-size:14px;letter-spacing:.12em;margin-bottom:30px}
+.cover-open{padding:13px 43px;border:1px solid #d6bd85;background:rgba(24,53,49,.82);color:#f3ddb0;letter-spacing:.35em;font-size:17px;cursor:pointer;transition:background .2s}
+.cover-open:hover,.cover-open:focus-visible{background:#31554b;outline:2px solid #d6bd85;outline-offset:3px}
+.cover-return{display:block;width:max-content;margin:20px auto 0;color:#a9c2b7;font-size:13px;text-decoration:none}
+.cover-return:hover{text-decoration:underline}
+body.cover-locked{overflow:hidden}
 </style>
 </head>
-<body>
+<body class="cover-locked">
+<section class="chapter-cover" id="chapterCover" aria-label="章節封面" style="--cover-image:url('images/tobi-2021061007.jpg')"><div class="cover-content"><div class="cover-kicker">咸陵鏢局 · 支線委託 · 卷一</div><h1 class="cover-title">江上無歸人</h1><p class="cover-desc">天環江商旅失蹤案</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="bounty.html">← 返回卷宗目錄</a></div></section>
 <header><div class="brand">負驗書</div><nav class="topnav"><a href="city.html">咸陵主城</a><a href="bounty.html">鏢局委託榜</a></nav></header>
 <div class="shell">
 <section class="masthead"><div class="eyebrow">咸陵鏢局 · 委託演繹 · 卷一</div><h1>江上無歸人</h1><p>天環江商旅失蹤案</p></section>
@@ -161,4 +175,17 @@ initializeCloud();
 </script>
 <script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
 <script src="virtue-system.js"></script>
+<script>
+(function(){
+ const cover=document.getElementById('chapterCover');
+ const open=document.getElementById('openChapter');
+ open.addEventListener('click',function(){
+   cover.hidden=true;
+   document.body.classList.remove('cover-locked');
+   window.scrollTo({top:0,behavior:'instant'});
+   const first=document.querySelector('main .choice, main button');
+   if(first && first.focus)first.focus({preventScroll:true});
+ });
+})();
+</script>
 </body></html>

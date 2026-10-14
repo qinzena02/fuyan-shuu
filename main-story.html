@@ -6,13 +6,22 @@
 <style>
 :root{--bg:#091113;--panel:#112326;--line:#3b6059;--gold:#e1c994;--blue:#75eaff;--text:#d5d9ce;--muted:#9db9ae}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);background:radial-gradient(ellipse at 50% -10%,#24433c 0%,#091113 55%);font-family:"Microsoft JhengHei","Noto Serif TC",serif;line-height:1.95}button,a{font:inherit}a{color:var(--muted);text-decoration:none}a:hover{color:var(--gold)}header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px max(18px,calc((100vw - 1080px)/2));border-bottom:1px solid var(--line);background:#0b191bdc;flex-wrap:wrap}.brand{color:var(--gold);letter-spacing:3px}.header-right{display:flex;gap:15px;align-items:center;font-size:13px}.time{color:var(--blue);text-shadow:0 0 12px #43dfff9e;font-variant-numeric:tabular-nums}.wrap{max-width:1080px;margin:0 auto;padding:42px 20px 75px}.eyebrow{color:var(--blue);font-size:11px;letter-spacing:3px}.intro{text-align:center;margin-bottom:32px}.intro h1{font-size:clamp(32px,6vw,52px);font-weight:normal;color:var(--gold);letter-spacing:7px;text-shadow:0 0 20px #dfbb694f;margin:12px 0}.intro p{color:var(--muted);font-size:14px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start}.scene,.aside-card{background:#102123ee;border:1px solid var(--line);box-shadow:0 16px 55px #0003}.scene{padding:clamp(22px,4vw,43px);min-height:480px}.chapter{color:var(--blue);font-size:12px;letter-spacing:2px}.scene h2{font-size:26px;font-weight:normal;color:var(--gold);margin:8px 0 22px;text-shadow:0 0 15px #cbb47a55}.story{white-space:pre-line;font-size:15px;line-height:2.25}.story p{margin:0 0 18px}.choices{border-top:1px solid #36564d;padding-top:22px;margin-top:24px}.choice{display:block;width:100%;text-align:left;color:#e6d4aa;background:#172e2f;border:1px solid #42665d;padding:13px 18px;margin:9px 0;cursor:pointer;transition:.2s}.choice:hover,.choice:focus-visible{border-color:var(--gold);background:#24423f;transform:translateX(3px);outline:none}.aside{display:grid;gap:14px}.aside-card{padding:18px}.aside h3{font-weight:normal;color:var(--gold);font-size:16px;margin:0 0 10px}.aside p,.aside li{font-size:13px;color:var(--muted);margin:5px 0}.aside ul{padding-left:18px;margin:0}.pill{display:inline-block;border:1px solid #4e827c;color:var(--blue);padding:2px 8px;font-size:11px;margin-top:8px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:17px}.secondary{background:transparent;border:1px solid #806f50;color:var(--gold);padding:8px 12px;cursor:pointer;font-size:12px}.secondary:hover{background:#243b36}.note{font-size:12px;color:#9bb1a6}.error{border:1px solid #b98b65;padding:20px;color:#e9caa8;background:#241e1b}.hidden{display:none}footer{text-align:center;color:#67867e;font-size:12px;padding:15px 0 35px}@media(max-width:780px){.layout{grid-template-columns:1fr}.aside{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding-top:28px}}@media(max-width:520px){.aside{grid-template-columns:1fr}.intro h1{letter-spacing:3px}.scene{min-height:0}}
 
-/* 天眼判定：猩紅警示閃爍 */
-.tianyan-warning{color:#ff4052;font-weight:700;letter-spacing:.1em;text-shadow:0 0 7px #ff4052,0 0 17px #d71935,0 0 30px #9e0924;animation:tianyan-flicker 1.8s infinite}
-@keyframes tianyan-flicker{0%,18%,22%,50%,54%,100%{opacity:1}20%,52%{opacity:.25}21%,53%{opacity:.7}}
-@media(prefers-reduced-motion:reduce){.tianyan-warning{animation:none}}
+/* 章節啟卷：只控制呈現，不修改存檔或遊戲狀態 */
+.chapter-cover{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;background:linear-gradient(180deg,rgba(5,13,15,.54),rgba(5,13,15,.77)),var(--cover-image,linear-gradient(135deg,#122d2d,#091113));background-size:cover;background-position:center;overflow:auto}
+.chapter-cover[hidden]{display:none!important}
+.cover-content{width:min(600px,100%);padding:clamp(25px,6vw,58px) 18px;border-top:1px solid #a98b58;border-bottom:1px solid #a98b58;background:rgba(5,16,18,.55);backdrop-filter:blur(3px)}
+.cover-kicker{color:#a8cbbd;letter-spacing:.28em;font-size:12px}
+.cover-title{font-weight:400;font-size:clamp(34px,7vw,60px);letter-spacing:.16em;color:#ead3a3;margin:20px 0 10px;text-shadow:0 5px 24px #000}
+.cover-desc{color:#c0c9bb;font-size:14px;letter-spacing:.12em;margin-bottom:30px}
+.cover-open{padding:13px 43px;border:1px solid #d6bd85;background:rgba(24,53,49,.82);color:#f3ddb0;letter-spacing:.35em;font-size:17px;cursor:pointer;transition:background .2s}
+.cover-open:hover,.cover-open:focus-visible{background:#31554b;outline:2px solid #d6bd85;outline-offset:3px}
+.cover-return{display:block;width:max-content;margin:20px auto 0;color:#a9c2b7;font-size:13px;text-decoration:none}
+.cover-return:hover{text-decoration:underline}
+body.cover-locked{overflow:hidden}
 </style>
 </head>
-<body>
+<body class="cover-locked">
+<section class="chapter-cover" id="chapterCover" aria-label="章節封面" style="--cover-image:radial-gradient(ellipse at 50% 30%,#2b5047,#091113 80%)"><div class="cover-content"><div class="cover-kicker">長明府 · 主線卷宗 · 卷一</div><h1 class="cover-title">天地不問來處</h1><p class="cover-desc">承光年間 · 北城第三更</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="city.html">← 返回卷宗目錄</a></div></section>
 <header><div class="brand">負驗書 · 主線卷宗</div><div class="header-right"><span class="time" id="clock">--:--:--</span><a href="city.html">← 返回咸陵主城</a></div></header>
 <div class="wrap"><div class="intro"><div class="eyebrow">MAIN STORY · VOLUME 01</div><h1>天地不問來處</h1><p>承光年間 · 北城第三更　／　序幕：禁步歸零</p></div>
 <div class="layout"><main class="scene"><div id="error" class="error hidden"></div><div id="game"><div class="chapter" id="chapter"></div><h2 id="scene-title"></h2><div class="story" id="story"></div><div class="choices" id="choices"></div><div class="actions"><button class="secondary" id="restart" type="button">重啟本卷序幕</button><button class="secondary" id="save" type="button">手動儲存</button></div><p class="note" id="status" role="status">行跡將自動記錄於此裝置。</p></div></main>
@@ -79,7 +88,7 @@ const scenes={
 let state={scene:'start',clues:[],relations:[]};
 function uniqueAdd(key,values){for(const value of values||[])if(!state[key].includes(value))state[key].push(value);}
 function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));$('status').textContent='已儲存 · '+new Date().toLocaleTimeString('zh-TW',{hour12:false});}catch(e){$('status').textContent='無法儲存：請檢查瀏覽器是否允許本機儲存。';}}
-function render(){const scene=scenes[state.scene]||scenes.start;uniqueAdd('clues',scene.clues);uniqueAdd('relations',scene.relations);$('chapter').textContent=scene.chapter;$('scene-title').textContent=scene.title;$('story').replaceChildren();for(const p of scene.paragraphs){const node=document.createElement('p');node.textContent=p;if(p.includes('德數歸零者，禁止前行'))node.classList.add('tianyan-warning');$('story').appendChild(node);}$('choices').replaceChildren();for(const [label,next] of scene.options){const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='→ '+label;b.addEventListener('click',()=>{state.scene=next;render();document.querySelector('.scene').scrollIntoView({behavior:'smooth',block:'start'});});$('choices').appendChild(b);}if(!scene.options.length){const a=document.createElement('a');a.href='city.html';a.className='choice';a.textContent='← 返回咸陵主城';$('choices').appendChild(a);}for(const [key,target] of [['clues','clue-list'],['relations','relation-list']]){const ul=$(target);ul.replaceChildren();for(const text of state[key].length?state[key]:['尚無記錄']){const li=document.createElement('li');li.textContent=text;ul.appendChild(li);}}persist();}
+function render(){const scene=scenes[state.scene]||scenes.start;uniqueAdd('clues',scene.clues);uniqueAdd('relations',scene.relations);$('chapter').textContent=scene.chapter;$('scene-title').textContent=scene.title;$('story').replaceChildren();for(const p of scene.paragraphs){const node=document.createElement('p');node.textContent=p;$('story').appendChild(node);}$('choices').replaceChildren();for(const [label,next] of scene.options){const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='→ '+label;b.addEventListener('click',()=>{state.scene=next;render();document.querySelector('.scene').scrollIntoView({behavior:'smooth',block:'start'});});$('choices').appendChild(b);}if(!scene.options.length){const a=document.createElement('a');a.href='city.html';a.className='choice';a.textContent='← 返回咸陵主城';$('choices').appendChild(a);}for(const [key,target] of [['clues','clue-list'],['relations','relation-list']]){const ul=$(target);ul.replaceChildren();for(const text of state[key].length?state[key]:['尚無記錄']){const li=document.createElement('li');li.textContent=text;ul.appendChild(li);}}persist();}
 $('restart').addEventListener('click',()=>{if(confirm('確定重新開始卷一序幕？本卷的線索與人物交集將重設，其他支線存檔不受影響。')){state={scene:'start',clues:[],relations:[]};render();}});
 $('save').addEventListener('click',persist);
 if(!player||!player.name){$('game').classList.add('hidden');$('error').classList.remove('hidden');$('error').textContent='尚未建立示籙。請先返回登記頁建立玩家身分，再進入主線。';const a=document.createElement('a');a.href='index.html';a.textContent=' → 前往示籙登記';$('error').appendChild(a);}else{
@@ -87,5 +96,17 @@ if(!player||!player.name){$('game').classList.add('hidden');$('error').classList
  try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&scenes[saved.scene]&&Array.isArray(saved.clues)&&Array.isArray(saved.relations))state={scene:saved.scene,clues:saved.clues.filter(x=>typeof x==='string'),relations:saved.relations.filter(x=>typeof x==='string')};}catch(e){}
  render();}
 </script>
-<script src="virtue-system.js"></script>
+<script>
+(function(){
+ const cover=document.getElementById('chapterCover');
+ const open=document.getElementById('openChapter');
+ open.addEventListener('click',function(){
+   cover.hidden=true;
+   document.body.classList.remove('cover-locked');
+   window.scrollTo({top:0,behavior:'instant'});
+   const first=document.querySelector('main .choice, main button');
+   if(first && first.focus)first.focus({preventScroll:true});
+ });
+})();
+</script>
 </body></html>
