@@ -371,6 +371,12 @@ if(!player||!player.name){window.location.replace('index.html')}else{
        window.location.href=target;
      });
      details.appendChild(share);
+     const official=document.createElement('button');official.type='button';official.className='news-share';official.style.marginLeft='8px';official.textContent='↗ 以官方角色轉發';
+     official.addEventListener('click',()=>{
+       const params=new URLSearchParams({news_title:item.title,news_tag:item.tag,news_body:item.body});
+       window.location.href='admin.html?'+params.toString();
+     });
+     details.appendChild(official);
    }
    feed.appendChild(details);
  });}

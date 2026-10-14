@@ -95,7 +95,14 @@ async function sendDirectComment(){
  }catch(e){msg.textContent='發布失敗：'+errorText(e);}
  finally{button.disabled=false;}
 }
-$('directSend').addEventListener('click',sendDirectComment);
+ function receiveNewsForOfficial(){
+  const params=new URLSearchParams(location.search);const title=params.get('news_title');if(!title)return;
+  const tag=params.get('news_tag')||'城中消息',body=params.get('news_body')||'';
+  $('body').value='【轉引咸陵日報｜'+tag+'】\n'+title+'\n'+body.slice(0,500)+'\n—— 來源：咸陵日報\n\n';
+  updateForm();notify('已載入公開新聞。請選擇發文角色，加入角色評論後再發布。','success');
+  history.replaceState(null,'',location.pathname+location.hash);
+ }
+ $('directSend').addEventListener('click',sendDirectComment);
 
 function renderAdminImages(){const root=$('adminImagePreviews');root.replaceChildren();const all=[...keptImages.map(path=>({path})),...newImages.map(file=>({file}))];for(let i=0;i<all.length;i++){const item=all[i],wrap=document.createElement('div');wrap.className='admin-image';const img=document.createElement('img');if(item.path){img.src=db.storage.from('social-images').getPublicUrl(item.path).data.publicUrl;}else{const url=URL.createObjectURL(item.file);img.src=url;img.onload=()=>URL.revokeObjectURL(url);}const remove=document.createElement('button');remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','移除附圖');remove.onclick=()=>{if(item.path)keptImages=keptImages.filter(x=>x!==item.path);else newImages=newImages.filter(x=>x!==item.file);renderAdminImages()};wrap.append(img,remove);root.appendChild(wrap);}}
 $('postImages').addEventListener('change',e=>{const files=[...e.target.files];e.target.value='';if(keptImages.length+newImages.length+files.length>4){notify('每篇最多四張圖片。','error');return;}for(const f of files){if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>5*1024*1024){notify('圖片必須是 JPG、PNG 或 WebP，且每張不超過 5 MB。','error');return;}}newImages.push(...files);renderAdminImages();});
