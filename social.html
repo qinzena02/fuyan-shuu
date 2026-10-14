@@ -80,6 +80,20 @@ main{max-width:1240px;padding:32px 24px 85px}
 
 /* 圖文書札 */
 .composer{margin-bottom:22px}.composer textarea{width:100%;min-height:100px;resize:vertical;background:#0a1c1d;border:1px solid #436359;border-radius:9px;padding:12px;color:#e5e0d4;font:inherit}.composer-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}.composer button,.composer label.upload-label{background:#1b3934;border:1px solid #897750;color:#e8d2a2;border-radius:7px;padding:7px 13px;cursor:pointer;font:inherit;font-size:13px}.composer button:disabled{opacity:.5}.upload-label input{display:none}.image-previews,.post-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}.image-preview{position:relative}.image-preview img,.post-images img{width:100%;max-height:290px;object-fit:cover;border-radius:8px;display:block}.image-preview button{position:absolute;top:5px;right:5px;background:#102223;color:#fff;border:1px solid #bda77e;border-radius:50%;width:28px;height:28px;cursor:pointer}.post-images button{border:0;padding:0;background:transparent;cursor:zoom-in}.post-images.single{grid-template-columns:1fr}.composer-status{color:#c4b084;font-size:12px}.composer-status.error{color:#f0b9b9}.player-post-tag{color:#a8d0c3;font-size:12px}
+
+/* 角色頭像導覽：置於萬象傳書介紹下方，取代側邊欄 */
+.layout{display:block;max-width:100%;}
+.layout>section{min-width:0;}
+.character-strip{margin:18px 0 24px;max-width:100%;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#456a5e transparent;padding:5px 2px 12px;}
+.character-strip .filters{display:flex;flex-direction:row;align-items:flex-start;gap:16px;width:max-content;min-width:100%;}
+.character-strip .avatar-filter{display:flex;flex-direction:column;align-items:center;gap:7px;width:75px;min-width:75px;min-height:0;padding:4px 2px;border:0;border-radius:12px;background:transparent;color:#a9c5b9;text-align:center;cursor:pointer;}
+.character-strip .avatar-filter:hover,.character-strip .avatar-filter.active{border:0;background:transparent;color:#eed6a1;}
+.character-strip .sidebar-portrait{width:62px;height:62px;border-radius:50%;border:2px solid #52766b;background:#17322e;box-shadow:none;font-size:22px;transition:transform .15s,border-color .15s;}
+.character-strip .avatar-filter:hover .sidebar-portrait{transform:translateY(-2px);border-color:#b5a16e;}
+.character-strip .avatar-filter.active .sidebar-portrait{border-color:#e4c486;box-shadow:0 0 0 3px rgba(228,196,134,.15);}
+.character-strip .sidebar-portrait img{width:100%;height:100%;object-fit:cover;}
+.avatar-filter-label{font-size:12px;white-space:nowrap;line-height:1.5;}
+@media(max-width:760px){.layout{display:block}.character-strip{margin:12px 0 20px}.character-strip .filters{flex-wrap:nowrap;gap:10px}.character-strip .avatar-filter{width:65px;min-width:65px}.character-strip .sidebar-portrait{width:54px;height:54px}.avatar-filter-label{font-size:11px}}
 </style>
 </head>
 <body>
@@ -87,8 +101,8 @@ main{max-width:1240px;padding:32px 24px 85px}
 <main>
 <div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1>
 <p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
+<nav class="character-strip" aria-label="依角色查看書札"><div class="filters" id="filters"></div></nav>
 <div class="layout">
-<aside class="panel social-sidebar"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有書札</button></div><p class="note">循人物之名，尋江湖書札。</p></aside>
 <section aria-label="公開書札動態牆"><div id="playerComposer" class="panel composer hidden"><h2>撰寫書札</h2><textarea id="newPostBody" maxlength="3000" placeholder="江湖所見、城中近聞，皆可留於此處……"></textarea><div id="newImagePreviews" class="image-previews"></div><div class="composer-tools"><label class="upload-label">＋ 附加圖片<input id="newPostImages" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><span id="newImageCount" class="small">0 / 4 張</span><button id="submitPost" type="button">發布書札</button></div><p id="composerStatus" class="composer-status" role="status"></p></div><div class="feed-head"><h2 id="feedTitle">城中書札</h2></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
 </div>
 </main><footer>長明府 · 萬象傳書</footer>
@@ -104,7 +118,28 @@ let commentsByPost=new Map(),commentLoadError="",playerName="行旅者";let pend
 function showState(message,error=false){const e=$('state');e.textContent=message;e.className='state'+(error?' error':'');e.classList.remove('hidden');}
 function hideState(){$('state').classList.add('hidden');}
 function timeText(value){if(!value)return '時間未記錄';const d=new Date(value);return Number.isNaN(d.getTime())?'時間未記錄':d.toLocaleString('zh-TW',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
-function renderFilters(){const root=$('filters');root.replaceChildren();const options=[{id:'all',label:'所有書札'},...accounts.map(a=>({id:a.character_id,label:a.characters.name}))];for(const opt of options){const b=document.createElement('button');b.type='button';b.className='filter'+(selected===opt.id?' active':'');if(opt.id!=='all'){const acc=accounts.find(x=>x.character_id===opt.id);const portrait=document.createElement('span');portrait.className='sidebar-portrait';if(acc?.characters?.avatar_url&&/^https:\/\//i.test(acc.characters.avatar_url)){const img=document.createElement('img');img.src=acc.characters.avatar_url;img.alt='';img.loading='lazy';portrait.appendChild(img);}else portrait.textContent=opt.label.slice(0,1);b.appendChild(portrait);}const label=document.createElement('span');label.textContent=opt.label;b.appendChild(label);b.addEventListener('click',()=>{selected=opt.id;renderFilters();renderPosts();});root.appendChild(b);}}
+function renderFilters(){
+ const root=$('filters');root.replaceChildren();
+ const options=[{id:'all',label:'所有書札'},...accounts.map(a=>({id:a.character_id,label:a.characters.name}))];
+ for(const opt of options){
+  const b=document.createElement('button');b.type='button';
+  b.className='filter avatar-filter'+(selected===opt.id?' active':'');
+  b.title=opt.label;b.setAttribute('aria-label',opt.label);b.setAttribute('aria-pressed',String(selected===opt.id));
+  const portrait=document.createElement('span');portrait.className='sidebar-portrait';
+  if(opt.id==='all')portrait.textContent='全';
+  else{
+   const acc=accounts.find(x=>x.character_id===opt.id);
+   if(acc?.characters?.avatar_url&&/^https:\/\//i.test(acc.characters.avatar_url)){
+    const img=document.createElement('img');img.src=acc.characters.avatar_url;img.alt='';img.loading='lazy';
+    img.onerror=()=>{portrait.replaceChildren();portrait.textContent=opt.label.slice(0,1)};
+    portrait.appendChild(img);
+   }else portrait.textContent=opt.label.slice(0,1);
+  }
+  const label=document.createElement('span');label.className='avatar-filter-label';label.textContent=opt.id==='all'?'全部':opt.label;
+  b.append(portrait,label);
+  b.addEventListener('click',()=>{selected=opt.id;renderFilters();renderPosts();});root.appendChild(b);
+ }
+}
 function renderPosts(){
  const root=$('feed');root.replaceChildren();
  const list=posts.filter(p=>selected==='all'||p.author_character_id===selected);
