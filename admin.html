@@ -36,6 +36,11 @@
 <label class="field" for="avatarUrl">頭像圖片網址</label><input id="avatarUrl" type="url" inputmode="url" placeholder="https://.../avatar.png" maxlength="2000">
 <div class="actions"><button id="saveAvatar" class="primary" type="button">儲存角色頭像</button><button id="clearAvatar" type="button">移除頭像</button></div>
 <p class="hint">請使用可公開存取的圖片網址。你可以先在 Supabase Storage 上傳圖片，再複製 Public URL 貼到這裡。</p></section>
+<section class="panel"><h2>官方角色 · 回應書札</h2><p class="hint">角色可以直接在任何已公開的官方書札下留言，不必等待玩家先留言。留言會出現在該篇書札的討論區。</p>
+<label class="field" for="directPost">選擇書札</label><select id="directPost"></select>
+<label class="field" for="directCharacter">留言角色</label><select id="directCharacter"></select>
+<label class="field" for="directBody">留言內容</label><textarea id="directBody" class="reply-text" maxlength="1000" placeholder="以角色身分留下回應（最多 1000 字）"></textarea>
+<div class="actions"><button id="directSend" type="button" class="primary">發布角色留言</button><span id="directStatus" class="reply-status" role="status"></span></div></section>
 <section class="panel"><h2>書札留言 · 角色回覆</h2><p class="hint">以官方角色身分回覆玩家留言。僅列出已公開的書札；回覆會直接顯示在玩家端。</p><div class="actions"><button id="refreshComments" type="button">重新整理留言</button></div><div id="adminComments">正在讀取留言……</div></section>
 <section class="panel"><h2>官方書札紀錄</h2><div class="actions"><button id="refresh">重新整理</button><span class="pill" id="total">0 篇</span></div><div id="posts" class="empty">正在載入貼文……</div></section>
 </div>
@@ -47,20 +52,43 @@
 const db=window.fuyanshuDB;const $=id=>document.getElementById(id);let currentUser=null;let characters=[];let posts=[];let editing=null;let busy=false;
 function notify(message,type=''){const el=$('status');el.textContent=message;el.className='status '+type;}
 function gate(message){$('workspace').classList.add('hidden');$('gate').classList.remove('hidden');$('gateText').textContent=message;}
-function setBusy(value){busy=value;['saveDraft','publish','reset','refresh','saveAvatar','clearAvatar','refreshComments'].forEach(id=>$(id).disabled=value);}
+function setBusy(value){busy=value;['saveDraft','publish','reset','refresh','saveAvatar','clearAvatar','refreshComments','directSend'].forEach(id=>$(id).disabled=value);}
 function errorText(error){return error?.message||String(error||'未知錯誤');}
 function resetForm(){editing=null;$('editorTitle').textContent='撰寫官方書札';$('body').value='';$('visibility').value='public';$('unlockStory').value='';$('character').disabled=false;updateForm();}
 function updateForm(){const len=$('body').value.trim().length;$('counter').textContent=$('body').value.length+' / 3000';$('unlockStory').disabled=$('visibility').value!=='story';$('publish').disabled=busy||len===0||$('visibility').value==='story';$('saveDraft').disabled=busy||len===0;}
-async function loadCharacters(){const {data,error}=await db.from('character_social_profiles').select('character_id,handle,is_active,characters(name,is_public,avatar_url)').eq('is_active',true);if(error)throw error;characters=(data||[]).filter(x=>x.characters?.is_public);const select=$('character');select.replaceChildren();for(const c of characters){const o=document.createElement('option');o.value=c.character_id;o.textContent=c.characters.name+' · @'+c.handle;select.appendChild(o);}if(!characters.length){notify('目前沒有已啟用且公開的角色帳號，請先檢查角色資料。','error');}const avatarSelect=$('avatarCharacter');avatarSelect.replaceChildren();for(const c of characters){const option=document.createElement('option');option.value=c.character_id;option.textContent=c.characters.name;avatarSelect.appendChild(option);}syncAvatarEditor();} 
+async function loadCharacters(){const {data,error}=await db.from('character_social_profiles').select('character_id,handle,is_active,characters(name,is_public,avatar_url)').eq('is_active',true);if(error)throw error;characters=(data||[]).filter(x=>x.characters?.is_public);const select=$('character');select.replaceChildren();for(const c of characters){const o=document.createElement('option');o.value=c.character_id;o.textContent=c.characters.name+' · @'+c.handle;select.appendChild(o);}if(!characters.length){notify('目前沒有已啟用且公開的角色帳號，請先檢查角色資料。','error');}const avatarSelect=$('avatarCharacter');avatarSelect.replaceChildren();for(const c of characters){const option=document.createElement('option');option.value=c.character_id;option.textContent=c.characters.name;avatarSelect.appendChild(option);}syncAvatarEditor();const direct=$('directCharacter');direct.replaceChildren();for(const c of characters){const opt=document.createElement('option');opt.value=c.character_id;opt.textContent=c.characters.name;direct.appendChild(opt);}} 
 function syncAvatarEditor(){const c=characters.find(x=>x.character_id===$('avatarCharacter').value);$('avatarUrl').value=c?.characters?.avatar_url||'';renderAvatarPreview();}
 function renderAvatarPreview(){const box=$('avatarPreview');box.replaceChildren();const url=$('avatarUrl').value.trim();const c=characters.find(x=>x.character_id===$('avatarCharacter').value);if(url&&/^https:\/\//i.test(url)){const img=document.createElement('img');img.alt='頭像預覽';img.src=url;img.referrerPolicy='no-referrer';img.onerror=()=>{box.replaceChildren();box.textContent='圖片無法載入';};box.appendChild(img);}else{box.textContent=c?.characters?.name?.slice(0,1)||'未設定';}}
 async function saveAvatar(remove=false){if(busy)return;const c=characters.find(x=>x.character_id===$('avatarCharacter').value);if(!c){notify('請先選擇角色。','error');return;}const url=remove?'':$('avatarUrl').value.trim();if(url&&!url.startsWith('https://')){notify('頭像網址必須以 https:// 開頭。','error');return;}if(url.length>2000){notify('頭像網址過長。','error');return;}setBusy(true);try{const {data,error}=await db.from('characters').update({avatar_url:url||null}).eq('id',c.character_id).select('id,avatar_url');if(error)throw error;if(!data?.length)throw new Error('更新未成功，請確認管理員權限。');c.characters.avatar_url=url||null;syncAvatarEditor();notify(remove?'角色頭像已移除。':'角色頭像已儲存，重新整理玩家端即可看到。','success');}catch(e){notify('頭像儲存失敗：'+errorText(e),'error');}finally{setBusy(false);updateForm();}}
 
-async function loadPosts(){const {data,error}=await db.from('social_posts').select('id,author_character_id,author_user_id,body,status,visibility,unlock_story_id,created_at,published_at').not('author_character_id','is',null).order('created_at',{ascending:false}).limit(100);if(error)throw error;posts=data||[];renderPosts();}
+async function loadPosts(){const {data,error}=await db.from('social_posts').select('id,author_character_id,author_user_id,body,status,visibility,unlock_story_id,created_at,published_at').not('author_character_id','is',null).order('created_at',{ascending:false}).limit(100);if(error)throw error;posts=data||[];renderPosts();renderDirectPosts();}
 function renderPosts(){const root=$('posts');root.replaceChildren();$('total').textContent=posts.length+' 篇（最多顯示 100 篇）';if(!posts.length){root.textContent='尚無官方貼文。可以從左側建立第一篇。';return;}for(const p of posts){const item=document.createElement('article');item.className='item';const title=document.createElement('div');title.className='item-title';const c=characters.find(x=>x.character_id===p.author_character_id);title.textContent=(c?.characters?.name||'未啟用角色')+' · '+(p.status==='published'?'已發布':'草稿');const meta=document.createElement('div');meta.className='item-meta';meta.textContent=(p.visibility==='story'?'劇情限定':'全服公開')+' · '+new Date(p.created_at).toLocaleString('zh-TW');const content=document.createElement('div');content.className='item-body';content.textContent=p.body;const actions=document.createElement('div');actions.className='item-actions';const edit=document.createElement('button');edit.type='button';edit.textContent='編輯';edit.addEventListener('click',()=>editPost(p));const del=document.createElement('button');del.type='button';del.textContent='刪除';del.className='danger';del.addEventListener('click',()=>deletePost(p));actions.append(edit,del);item.append(title,meta,content,actions);root.appendChild(item);}}
 function editPost(p){editing=p.id;$('editorTitle').textContent='編輯官方書札';$('character').value=p.author_character_id;$('character').disabled=true;$('body').value=p.body;$('visibility').value=p.visibility;$('unlockStory').value=p.unlock_story_id||'';updateForm();window.scrollTo({top:0,behavior:'smooth'});notify('正在編輯：'+(p.status==='published'?'已發布貼文':'草稿')+'。按「正式發布」將公開更新後的內容。');}
 async function save(status){if(busy)return;const body=$('body').value.trim();const characterId=$('character').value;const visibility=$('visibility').value;if(!body||body.length>3000||!characterId){notify('請選擇角色並輸入 1 至 3000 字的內容。','error');return;}if(status==='published'&&visibility==='story'){notify('劇情貼文尚未建立解鎖驗證，請先儲存草稿。','error');return;}if(!characters.some(c=>c.character_id===characterId)){notify('角色帳號未啟用。','error');return;}setBusy(true);try{const payload={body,visibility,status,unlock_story_id:visibility==='story'?($('unlockStory').value.trim()||null):null,published_at:status==='published'?new Date().toISOString():null,updated_at:new Date().toISOString()};let result;if(editing){result=await db.from('social_posts').update(payload).eq('id',editing).not('author_character_id','is',null).select('id');}else{result=await db.from('social_posts').insert({...payload,author_character_id:characterId,author_user_id:null}).select('id');}if(result.error)throw result.error;if(!result.data?.length)throw new Error('資料未更新，請檢查管理員權限。');resetForm();await loadPosts();notify(status==='published'?'官方書札已發布。':'草稿已儲存。','success');}catch(e){notify('儲存失敗：'+errorText(e),'error');}finally{setBusy(false);updateForm();}}
 async function deletePost(p){if(busy)return;if(!window.confirm('確定永久刪除這篇官方書札？此操作無法復原。'))return;setBusy(true);try{const {data,error}=await db.from('social_posts').delete().eq('id',p.id).not('author_character_id','is',null).select('id');if(error)throw error;if(!data?.length)throw new Error('刪除未成功，請檢查權限。');if(editing===p.id)resetForm();await loadPosts();notify('貼文已刪除。','success');}catch(e){notify('刪除失敗：'+errorText(e),'error');}finally{setBusy(false);updateForm();}}
+
+
+function renderDirectPosts(){
+ const sel=$('directPost'),before=sel.value;sel.replaceChildren();
+ for(const p of posts.filter(p=>p.status==='published'&&p.visibility==='public')){
+  const opt=document.createElement('option');opt.value=p.id;
+  const c=characters.find(x=>x.character_id===p.author_character_id);
+  opt.textContent=(c?.characters?.name||'角色')+'：'+p.body.replace(/\s+/g,' ').slice(0,55);sel.appendChild(opt);
+ }
+ if([...sel.options].some(x=>x.value===before))sel.value=before;
+}
+async function sendDirectComment(){
+ const msg=$('directStatus'),postId=$('directPost').value,characterId=$('directCharacter').value,body=$('directBody').value.trim();
+ if(!postId||!characterId||!body){msg.textContent='請選擇書札、角色並輸入內容。';return;}
+ const button=$('directSend');button.disabled=true;msg.textContent='正在發布……';
+ try{
+  const {error}=await db.from('social_comments').insert({post_id:postId,parent_id:null,author_character_id:characterId,author_user_id:null,body});
+  if(error)throw error;
+  $('directBody').value='';msg.textContent='角色留言已發布。';await loadAdminComments();
+ }catch(e){msg.textContent='發布失敗：'+errorText(e);}
+ finally{button.disabled=false;}
+}
+$('directSend').addEventListener('click',sendDirectComment);
 
 async function loadAdminComments(){
  const root=$('adminComments');root.textContent='正在讀取留言……';

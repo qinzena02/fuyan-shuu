@@ -30,6 +30,30 @@
 .comment-form{display:flex;gap:8px;align-items:flex-start}.comment-input{flex:1;min-width:0;min-height:42px;max-height:130px;resize:vertical;background:#0a1c1d;border:1px solid #436359;color:#e5e0d4;border-radius:5px;padding:8px 10px;font:inherit;font-size:13px}
 .comment-send{border:1px solid #897750;background:#1b3934;color:#e8d2a2;border-radius:5px;padding:8px 13px;font:inherit;font-size:12px;cursor:pointer}
 .comment-send:disabled{opacity:.55;cursor:wait}.comment-status{font-size:12px;color:#dca7a1;margin:5px 0}.comment-empty{font-size:12px;color:#829e92}
+
+/* v2：側邊欄與圓潤對話氣泡 */
+main{max-width:1240px;padding:32px 24px 85px}
+.layout{grid-template-columns:245px minmax(0,1fr);gap:28px;align-items:start}
+.social-sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;border-radius:0;border-top:0;border-bottom:0;border-left:0;background:linear-gradient(180deg,#102322,#0b1a1b);padding:25px 18px 30px 0;box-shadow:none}
+.social-sidebar h2{font-size:18px;letter-spacing:3px;padding-left:12px}
+.social-sidebar .filters{display:flex;flex-direction:column;gap:7px}
+.social-sidebar .filter{display:flex;align-items:center;gap:12px;border-radius:9px;min-height:48px}
+.social-sidebar .filter.active{border-left:3px solid #d3b67e;background:#1b3431}
+.sidebar-portrait{width:32px;height:32px;display:grid;place-items:center;flex-shrink:0;border:1px solid #8b805d;border-radius:50%;overflow:hidden;color:#dfc899}
+.sidebar-portrait img{width:100%;height:100%;object-fit:cover}
+.post{border-radius:17px;padding:26px 28px}
+.post-foot{display:none}
+.comment-list{gap:13px}
+.comment-item{position:relative;border:1px solid #36554c;border-radius:23px;background:#152e2c;padding:13px 17px 30px;min-height:85px;margin-right:25px}
+.comment-item.reply{margin-left:34px;margin-right:0;border:1px solid #736747;border-radius:23px;background:#252f2a}
+.comment-item::before{content:'';position:absolute;left:-7px;top:21px;width:12px;height:12px;transform:rotate(45deg);background:#152e2c;border-left:1px solid #36554c;border-bottom:1px solid #36554c}
+.comment-item.reply::before{background:#252f2a;border-color:#736747}
+.comment-author{display:block;font-size:13px;margin-bottom:3px;color:#e5cd9b}
+.comment-body{font-size:14px;line-height:1.9;padding-bottom:1px}
+.comment-meta{position:absolute;right:16px;bottom:8px;margin:0;font-size:10px;color:#829e94;opacity:.78;line-height:1.4}
+.comment-section{margin-top:18px;padding-top:20px}
+.comment-form{margin-top:16px}.comment-input{border-radius:18px;padding:12px 16px}.comment-send{border-radius:14px;padding:10px 17px}
+@media(max-width:760px){main{padding:24px 15px 60px}.layout{grid-template-columns:1fr;gap:18px}.social-sidebar{position:static;max-height:none;border:1px solid #34574d;border-radius:14px;padding:15px}.social-sidebar .filters{flex-direction:row;overflow-x:auto;gap:7px;padding-bottom:4px}.social-sidebar .filter{width:auto;white-space:nowrap;flex:none}.social-sidebar .note{display:none}.post{padding:18px 15px}.comment-item{margin-right:8px}.comment-item.reply{margin-left:21px}}
 </style>
 </head>
 <body>
@@ -38,8 +62,8 @@
 <div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1>
 <p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
 <div class="layout">
-<aside class="panel"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有公開書札</button></div><p class="note">目前開放官方角色的公開書札。目前可為官方書札按讚與留言；角色也可能親自回覆。玩家發文與關注功能將陸續開放。</p></aside>
-<section aria-label="公開書札動態牆"><div class="feed-head"><h2 id="feedTitle">城中書札</h2><button class="refresh" id="refresh">重新整理</button></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
+<aside class="panel social-sidebar"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有書札</button></div><p class="note">循人物之名，尋江湖書札。</p></aside>
+<section aria-label="公開書札動態牆"><div class="feed-head"><h2 id="feedTitle">城中書札</h2></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
 </div>
 </main><footer>長明府 · 萬象傳書</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -54,7 +78,7 @@ let commentsByPost=new Map(),commentLoadError="",playerName="行旅者";
 function showState(message,error=false){const e=$('state');e.textContent=message;e.className='state'+(error?' error':'');e.classList.remove('hidden');}
 function hideState(){$('state').classList.add('hidden');}
 function timeText(value){if(!value)return '時間未記錄';const d=new Date(value);return Number.isNaN(d.getTime())?'時間未記錄':d.toLocaleString('zh-TW',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
-function renderFilters(){const root=$('filters');root.replaceChildren();const options=[{id:'all',label:'所有公開書札'},...accounts.map(a=>({id:a.character_id,label:a.characters.name}))];for(const opt of options){const b=document.createElement('button');b.type='button';b.className='filter'+(selected===opt.id?' active':'');b.textContent=opt.label;b.addEventListener('click',()=>{selected=opt.id;renderFilters();renderPosts();});root.appendChild(b);}}
+function renderFilters(){const root=$('filters');root.replaceChildren();const options=[{id:'all',label:'所有書札'},...accounts.map(a=>({id:a.character_id,label:a.characters.name}))];for(const opt of options){const b=document.createElement('button');b.type='button';b.className='filter'+(selected===opt.id?' active':'');if(opt.id!=='all'){const acc=accounts.find(x=>x.character_id===opt.id);const portrait=document.createElement('span');portrait.className='sidebar-portrait';if(acc?.characters?.avatar_url&&/^https:\/\//i.test(acc.characters.avatar_url)){const img=document.createElement('img');img.src=acc.characters.avatar_url;img.alt='';img.loading='lazy';portrait.appendChild(img);}else portrait.textContent=opt.label.slice(0,1);b.appendChild(portrait);}const label=document.createElement('span');label.textContent=opt.label;b.appendChild(label);b.addEventListener('click',()=>{selected=opt.id;renderFilters();renderPosts();});root.appendChild(b);}}
 function renderPosts(){
  const root=$('feed');root.replaceChildren();
  const list=posts.filter(p=>selected==='all'||p.author_character_id===selected);
@@ -70,7 +94,7 @@ function renderPosts(){
    const img=document.createElement('img');img.src=character.avatar_url;img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{avatar.replaceChildren();avatar.textContent=character.name.slice(0,1)};avatar.appendChild(img);
   }else avatar.textContent=character.name.slice(0,1);
   const identity=document.createElement('div'),name=document.createElement('div');name.className='name';name.textContent=character.name;
-  const tag=document.createElement('span');tag.className='official';tag.textContent='官方角色';name.appendChild(tag);
+  
   const meta=document.createElement('div');meta.className='meta';meta.textContent='@'+account.handle+' · '+(character.faction||'咸陵')+' · '+timeText(p.published_at||p.created_at);
   identity.append(name,meta);top.append(avatar,identity);
   const body=document.createElement('div');body.className='body';body.textContent=p.body;
@@ -84,8 +108,8 @@ function renderPosts(){
   like.addEventListener('click',()=>toggleLike(p.id,like));actions.appendChild(like);
 
   const error=document.createElement('span');error.className='like-error';error.setAttribute('role','status');error.id='like-error-'+p.id;actions.appendChild(error);
-  const foot=document.createElement('div');foot.className='post-foot';const type=document.createElement('span');type.textContent='公開書札';const sig=document.createElement('span');sig.textContent='萬象傳書 · 咸陵';foot.append(type,sig);
-  article.append(top,body,actions,foot);
+  
+  article.append(top,body,actions);
   article.appendChild(buildComments(p));root.appendChild(article);
  }
 }
@@ -101,10 +125,10 @@ function buildComments(post){
   const card=document.createElement('div');card.className='comment-item'+(isReply?' reply':'');
   const who=document.createElement('span');who.className='comment-author'+(item.author_user_id?' player':'');
   const c=accounts.find(x=>x.character_id===item.author_character_id);
-  who.textContent=item.author_character_id?(c?.characters?.name||'官方角色')+' · 官方':(item.player_profiles?.character_name||'行旅者');
-  const when=document.createElement('span');when.className='comment-meta';when.textContent=timeText(item.created_at);
+  who.textContent=item.author_character_id?(c?.characters?.name||'角色'):(item.player_profiles?.character_name||'行旅者');
+  const when=document.createElement('time');when.className='comment-meta';when.textContent=timeText(item.created_at);when.dateTime=item.created_at;
   const body=document.createElement('div');body.className='comment-body';body.textContent=item.body;
-  card.append(who,when,body);return card;
+  card.append(who,body,when);return card;
  };
  const top=rows.filter(c=>!c.parent_id||!rows.some(r=>r.id===c.parent_id));
  for(const c of top){list.appendChild(makeItem(c));for(const reply of rows.filter(r=>r.parent_id===c.id))list.appendChild(makeItem(reply,true));}
@@ -165,7 +189,7 @@ async function toggleLike(postId,button){
  finally{likeBusy.delete(postId);button.disabled=false;}
 }
 async function load(){
- if(loading)return;loading=true;$('refresh').disabled=true;showState('正在讀取城中書札……');
+ if(loading)return;loading=true;showState('正在讀取城中書札……');
  try{
   if(!db)throw new Error('找不到 Supabase 客戶端，請確認 supabase-client.js 已上傳至相同資料夾。');
   const auth=await db.auth.getUser();if(auth.error)throw auth.error;currentUser=auth.data?.user||null;
@@ -177,9 +201,9 @@ async function load(){
   try{await fetchLikes();}catch(e){console.warn('萬象傳書按讚紀錄讀取失敗',e);showState('書札已載入，但按讚紀錄暫時無法同步：'+(e?.message||String(e)),true);}
   await fetchComments();renderFilters();renderPosts();
  }catch(e){$('feed').replaceChildren();showState('讀取失敗：'+(e?.message||String(e)),true);}
- finally{loading=false;$('refresh').disabled=false;}
+ finally{loading=false;}
 }
-$('refresh').addEventListener('click',load);load();
+load();
 })();
 </script>
 </body></html>
