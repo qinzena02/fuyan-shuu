@@ -93,6 +93,16 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 .case[open] summary::after{content:'－'}
 .case small{padding:0 6px 12px}
 .journey-overview{margin:10px 0 35px}.journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.journey-item{padding:23px 20px;background:linear-gradient(140deg,#112827,#0d1d1e);border:1px solid #47645a;min-height:160px;display:flex;flex-direction:column;gap:8px}.journey-item small{color:#92bdb0;font-size:13px}.journey-item strong{color:#e5ce9e;font-size:21px;font-weight:normal}.journey-item span,.journey-note{color:#8eaaa1;font-size:12px}.journey-note{margin-top:14px}@media(max-width:700px){.journey-grid{grid-template-columns:1fr}.journey-item{min-height:110px;padding:16px}}
+
+/* 行旅紀錄：單一圓角容器，三欄以細線分隔 */
+.journey-overview{background:linear-gradient(135deg,#112827,#0b1b1d);border:1px solid #4b695e;border-radius:16px;padding:22px 26px 18px;margin:10px 0 35px;box-shadow:0 10px 30px #0002}
+.journey-overview h2{margin:0 0 7px}.journey-overview .intro{margin:0 0 18px}
+.journey-overview .journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.journey-overview .journey-item{background:transparent;border:0;border-right:1px solid #3e5b52;min-height:0;padding:7px 17px 9px;gap:5px}
+.journey-overview .journey-item:first-child{padding-left:0}.journey-overview .journey-item:last-child{border-right:0;padding-right:0}
+.journey-overview .journey-item strong{font-size:clamp(15px,2vw,20px);line-height:1.5;overflow-wrap:anywhere}
+.journey-overview .journey-note{border-top:1px solid #29483f;padding-top:12px;margin:15px 0 0}
+@media(max-width:700px){.journey-overview{padding:19px 16px}.journey-overview .journey-grid{grid-template-columns:1fr}.journey-overview .journey-item,.journey-overview .journey-item:first-child,.journey-overview .journey-item:last-child{border-right:0;border-bottom:1px solid #36544b;padding:12px 2px;min-height:0}.journey-overview .journey-item:last-child{border-bottom:0}}
 </style>
 </head>
 <body>
@@ -107,7 +117,7 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
       <em>MAIN STORY</em><strong>主線啟卷 →</strong><span>卷一《天地不問來處》</span><small>序幕 · 第三更｜已開放</small>
     </a>
     <a class="story-route" href="bounty.html" aria-label="進入懸賞榜，查看江湖支線故事與人物軼事">
-      <em>SIDE STORIES</em><strong>懸賞榜 →</strong><span>江湖軼事 · 人物支線</span><small>前往懸賞榜</small>
+      <em>SIDE STORIES</em><strong>懸賞榜 →</strong><span>江湖軼事 · 人物支線</span>
     </a>
   </div>
 </section>
