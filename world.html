@@ -18,7 +18,7 @@
 <audio id="music" src="music/lv_0_20260927142906.mp3" preload="auto" loop></audio>
 <script>
 'use strict';
-const allowed=new Set(['city.html','archive.html','bounty.html','story.html','personal.html']);
+const allowed=new Set(['city.html','archive.html','bounty.html','story.html','personal.html','travel.html']);
 const frame=document.getElementById('page'),music=document.getElementById('music'),toggle=document.getElementById('toggle'),controls=document.getElementById('controls'),hint=document.getElementById('hint');
 const initial=new URLSearchParams(location.search).get('page');
 frame.src=allowed.has(initial)?initial:'city.html';

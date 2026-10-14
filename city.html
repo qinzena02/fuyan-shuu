@@ -92,44 +92,22 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 .case summary::after{content:'＋';position:absolute;right:5px;color:#8fbeb0}
 .case[open] summary::after{content:'－'}
 .case small{padding:0 6px 12px}
-/* 行旅紀錄：單一圓角資訊面板 */
-.journey-overview{margin:10px 0 35px;padding:24px 28px 17px;background:linear-gradient(135deg,rgba(17,40,39,.88),rgba(10,26,28,.94));border:1px solid #47645a;border-radius:16px}
-.journey-overview h2{margin:0 0 6px}
-.journey-overview .intro{margin:0 0 20px}
-.journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
-.journey-item{min-width:0;padding:4px 22px;display:flex;flex-direction:column;gap:7px}
-.journey-item:first-child{padding-left:0}
-.journey-item:not(:last-child){border-right:1px solid #36524c}
-.journey-item small{color:#92bdb0;font-size:12px;letter-spacing:1px}
-.journey-item strong{color:#e5ce9e;font-size:19px;font-weight:normal;overflow-wrap:anywhere}
-.journey-item span{color:#8eaaa1;font-size:12px}
-.journey-note{margin:19px 0 0;color:#78978e;font-size:11px}
-@media(max-width:700px){.journey-overview{padding:20px 19px 16px}.journey-grid{grid-template-columns:1fr}.journey-item,.journey-item:first-child{padding:13px 0}.journey-item:not(:last-child){border-right:0;border-bottom:1px solid #36524c}.journey-item:first-child{padding-top:0}.journey-item:last-child{padding-bottom:0}}
-
+.journey-overview{margin:10px 0 35px}.journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.journey-item{padding:23px 20px;background:linear-gradient(140deg,#112827,#0d1d1e);border:1px solid #47645a;min-height:160px;display:flex;flex-direction:column;gap:8px}.journey-item small{color:#92bdb0;font-size:13px}.journey-item strong{color:#e5ce9e;font-size:21px;font-weight:normal}.journey-item span,.journey-note{color:#8eaaa1;font-size:12px}.journey-note{margin-top:14px}@media(max-width:700px){.journey-grid{grid-template-columns:1fr}.journey-item{min-height:110px;padding:16px}}
 </style>
 </head>
 <body>
 <header><div class="logo">負驗書</div><div class="player"><div id="player">示籙核驗中</div><div>禁步 · 仁德值：<span id="virtue">讀取中…</span></div></div></header>
 <section class="hero"><p class="eyebrow">承光年間 · 咸陵</p><h1>天下地脈</h1><p>鋼鐵築城，符機行世。</p><p>舊朝已逝，而人間依舊燈火長明。</p></section>
 <main>
-<section class="journey-overview" aria-label="行旅紀錄">
-  <h2>行旅紀錄</h2>
-  <p class="intro">山河萬里，所行皆有跡可循。</p>
-  <div class="journey-grid">
-    <div class="journey-item"><small>已協辦懸賞</small><strong id="assistedCount">讀取中…</strong><span>鏢局委託</span></div>
-    <div class="journey-item"><small>主線進度</small><strong id="mainProgress">讀取中…</strong><span>《天地不問來處》</span></div>
-    <div class="journey-item"><small>支線進度</small><strong id="sideProgress">讀取中…</strong><span>《江上無歸人》</span></div>
-  </div>
-  <p class="journey-note" id="journeyNote">進度依目前已連接的雲端與本機存檔顯示。</p>
-</section>
+<section class="journey-overview" aria-label="行旅紀錄"><h2>行旅紀錄</h2><p class="intro">山河萬里，所行皆有跡可循。</p><div class="journey-grid"><div class="journey-item"><small>已協辦懸賞</small><strong id="assistedCount">讀取中…</strong><span>以線上鏢局接案紀錄為準</span></div><div class="journey-item"><small>主線進度</small><strong id="mainProgress">讀取中…</strong><span>《天地不問來處》</span></div><div class="journey-item"><small>支線進度</small><strong id="sideProgress">讀取中…</strong><span>《江上無歸人》</span></div></div><p class="journey-note" id="journeyNote">雲端協辦數量與劇情存檔會分別讀取；尚未開始的案件顯示未開始。</p></section>
 <section class="story-portal" aria-label="江湖演繹入口">
   <div class="story-portal-heading"><em>INTERACTIVE STORY · 江湖演繹</em><strong>入世</strong><span>人間萬象，各有其途。</span></div>
   <div class="story-portal-actions">
     <a class="story-route" href="main-story.html" aria-label="進入主線卷一天地不問來處，序幕第三更">
-      <em>MAIN STORY</em><strong>主線啟卷</strong><span>卷一《天地不問來處》</span><small>序幕 · 第三更｜已開放</small>
+      <em>MAIN STORY</em><strong>主線啟卷 →</strong><span>卷一《天地不問來處》</span><small>序幕 · 第三更｜已開放</small>
     </a>
     <a class="story-route" href="bounty.html" aria-label="進入懸賞榜，查看江湖支線故事與人物軼事">
-      <em>SIDE STORIES</em><strong>懸賞榜 →</strong><span>江湖軼事 · 人物支線</span>
+      <em>SIDE STORIES</em><strong>懸賞榜 →</strong><span>江湖軼事 · 人物支線</span><small>前往懸賞榜</small>
     </a>
   </div>
 </section>
@@ -139,9 +117,9 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 <button class="nav-close" id="navClose" type="button" aria-label="關閉城中通行選單">×</button>
 <h2>城中通行 · 公開入口</h2><p class="intro">城中萬事皆有其門。請依示籙所載身分，擇路而行。</p>
 <div class="grid">
-<a class="place" href="archive.html"><em>PUBLIC ARCHIVES</em><strong>咸陵典籍庫</strong><span>公開文獻 · 人物名錄 · 門派與制度</span></a>
+<a class="place" href="archive.html"><em>PUBLIC ARCHIVES</em><strong>咸陵典籍庫</strong><span>公開文獻 · 機構與制度</span></a>
 <a class="place" href="personal.html"><em>PERSONAL RECORD</em><strong>示籙個人中心</strong><span>通行憑證 · 仁德值 · 個人資料</span></a>
-<div class="place disabled" aria-label="咸陵行旅，尚未開放"><em>COMING SOON</em><strong>咸陵行旅</strong><span>城區探索 · 偶遇事件 · 尚未開放</span></div>
+<a class="place" href="travel.html"><em>TRAVEL ATLAS</em><strong>咸陵行旅</strong><span>山川地誌 · 五大門派 · 地標導覽</span></a>
 </div>
 </aside>
 <h2>咸陵日報 · 城中消息</h2>
@@ -155,10 +133,10 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 <details class="news"><summary><span class="category">民生消息 · 城南</span><span class="news-title">城南符機失竊案引起商戶關注</span></summary><p>城南發生符機失竊事件，附近商戶對器械保管及夜間巡查提出疑慮。案件相關資料已列入鏢局公開案牘，民眾可依規定查閱。</p></details>
 </section>
 <aside class="panel"><div class="panel-heading"><span>近期案牘</span><small>鏢局公開索引</small></div>
-<details class="case"><summary>天環江商旅失蹤案</summary><small>商隊行蹤不明 · 結案</small></details>
-<details class="case"><summary>咸陵城南符機失竊案</summary><small>器物失竊 · 結案</small></details>
-<details class="case"><summary>邊境舊驛道異常調查</summary><small>驛道異聞 · 結案</small></details>
-<details class="case"><summary>咸陵邊境分屍案</summary><small>邊境案卷 · 結案</small></details>
+<details class="case"><summary>天環江商旅失蹤案</summary><small>商隊行蹤不明 · 待查</small></details>
+<details class="case"><summary>咸陵城南符機失竊案</summary><small>器物失竊 · 待查</small></details>
+<details class="case"><summary>邊境舊驛道異常調查</summary><small>驛道異聞 · 待查</small></details>
+<details class="case"><summary>咸陵邊境分屍案</summary><small>邊境案卷 · 待查</small></details>
 <a class="text-link" href="bounty.html">前往鏢局查閱完整案卷 →</a></aside></div>
 
 </main><footer>長明府 · 示籙已錄 · 行跡有循</footer>
