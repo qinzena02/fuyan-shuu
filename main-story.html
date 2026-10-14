@@ -56,11 +56,16 @@ body{
   background-size:cover;
 }
 @media(max-width:780px){body{background-attachment:scroll,scroll}}
+/* 主線專屬音樂：由使用者點擊後播放 */
+.main-music{position:fixed;bottom:16px;right:16px;z-index:100;display:flex;gap:9px;align-items:center;background:#0b1a1de9;border:1px solid #806f50;padding:9px 12px;color:#d9cba8;font-size:12px;max-width:calc(100vw - 32px)}
+.main-music button{background:transparent;border:0;color:#e7d4a7;cursor:pointer;padding:4px 7px}
+.main-music button:focus-visible{outline:2px solid #e7d4a7}
 </style>
 </head>
 <body class="cover-locked">
-<section class="chapter-cover" id="chapterCover" aria-label="章節封面" style="--cover-image:url('images/tobi-2021061004.jpg')"><div class="cover-content"><div class="cover-kicker">長明府 · 主線卷宗 · 卷一</div><h1 class="cover-title">天地不問來處</h1><p class="cover-desc">承光年間 · 北城第三更</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="city.html">← 返回卷宗目錄</a></div></section>
-<header><div class="brand">負驗書 · 主線卷宗</div><div class="header-right"><span class="time" id="clock">--:--:--</span><a href="city.html">← 返回咸陵主城</a></div></header>
+<div class="main-music"><button type="button" id="mainMusicToggle" aria-label="播放主線配樂">♫ 播放主線配樂</button><audio id="mainMusic" src="music/Screenrecording_20261014_182342_14102026.mp3" preload="none" loop></audio></div>
+<section class="chapter-cover" id="chapterCover" aria-label="章節封面" style="--cover-image:url('images/tobi-2021061004.jpg')"><div class="cover-content"><div class="cover-kicker">長明府 · 主線卷宗 · 卷一</div><h1 class="cover-title">天地不問來處</h1><p class="cover-desc">承光年間 · 北城第三更</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="main-chapters.html">← 返回卷宗目錄</a></div></section>
+<header><div class="brand">負驗書 · 主線卷宗</div><div class="header-right"><span class="time" id="clock">--:--:--</span><a href="main-chapters.html">← 返回主線目錄</a></div></header>
 <div class="wrap"><div class="intro"><div class="eyebrow">MAIN STORY · VOLUME 01</div><h1>天地不問來處</h1><p>承光年間 · 北城第三更　／　序幕：禁步歸零</p></div>
 <button type="button" class="status-toggle" id="openMainStatus" aria-controls="mainStatusSidebar" aria-expanded="false">行旅紀錄</button><div class="sidebar-backdrop" id="mainStatusBackdrop" hidden></div><div class="layout"><main class="scene"><div id="error" class="error hidden"></div><div id="game"><div class="chapter" id="chapter"></div><h2 id="scene-title"></h2><div class="story" id="story"></div><div class="choices" id="choices"></div><div class="actions"><button class="secondary" id="restart" type="button">重啟本卷序幕</button><button class="secondary" id="save" type="button">手動儲存</button></div><p class="note" id="status" role="status">行跡將自動記錄於此裝置。</p></div></main>
 <aside class="aside" id="mainStatusSidebar" role="dialog" aria-modal="true" aria-label="主線行旅紀錄" aria-hidden="true"><div class="sidebar-top"><strong>行旅紀錄</strong><button type="button" id="closeMainStatus" class="sidebar-close" aria-label="關閉側欄">✕</button></div><section class="aside-card"><h3>示籙 · 行旅者</h3><p id="player-name">—</p><p id="player-sect">—</p><p id="player-origin">—</p><span class="pill">主線進行中</span></section><section class="aside-card"><h3>線索簿</h3><ul id="clue-list"><li>尚無記錄</li></ul></section><section class="aside-card"><h3>人物交集</h3><ul id="relation-list"><li>尚無記錄</li></ul></section></aside></div></div>
@@ -69,6 +74,7 @@ body{
 'use strict';
 // 遊戲進度與示籙分開儲存，不會覆蓋其他支線故事。
 const SAVE_KEY='fuyanshu_main_vol1_v1';
+const REVIEW_MODE=new URLSearchParams(location.search).get('mode')==='review';
 const $=id=>document.getElementById(id);
 const escapeText=s=>String(s??'');
 let player=null;
@@ -125,13 +131,14 @@ const scenes={
 };
 let state={scene:'start',clues:[],relations:[]};
 function uniqueAdd(key,values){for(const value of values||[])if(!state[key].includes(value))state[key].push(value);}
-function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));$('status').textContent='已儲存 · '+new Date().toLocaleTimeString('zh-TW',{hour12:false});}catch(e){$('status').textContent='無法儲存：請檢查瀏覽器是否允許本機儲存。';}}
-function render(){const scene=scenes[state.scene]||scenes.start;uniqueAdd('clues',scene.clues);uniqueAdd('relations',scene.relations);$('chapter').textContent=scene.chapter;$('scene-title').textContent=scene.title;$('story').replaceChildren();for(const p of scene.paragraphs){const node=document.createElement('p');node.textContent=p;$('story').appendChild(node);}$('choices').replaceChildren();for(const [label,next] of scene.options){const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='→ '+label;b.addEventListener('click',()=>{state.scene=next;render();document.querySelector('.scene').scrollIntoView({behavior:'smooth',block:'start'});});$('choices').appendChild(b);}if(!scene.options.length){const a=document.createElement('a');a.href='city.html';a.className='choice';a.textContent='← 返回咸陵主城';$('choices').appendChild(a);}for(const [key,target] of [['clues','clue-list'],['relations','relation-list']]){const ul=$(target);ul.replaceChildren();for(const text of state[key].length?state[key]:['尚無記錄']){const li=document.createElement('li');li.textContent=text;ul.appendChild(li);}}persist();}
+function persist(){if(REVIEW_MODE){$('status').textContent='回顧模式 · 不會更動正式存檔';return;}try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));$('status').textContent='已儲存 · '+new Date().toLocaleTimeString('zh-TW',{hour12:false});}catch(e){$('status').textContent='無法儲存：請檢查瀏覽器是否允許本機儲存。';}}
+function render(){const scene=scenes[state.scene]||scenes.start;uniqueAdd('clues',scene.clues);uniqueAdd('relations',scene.relations);$('chapter').textContent=scene.chapter;$('scene-title').textContent=scene.title;$('story').replaceChildren();for(const p of scene.paragraphs){const node=document.createElement('p');node.textContent=p;$('story').appendChild(node);}$('choices').replaceChildren();for(const [label,next] of scene.options){const b=document.createElement('button');b.type='button';b.className='choice';b.textContent='→ '+label;b.addEventListener('click',()=>{state.scene=next;render();document.querySelector('.scene').scrollIntoView({behavior:'smooth',block:'start'});});$('choices').appendChild(b);}if(!scene.options.length){const a=document.createElement('a');a.href='main-chapters.html';a.className='choice';a.textContent='← 返回主線目錄';$('choices').appendChild(a);}for(const [key,target] of [['clues','clue-list'],['relations','relation-list']]){const ul=$(target);ul.replaceChildren();for(const text of state[key].length?state[key]:['尚無記錄']){const li=document.createElement('li');li.textContent=text;ul.appendChild(li);}}persist();}
 $('restart').addEventListener('click',()=>{if(confirm('確定重新開始卷一序幕？本卷的線索與人物交集將重設，其他支線存檔不受影響。')){state={scene:'start',clues:[],relations:[]};render();}});
 $('save').addEventListener('click',persist);
+if(REVIEW_MODE){$('restart').textContent='重讀序幕';$('save').hidden=true;document.querySelector('.intro p').textContent+='　／　回顧模式（不存檔）';}
 if(!player||!player.name){$('game').classList.add('hidden');$('error').classList.remove('hidden');$('error').textContent='尚未建立示籙。請先返回登記頁建立玩家身分，再進入主線。';const a=document.createElement('a');a.href='index.html';a.textContent=' → 前往示籙登記';$('error').appendChild(a);}else{
  $('player-name').textContent='姓名 · '+escapeText(player.name);$('player-sect').textContent='門派 · '+escapeText(player.sect||'未登錄');$('player-origin').textContent='籍貫 · '+escapeText(player.origin||'未登錄');
- try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&scenes[saved.scene]&&Array.isArray(saved.clues)&&Array.isArray(saved.relations))state={scene:saved.scene,clues:saved.clues.filter(x=>typeof x==='string'),relations:saved.relations.filter(x=>typeof x==='string')};}catch(e){}
+ try{const saved=REVIEW_MODE?null:JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(saved&&scenes[saved.scene]&&Array.isArray(saved.clues)&&Array.isArray(saved.relations))state={scene:saved.scene,clues:saved.clues.filter(x=>typeof x==='string'),relations:saved.relations.filter(x=>typeof x==='string')};}catch(e){}
  render();}
 </script>
 <script>
@@ -174,6 +181,7 @@ if(!player||!player.name){$('game').classList.add('hidden');$('error').classList
  open.addEventListener('click',function(){
    if(cover.classList.contains('cover-exiting'))return;
    window.FYSPlayPageTurn?.();
+   window.FYSMainMusicStart?.();
    cover.classList.add('cover-exiting');
    document.body.classList.remove('cover-locked');
    document.body.classList.add('chapter-revealed');
@@ -202,6 +210,20 @@ if(!player||!player.name){$('game').classList.add('hidden');$('error').classList
  closeBtn.addEventListener('click',()=>setOpen(false));
  backdrop.addEventListener('click',()=>setOpen(false));
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer.classList.contains('open'))setOpen(false)});
+})();
+</script>
+<script>
+(function(){
+ const audio=document.getElementById('mainMusic');
+ const button=document.getElementById('mainMusicToggle');
+ audio.volume=.32;
+ function update(){button.textContent=audio.paused?'♫ 播放主線配樂':'♫ 暫停主線配樂';button.setAttribute('aria-label',audio.paused?'播放主線配樂':'暫停主線配樂');}
+ window.FYSMainMusicStart=()=>{if(audio.paused)audio.play().catch(()=>{});};
+ button.addEventListener('click',()=>{if(audio.paused)audio.play().catch(()=>{});else audio.pause();});
+ audio.addEventListener('play',update);audio.addEventListener('pause',update);
+ audio.addEventListener('error',()=>{button.textContent='配樂載入失敗';button.title='請確認 GitHub 的 music 資料夾內有指定 MP3';});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)audio.pause();});
+ update();
 })();
 </script>
 </body></html>
