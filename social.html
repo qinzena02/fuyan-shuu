@@ -5,6 +5,15 @@
 <title>負驗書｜萬象傳書</title>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#091315;color:#ddd7c8;font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;line-height:1.85}a{color:#bdd6cd;text-decoration:none}a:hover{text-decoration:underline}header{border-bottom:1px solid #36584f;background:#0d1d1e;padding:18px max(20px,calc((100vw - 1000px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{color:#e1c992;font-size:23px;letter-spacing:4px}.small{color:#8eaca1;font-size:13px}main{max-width:1000px;margin:0 auto;padding:34px 20px 90px}.eyebrow{font-size:12px;letter-spacing:5px;color:#9cb7a9}h1{font-size:35px;letter-spacing:5px;font-weight:400;color:#e7cd97;margin:4px 0 8px}.intro{max-width:700px;color:#a9bcb1;margin:0 0 25px}.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;align-items:start}.panel,.post{border:1px solid #34574d;background:#102223;border-radius:8px}.panel{padding:20px}.panel h2{font-size:16px;font-weight:400;letter-spacing:2px;color:#e6cfa0;margin:0 0 15px}.filters{display:grid;gap:8px}.filter{width:100%;text-align:left;border:1px solid transparent;background:transparent;color:#b8c8bb;padding:9px 12px;border-radius:5px;font:inherit;cursor:pointer}.filter:hover,.filter.active{border-color:#648176;background:#1d3835;color:#f2dba9}.feed-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px}.feed-head h2{font-size:18px;font-weight:400;color:#d9c79f;margin:0}.refresh{border:1px solid #8b7a55;background:#1b3834;color:#edd9ad;border-radius:5px;padding:8px 14px;cursor:pointer;font:inherit}.refresh:disabled{opacity:.5;cursor:wait}.post{padding:24px;margin:0 0 16px}.post-top{display:flex;align-items:center;gap:13px}.avatar{width:47px;height:47px;border-radius:50%;border:1px solid #8a825f;background:#223d38;color:#ead4a2;display:grid;place-items:center;font-size:21px;flex-shrink:0;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.name{font-size:17px;color:#ebd5a8}.official{display:inline-block;font-size:10px;line-height:1.6;color:#d9c595;border:1px solid #84734f;padding:1px 6px;border-radius:4px;margin-left:7px;vertical-align:middle}.meta{font-size:12px;color:#8ea99f}.body{white-space:pre-wrap;overflow-wrap:anywhere;margin:18px 0 10px;font-size:15px;line-height:2.05;color:#e2ded1}.post-foot{border-top:1px solid #28473f;padding-top:12px;color:#86a79c;font-size:12px;display:flex;justify-content:space-between;gap:10px}.state{border:1px solid #385e54;background:#142b2a;border-radius:6px;padding:16px 20px;color:#afc4b7;margin-bottom:16px}.state.error{border-color:#9a5555;color:#f0b9b9}.hidden{display:none!important}.note{color:#8ba69c;font-size:12px;margin-top:18px}footer{text-align:center;color:#66897d;font-size:12px;padding:25px}@media(max-width:700px){.layout{grid-template-columns:1fr}.panel{padding:13px}.filters{display:flex;flex-wrap:wrap}.filter{width:auto}h1{font-size:28px}.post{padding:18px}}
+/* 萬象傳書・書札互動 */
+.post-actions{display:flex;align-items:center;gap:12px;margin:12px 0 0;flex-wrap:wrap}
+.like-button{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:6px 13px;border:1px solid #4b7063;border-radius:999px;background:#142d2c;color:#b8d0c5;font:inherit;font-size:13px;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.like-button:hover,.like-button:focus-visible{border-color:#d6b77e;color:#f0d9a6;background:#1e3c37}
+.like-button.liked{border-color:#bb8b82;color:#f0b8ad;background:#3a2728}
+.like-button:disabled{opacity:.65;cursor:wait}
+.like-icon{font-size:18px;line-height:1}
+.like-error{color:#f0b9b9;font-size:12px}
+.like-hint{color:#86a79c;font-size:12px}
 </style>
 </head>
 <body>
@@ -13,7 +22,7 @@
 <div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1>
 <p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
 <div class="layout">
-<aside class="panel"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有公開書札</button></div><p class="note">目前開放官方角色的公開書札。玩家發文、留言與關注功能將陸續開放。</p></aside>
+<aside class="panel"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有公開書札</button></div><p class="note">目前開放官方角色的公開書札。目前可為官方書札按讚。玩家發文、留言與關注功能將陸續開放。</p></aside>
 <section aria-label="公開書札動態牆"><div class="feed-head"><h2 id="feedTitle">城中書札</h2><button class="refresh" id="refresh">重新整理</button></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
 </div>
 </main><footer>長明府 · 萬象傳書</footer>
@@ -21,13 +30,92 @@
 <script src="supabase-client.js"></script>
 <script>
 (()=>{'use strict';
-const db=window.fuyanshuDB;const $=id=>document.getElementById(id);let accounts=[];let posts=[];let selected='all';let loading=false;
+const db=window.fuyanshuDB;
+const $=id=>document.getElementById(id);
+let accounts=[],posts=[],selected='all',loading=false,currentUser=null;
+let likeCounts=new Map(),myLikes=new Set(),likeBusy=new Set();
 function showState(message,error=false){const e=$('state');e.textContent=message;e.className='state'+(error?' error':'');e.classList.remove('hidden');}
 function hideState(){$('state').classList.add('hidden');}
 function timeText(value){if(!value)return '時間未記錄';const d=new Date(value);return Number.isNaN(d.getTime())?'時間未記錄':d.toLocaleString('zh-TW',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
 function renderFilters(){const root=$('filters');root.replaceChildren();const options=[{id:'all',label:'所有公開書札'},...accounts.map(a=>({id:a.character_id,label:a.characters.name}))];for(const opt of options){const b=document.createElement('button');b.type='button';b.className='filter'+(selected===opt.id?' active':'');b.textContent=opt.label;b.addEventListener('click',()=>{selected=opt.id;renderFilters();renderPosts();});root.appendChild(b);}}
-function renderPosts(){const root=$('feed');root.replaceChildren();const list=posts.filter(p=>selected==='all'||p.author_character_id===selected);$('feedTitle').textContent=selected==='all'?'城中書札':(accounts.find(a=>a.character_id===selected)?.characters?.name||'角色')+'的書札';if(!list.length){showState(selected==='all'?'目前還沒有公開書札。請先從管理臺發布第一篇。':'這位角色尚未發布公開書札。');return;}hideState();for(const p of list){const account=accounts.find(a=>a.character_id===p.author_character_id);if(!account)continue;const character=account.characters;const article=document.createElement('article');article.className='post';const top=document.createElement('div');top.className='post-top';const avatar=document.createElement('div');avatar.className='avatar';if(character.avatar_url&&/^https:\/\//i.test(character.avatar_url)){const img=document.createElement('img');img.src=character.avatar_url;img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{avatar.replaceChildren();avatar.textContent=character.name.slice(0,1)};avatar.appendChild(img);}else{avatar.textContent=character.name.slice(0,1);}const identity=document.createElement('div');const name=document.createElement('div');name.className='name';name.textContent=character.name;const tag=document.createElement('span');tag.className='official';tag.textContent='官方角色';name.appendChild(tag);const meta=document.createElement('div');meta.className='meta';meta.textContent='@'+account.handle+' · '+(character.faction||'咸陵')+' · '+timeText(p.published_at||p.created_at);identity.append(name,meta);top.append(avatar,identity);const body=document.createElement('div');body.className='body';body.textContent=p.body;const foot=document.createElement('div');foot.className='post-foot';const type=document.createElement('span');type.textContent='公開書札';const sig=document.createElement('span');sig.textContent='萬象傳書 · 咸陵';foot.append(type,sig);article.append(top,body,foot);root.appendChild(article);}}
-async function load(){if(loading)return;loading=true;$('refresh').disabled=true;showState('正在讀取城中書札……');try{if(!db)throw new Error('找不到 Supabase 客戶端，請確認 supabase-client.js 已上傳至相同資料夾。');const profile=await db.from('character_social_profiles').select('character_id,handle,characters(name,faction,avatar_url,is_public)').eq('is_active',true);if(profile.error)throw profile.error;accounts=(profile.data||[]).filter(a=>a.characters?.is_public);if(selected!=='all'&&!accounts.some(a=>a.character_id===selected))selected='all';const result=await db.from('social_posts').select('id,author_character_id,body,published_at,created_at').eq('status','published').eq('visibility','public').not('author_character_id','is',null).order('published_at',{ascending:false}).limit(100);if(result.error)throw result.error;const allowed=new Set(accounts.map(a=>a.character_id));posts=(result.data||[]).filter(p=>allowed.has(p.author_character_id));renderFilters();renderPosts();}catch(e){$('feed').replaceChildren();showState('讀取失敗：'+(e?.message||String(e)),true);}finally{loading=false;$('refresh').disabled=false;}}
+function renderPosts(){
+ const root=$('feed');root.replaceChildren();
+ const list=posts.filter(p=>selected==='all'||p.author_character_id===selected);
+ $('feedTitle').textContent=selected==='all'?'城中書札':(accounts.find(a=>a.character_id===selected)?.characters?.name||'角色')+'的書札';
+ if(!list.length){showState(selected==='all'?'目前還沒有公開書札。請先從管理臺發布第一篇。':'這位角色尚未發布公開書札。');return;}
+ hideState();
+ for(const p of list){
+  const account=accounts.find(a=>a.character_id===p.author_character_id);if(!account)continue;
+  const character=account.characters,article=document.createElement('article');article.className='post';
+  const top=document.createElement('div');top.className='post-top';
+  const avatar=document.createElement('div');avatar.className='avatar';
+  if(character.avatar_url&&/^https:\/\//i.test(character.avatar_url)){
+   const img=document.createElement('img');img.src=character.avatar_url;img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{avatar.replaceChildren();avatar.textContent=character.name.slice(0,1)};avatar.appendChild(img);
+  }else avatar.textContent=character.name.slice(0,1);
+  const identity=document.createElement('div'),name=document.createElement('div');name.className='name';name.textContent=character.name;
+  const tag=document.createElement('span');tag.className='official';tag.textContent='官方角色';name.appendChild(tag);
+  const meta=document.createElement('div');meta.className='meta';meta.textContent='@'+account.handle+' · '+(character.faction||'咸陵')+' · '+timeText(p.published_at||p.created_at);
+  identity.append(name,meta);top.append(avatar,identity);
+  const body=document.createElement('div');body.className='body';body.textContent=p.body;
+  const actions=document.createElement('div');actions.className='post-actions';
+  const like=document.createElement('button');like.type='button';like.className='like-button'+(myLikes.has(p.id)?' liked':'');
+  like.setAttribute('aria-pressed',String(myLikes.has(p.id)));
+  like.setAttribute('aria-label',(myLikes.has(p.id)?'取消按讚':'按讚')+'，目前 '+(likeCounts.get(p.id)||0)+' 個讚');
+  const heart=document.createElement('span');heart.className='like-icon';heart.textContent=myLikes.has(p.id)?'♥':'♡';heart.setAttribute('aria-hidden','true');
+  const count=document.createElement('span');count.textContent=currentUser?('喜歡 · '+(likeCounts.get(p.id)||0)):'喜歡 · 登入後查看';
+  like.append(heart,count);like.disabled=likeBusy.has(p.id);
+  like.addEventListener('click',()=>toggleLike(p.id,like));actions.appendChild(like);
+  if(!currentUser){const hint=document.createElement('span');hint.className='like-hint';hint.textContent='登入示籙後可按讚';actions.appendChild(hint);}
+  const error=document.createElement('span');error.className='like-error';error.setAttribute('role','status');error.id='like-error-'+p.id;actions.appendChild(error);
+  const foot=document.createElement('div');foot.className='post-foot';const type=document.createElement('span');type.textContent='公開書札';const sig=document.createElement('span');sig.textContent='萬象傳書 · 咸陵';foot.append(type,sig);
+  article.append(top,body,actions,foot);root.appendChild(article);
+ }
+}
+async function fetchLikes(){
+ likeCounts=new Map();myLikes=new Set();
+ if(!currentUser||!posts.length)return;
+ const ids=posts.map(p=>p.id);
+ // 依序分頁讀取，避免超過 Supabase 單次預設 1000 筆的上限。
+ for(let offset=0;;offset+=1000){
+  const r=await db.from('social_post_likes').select('post_id,user_id').in('post_id',ids).order('post_id',{ascending:true}).order('user_id',{ascending:true}).range(offset,offset+999);
+  if(r.error)throw r.error;
+  const rows=r.data||[];
+  for(const item of rows){likeCounts.set(item.post_id,(likeCounts.get(item.post_id)||0)+1);if(item.user_id===currentUser.id)myLikes.add(item.post_id);}
+  if(rows.length<1000)break;
+ }
+}
+async function toggleLike(postId,button){
+ if(!currentUser){const error=$('like-error-'+postId);if(error)error.textContent='請先從示籙登入帳號，再回來按讚。';return;}
+ if(likeBusy.has(postId))return;
+ likeBusy.add(postId);button.disabled=true;
+ const error=$('like-error-'+postId);if(error)error.textContent='';
+ try{
+  const liked=myLikes.has(postId);
+  const q=liked
+   ?db.from('social_post_likes').delete().eq('post_id',postId).eq('user_id',currentUser.id)
+   :db.from('social_post_likes').insert({post_id:postId,user_id:currentUser.id});
+  const result=await q;if(result.error)throw result.error;
+  if(liked){myLikes.delete(postId);likeCounts.set(postId,Math.max(0,(likeCounts.get(postId)||0)-1));}
+  else{myLikes.add(postId);likeCounts.set(postId,(likeCounts.get(postId)||0)+1);}
+  renderPosts();
+ }catch(e){if(error)error.textContent='操作失敗：'+(e?.message||String(e));console.error('萬象傳書按讚失敗',e);}
+ finally{likeBusy.delete(postId);button.disabled=false;}
+}
+async function load(){
+ if(loading)return;loading=true;$('refresh').disabled=true;showState('正在讀取城中書札……');
+ try{
+  if(!db)throw new Error('找不到 Supabase 客戶端，請確認 supabase-client.js 已上傳至相同資料夾。');
+  const auth=await db.auth.getUser();if(auth.error)throw auth.error;currentUser=auth.data?.user||null;
+  const profile=await db.from('character_social_profiles').select('character_id,handle,characters(name,faction,avatar_url,is_public)').eq('is_active',true);
+  if(profile.error)throw profile.error;accounts=(profile.data||[]).filter(a=>a.characters?.is_public);
+  if(selected!=='all'&&!accounts.some(a=>a.character_id===selected))selected='all';
+  const result=await db.from('social_posts').select('id,author_character_id,body,published_at,created_at').eq('status','published').eq('visibility','public').not('author_character_id','is',null).order('published_at',{ascending:false}).limit(100);
+  if(result.error)throw result.error;const allowed=new Set(accounts.map(a=>a.character_id));posts=(result.data||[]).filter(p=>allowed.has(p.author_character_id));
+  try{await fetchLikes();}catch(e){console.warn('萬象傳書按讚紀錄讀取失敗',e);showState('書札已載入，但按讚紀錄暫時無法同步：'+(e?.message||String(e)),true);}
+  renderFilters();renderPosts();
+ }catch(e){$('feed').replaceChildren();showState('讀取失敗：'+(e?.message||String(e)),true);}
+ finally{loading=false;$('refresh').disabled=false;}
+}
 $('refresh').addEventListener('click',load);load();
 })();
 </script>
