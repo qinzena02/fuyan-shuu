@@ -14,6 +14,22 @@
 .like-icon{font-size:18px;line-height:1}
 .like-error{color:#f0b9b9;font-size:12px}
 .like-hint{color:#86a79c;font-size:12px}
+
+/* 書札互動：無外框愛心，與分隔線保留距離 */
+.post-actions{margin:18px 0 19px;gap:16px;min-height:28px}
+.like-button,.like-button:hover,.like-button:focus-visible,.like-button.liked{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:0 3px!important;min-height:28px;color:#a9c8bb}
+.like-button.liked{color:#efb3ac!important}.like-button:focus-visible{outline:2px solid #d6b77e;outline-offset:3px}
+.like-icon{font-size:22px}.like-button span:last-child{font-variant-numeric:tabular-nums}
+.comment-section{border-top:1px solid #29463f;padding-top:14px;margin-top:2px}
+.comment-heading{font-size:13px;color:#d7c397;margin:0 0 10px}
+.comment-list{display:grid;gap:10px;margin-bottom:12px}
+.comment-item{padding:10px 12px;background:#122a29;border-left:2px solid #4c6b60;border-radius:2px 6px 6px 2px}
+.comment-item.reply{margin-left:24px;border-left-color:#ad9566}
+.comment-author{font-size:12px;color:#e4cc9b}.comment-author.player{color:#a7d0c2}
+.comment-meta{color:#78998e;font-size:11px;margin-left:9px}.comment-body{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;color:#d9dcd0}
+.comment-form{display:flex;gap:8px;align-items:flex-start}.comment-input{flex:1;min-width:0;min-height:42px;max-height:130px;resize:vertical;background:#0a1c1d;border:1px solid #436359;color:#e5e0d4;border-radius:5px;padding:8px 10px;font:inherit;font-size:13px}
+.comment-send{border:1px solid #897750;background:#1b3934;color:#e8d2a2;border-radius:5px;padding:8px 13px;font:inherit;font-size:12px;cursor:pointer}
+.comment-send:disabled{opacity:.55;cursor:wait}.comment-status{font-size:12px;color:#dca7a1;margin:5px 0}.comment-empty{font-size:12px;color:#829e92}
 </style>
 </head>
 <body>
@@ -22,7 +38,7 @@
 <div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1>
 <p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
 <div class="layout">
-<aside class="panel"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有公開書札</button></div><p class="note">目前開放官方角色的公開書札。目前可為官方書札按讚。玩家發文、留言與關注功能將陸續開放。</p></aside>
+<aside class="panel"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有公開書札</button></div><p class="note">目前開放官方角色的公開書札。目前可為官方書札按讚與留言；角色也可能親自回覆。玩家發文與關注功能將陸續開放。</p></aside>
 <section aria-label="公開書札動態牆"><div class="feed-head"><h2 id="feedTitle">城中書札</h2><button class="refresh" id="refresh">重新整理</button></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
 </div>
 </main><footer>長明府 · 萬象傳書</footer>
@@ -34,6 +50,7 @@ const db=window.fuyanshuDB;
 const $=id=>document.getElementById(id);
 let accounts=[],posts=[],selected='all',loading=false,currentUser=null;
 let likeCounts=new Map(),myLikes=new Set(),likeBusy=new Set();
+let commentsByPost=new Map(),commentLoadError="",playerName="行旅者";
 function showState(message,error=false){const e=$('state');e.textContent=message;e.className='state'+(error?' error':'');e.classList.remove('hidden');}
 function hideState(){$('state').classList.add('hidden');}
 function timeText(value){if(!value)return '時間未記錄';const d=new Date(value);return Number.isNaN(d.getTime())?'時間未記錄':d.toLocaleString('zh-TW',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
@@ -68,9 +85,55 @@ function renderPosts(){
 
   const error=document.createElement('span');error.className='like-error';error.setAttribute('role','status');error.id='like-error-'+p.id;actions.appendChild(error);
   const foot=document.createElement('div');foot.className='post-foot';const type=document.createElement('span');type.textContent='公開書札';const sig=document.createElement('span');sig.textContent='萬象傳書 · 咸陵';foot.append(type,sig);
-  article.append(top,body,actions,foot);root.appendChild(article);
+  article.append(top,body,actions,foot);
+  article.appendChild(buildComments(p));root.appendChild(article);
  }
 }
+
+function buildComments(post){
+ const section=document.createElement('section');section.className='comment-section';section.setAttribute('aria-label','書札留言');
+ const rows=commentsByPost.get(post.id)||[];
+ const heading=document.createElement('div');heading.className='comment-heading';heading.textContent='留言 · '+rows.length;section.appendChild(heading);
+ const list=document.createElement('div');list.className='comment-list';
+ if(commentLoadError){const warn=document.createElement('p');warn.className='comment-status';warn.textContent='留言暫無法讀取：'+commentLoadError;list.appendChild(warn);}
+ else if(!rows.length){const empty=document.createElement('span');empty.className='comment-empty';empty.textContent='尚無留言，留下第一句話。';list.appendChild(empty);}
+ const makeItem=(item,isReply=false)=>{
+  const card=document.createElement('div');card.className='comment-item'+(isReply?' reply':'');
+  const who=document.createElement('span');who.className='comment-author'+(item.author_user_id?' player':'');
+  const c=accounts.find(x=>x.character_id===item.author_character_id);
+  who.textContent=item.author_character_id?(c?.characters?.name||'官方角色')+' · 官方':(item.player_profiles?.character_name||'行旅者');
+  const when=document.createElement('span');when.className='comment-meta';when.textContent=timeText(item.created_at);
+  const body=document.createElement('div');body.className='comment-body';body.textContent=item.body;
+  card.append(who,when,body);return card;
+ };
+ const top=rows.filter(c=>!c.parent_id||!rows.some(r=>r.id===c.parent_id));
+ for(const c of top){list.appendChild(makeItem(c));for(const reply of rows.filter(r=>r.parent_id===c.id))list.appendChild(makeItem(reply,true));}
+ section.appendChild(list);
+ const form=document.createElement('form');form.className='comment-form';
+ const input=document.createElement('textarea');input.className='comment-input';input.maxLength=1000;input.rows=2;input.placeholder=currentUser?'留下你的話（最多 1000 字）':'請先登入示籙後留言';input.disabled=!currentUser;input.setAttribute('aria-label','輸入留言');
+ const send=document.createElement('button');send.type='submit';send.className='comment-send';send.textContent='送出';send.disabled=!currentUser;
+ const status=document.createElement('div');status.className='comment-status';status.setAttribute('role','status');
+ form.append(input,send);form.addEventListener('submit',async event=>{
+  event.preventDefault();const text=input.value.trim();if(!text||!currentUser)return;
+  send.disabled=true;status.textContent='';
+  try{const r=await db.from('social_comments').insert({post_id:post.id,author_user_id:currentUser.id,body:text});if(r.error)throw r.error;
+   input.value='';await fetchComments();renderPosts();}
+  catch(e){status.textContent='留言失敗：'+(e?.message||String(e));send.disabled=false;}
+ });section.append(form,status);return section;
+}
+async function fetchComments(){
+ commentsByPost=new Map();commentLoadError='';if(!posts.length)return;
+ const ids=posts.map(p=>p.id);
+ try{
+  const result=await db.from('social_comments').select('id,post_id,parent_id,author_user_id,author_character_id,body,created_at').in('post_id',ids).order('created_at',{ascending:true}).limit(1000);
+  if(result.error)throw result.error;
+  const rows=result.data||[];
+  const userIds=[...new Set(rows.map(r=>r.author_user_id).filter(Boolean))];let names=new Map();
+  if(userIds.length){const profile=await db.from('player_profiles').select('user_id,character_name').in('user_id',userIds);if(!profile.error)names=new Map((profile.data||[]).map(p=>[p.user_id,p.character_name]));}
+  for(const r of rows){if(r.author_user_id)r.player_profiles={character_name:names.get(r.author_user_id)||'行旅者'};if(!commentsByPost.has(r.post_id))commentsByPost.set(r.post_id,[]);commentsByPost.get(r.post_id).push(r);}
+ }catch(e){commentLoadError=e?.message||String(e);}
+}
+
 async function fetchLikes(){
  likeCounts=new Map();myLikes=new Set();
  if(!currentUser||!posts.length)return;
@@ -112,7 +175,7 @@ async function load(){
   const result=await db.from('social_posts').select('id,author_character_id,body,published_at,created_at').eq('status','published').eq('visibility','public').not('author_character_id','is',null).order('published_at',{ascending:false}).limit(100);
   if(result.error)throw result.error;const allowed=new Set(accounts.map(a=>a.character_id));posts=(result.data||[]).filter(p=>allowed.has(p.author_character_id));
   try{await fetchLikes();}catch(e){console.warn('萬象傳書按讚紀錄讀取失敗',e);showState('書札已載入，但按讚紀錄暫時無法同步：'+(e?.message||String(e)),true);}
-  renderFilters();renderPosts();
+  await fetchComments();renderFilters();renderPosts();
  }catch(e){$('feed').replaceChildren();showState('讀取失敗：'+(e?.message||String(e)),true);}
  finally{loading=false;$('refresh').disabled=false;}
 }
