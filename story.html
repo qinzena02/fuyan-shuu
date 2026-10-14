@@ -31,6 +31,14 @@ footer{text-align:center;color:#66867d;font-size:12px;padding:25px}@media(prefer
 .cover-return{display:block;width:max-content;margin:20px auto 0;color:#a9c2b7;font-size:13px;text-decoration:none}
 .cover-return:hover{text-decoration:underline}
 body.cover-locked{overflow:hidden}
+
+/* 啟卷淡出與正文淡入；尊重減少動態效果偏好 */
+.chapter-cover{opacity:1;transition:opacity .65s ease,visibility .65s ease}
+.chapter-cover.cover-exiting{opacity:0;visibility:hidden;pointer-events:none}
+body.cover-locked header,body.cover-locked .wrap,body.cover-locked footer,body.cover-locked .shell{opacity:0}
+body.chapter-revealed header,body.chapter-revealed .wrap,body.chapter-revealed footer,body.chapter-revealed .shell{animation:chapterReveal .75s ease both}
+@keyframes chapterReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.chapter-cover{transition:none}body.chapter-revealed header,body.chapter-revealed .wrap,body.chapter-revealed footer,body.chapter-revealed .shell{animation:none}}
 </style>
 </head>
 <body class="cover-locked">
@@ -180,9 +188,12 @@ initializeCloud();
  const cover=document.getElementById('chapterCover');
  const open=document.getElementById('openChapter');
  open.addEventListener('click',function(){
-   cover.hidden=true;
+   if(cover.classList.contains('cover-exiting'))return;
+   cover.classList.add('cover-exiting');
    document.body.classList.remove('cover-locked');
+   document.body.classList.add('chapter-revealed');
    window.scrollTo({top:0,behavior:'instant'});
+   window.setTimeout(()=>{cover.hidden=true;},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:680);
    const first=document.querySelector('main .choice, main button');
    if(first && first.focus)first.focus({preventScroll:true});
  });

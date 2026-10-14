@@ -18,14 +18,36 @@
 .cover-return{display:block;width:max-content;margin:20px auto 0;color:#a9c2b7;font-size:13px;text-decoration:none}
 .cover-return:hover{text-decoration:underline}
 body.cover-locked{overflow:hidden}
+
+/* 啟卷淡出與正文淡入；尊重減少動態效果偏好 */
+.chapter-cover{opacity:1;transition:opacity .65s ease,visibility .65s ease}
+.chapter-cover.cover-exiting{opacity:0;visibility:hidden;pointer-events:none}
+body.cover-locked header,body.cover-locked .wrap,body.cover-locked footer,body.cover-locked .shell{opacity:0}
+body.chapter-revealed header,body.chapter-revealed .wrap,body.chapter-revealed footer,body.chapter-revealed .shell{animation:chapterReveal .75s ease both}
+@keyframes chapterReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.chapter-cover{transition:none}body.chapter-revealed header,body.chapter-revealed .wrap,body.chapter-revealed footer,body.chapter-revealed .shell{animation:none}}
+
+/* 主線右側抽屜：不再佔據正文欄位 */
+.layout{display:block;max-width:790px;margin-inline:auto}
+.status-toggle{position:fixed;right:0;top:42%;z-index:31;background:#193b39;color:#e8d2a1;border:1px solid #927a52;border-right:0;padding:13px 12px;writing-mode:vertical-rl;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 18px #0009}
+.status-toggle:hover{background:#28534d}
+.aside{position:fixed;right:0;top:0;bottom:0;width:min(355px,90vw);overflow-y:auto;display:block;background:#0c1d1ff8;border-left:1px solid #927a52;z-index:41;padding:27px 21px;box-shadow:-12px 0 35px #000a;transform:translateX(103%);transition:transform .35s ease;visibility:hidden}
+.aside.open{transform:translateX(0);visibility:visible}
+.aside-card{margin-bottom:14px}
+.sidebar-top{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--gold);margin-bottom:20px}
+.sidebar-close{background:transparent;color:var(--gold);border:1px solid #806f50;padding:5px 11px;cursor:pointer}
+.sidebar-backdrop{position:fixed;inset:0;background:#0009;z-index:40}
+.sidebar-backdrop[hidden]{display:none}
+@media(max-width:780px){.aside{display:block;grid-template-columns:none}.layout{display:block}}
+@media(prefers-reduced-motion:reduce){.aside{transition:none}}
 </style>
 </head>
 <body class="cover-locked">
-<section class="chapter-cover" id="chapterCover" aria-label="章節封面" style="--cover-image:radial-gradient(ellipse at 50% 30%,#2b5047,#091113 80%)"><div class="cover-content"><div class="cover-kicker">長明府 · 主線卷宗 · 卷一</div><h1 class="cover-title">天地不問來處</h1><p class="cover-desc">承光年間 · 北城第三更</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="city.html">← 返回卷宗目錄</a></div></section>
+<section class="chapter-cover" id="chapterCover" aria-label="章節封面" style="--cover-image:url('images/tobi-2021061004.jpg')"><div class="cover-content"><div class="cover-kicker">長明府 · 主線卷宗 · 卷一</div><h1 class="cover-title">天地不問來處</h1><p class="cover-desc">承光年間 · 北城第三更</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="city.html">← 返回卷宗目錄</a></div></section>
 <header><div class="brand">負驗書 · 主線卷宗</div><div class="header-right"><span class="time" id="clock">--:--:--</span><a href="city.html">← 返回咸陵主城</a></div></header>
 <div class="wrap"><div class="intro"><div class="eyebrow">MAIN STORY · VOLUME 01</div><h1>天地不問來處</h1><p>承光年間 · 北城第三更　／　序幕：禁步歸零</p></div>
-<div class="layout"><main class="scene"><div id="error" class="error hidden"></div><div id="game"><div class="chapter" id="chapter"></div><h2 id="scene-title"></h2><div class="story" id="story"></div><div class="choices" id="choices"></div><div class="actions"><button class="secondary" id="restart" type="button">重啟本卷序幕</button><button class="secondary" id="save" type="button">手動儲存</button></div><p class="note" id="status" role="status">行跡將自動記錄於此裝置。</p></div></main>
-<aside class="aside"><section class="aside-card"><h3>示籙 · 行旅者</h3><p id="player-name">—</p><p id="player-sect">—</p><p id="player-origin">—</p><span class="pill">主線進行中</span></section><section class="aside-card"><h3>線索簿</h3><ul id="clue-list"><li>尚無記錄</li></ul></section><section class="aside-card"><h3>人物交集</h3><ul id="relation-list"><li>尚無記錄</li></ul></section></aside></div></div>
+<button type="button" class="status-toggle" id="openMainStatus" aria-controls="mainStatusSidebar" aria-expanded="false">行旅紀錄</button><div class="sidebar-backdrop" id="mainStatusBackdrop" hidden></div><div class="layout"><main class="scene"><div id="error" class="error hidden"></div><div id="game"><div class="chapter" id="chapter"></div><h2 id="scene-title"></h2><div class="story" id="story"></div><div class="choices" id="choices"></div><div class="actions"><button class="secondary" id="restart" type="button">重啟本卷序幕</button><button class="secondary" id="save" type="button">手動儲存</button></div><p class="note" id="status" role="status">行跡將自動記錄於此裝置。</p></div></main>
+<aside class="aside" id="mainStatusSidebar" role="dialog" aria-modal="true" aria-label="主線行旅紀錄" aria-hidden="true"><div class="sidebar-top"><strong>行旅紀錄</strong><button type="button" id="closeMainStatus" class="sidebar-close" aria-label="關閉側欄">✕</button></div><section class="aside-card"><h3>示籙 · 行旅者</h3><p id="player-name">—</p><p id="player-sect">—</p><p id="player-origin">—</p><span class="pill">主線進行中</span></section><section class="aside-card"><h3>線索簿</h3><ul id="clue-list"><li>尚無記錄</li></ul></section><section class="aside-card"><h3>人物交集</h3><ul id="relation-list"><li>尚無記錄</li></ul></section></aside></div></div>
 <footer>長明府未公開卷宗 · 你的選擇將留在這片土地上</footer>
 <script>
 'use strict';
@@ -101,12 +123,35 @@ if(!player||!player.name){$('game').classList.add('hidden');$('error').classList
  const cover=document.getElementById('chapterCover');
  const open=document.getElementById('openChapter');
  open.addEventListener('click',function(){
-   cover.hidden=true;
+   if(cover.classList.contains('cover-exiting'))return;
+   cover.classList.add('cover-exiting');
    document.body.classList.remove('cover-locked');
+   document.body.classList.add('chapter-revealed');
    window.scrollTo({top:0,behavior:'instant'});
+   window.setTimeout(()=>{cover.hidden=true;},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:680);
    const first=document.querySelector('main .choice, main button');
    if(first && first.focus)first.focus({preventScroll:true});
  });
+})();
+</script>
+
+<script>
+(function(){
+ const drawer=document.getElementById('mainStatusSidebar');
+ const backdrop=document.getElementById('mainStatusBackdrop');
+ const toggle=document.getElementById('openMainStatus');
+ const closeBtn=document.getElementById('closeMainStatus');
+ function setOpen(value){
+  drawer.classList.toggle('open',value);
+  drawer.setAttribute('aria-hidden',String(!value));
+  toggle.setAttribute('aria-expanded',String(value));
+  backdrop.hidden=!value;
+  if(value)closeBtn.focus();else toggle.focus();
+ }
+ toggle.addEventListener('click',()=>setOpen(true));
+ closeBtn.addEventListener('click',()=>setOpen(false));
+ backdrop.addEventListener('click',()=>setOpen(false));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer.classList.contains('open'))setOpen(false)});
 })();
 </script>
 </body></html>
