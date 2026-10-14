@@ -118,6 +118,12 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 @keyframes cityBulletinScroll{to{transform:translateX(-50%)}}
 @media(max-width:520px){.city-bulletin{gap:9px;padding:10px}.bulletin-label{font-size:12px;letter-spacing:1px;padding-right:9px}.bulletin-message{font-size:12px}.bulletin-pause{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.bulletin-track{animation:none}.bulletin-window{overflow-x:auto}.bulletin-group[aria-hidden]{display:none}.bulletin-pause{display:none}}
+
+/* 純文字字條：左右邊緣漸入、漸出 */
+.city-bulletin{display:block;margin:0 0 24px;padding:10px 0;background:transparent;border:0;box-shadow:none}
+.bulletin-window{width:100%;mask-image:linear-gradient(to right,transparent 0%,#000 7%,#000 93%,transparent 100%);-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 7%,#000 93%,transparent 100%)}
+.city-bulletin:hover .bulletin-track,.city-bulletin:focus-within .bulletin-track{animation-play-state:running}
+@media(max-width:520px){.city-bulletin{padding:8px 0}.bulletin-window{mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent)}}
 </style>
 </head>
 <body>
@@ -125,12 +131,12 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 <section class="hero"><p class="eyebrow">承光年間 · 咸陵</p><h1>天下地脈</h1><p>鋼鐵築城，符機行世。</p><p>舊朝已逝，而人間依舊燈火長明。</p></section>
 <main>
 <section class="city-bulletin" aria-label="咸陵傳報">
-<span class="bulletin-label">咸陵傳報</span>
+
 <div class="bulletin-window"><div class="bulletin-track" id="cityBulletinTrack"></div></div>
-<button class="bulletin-pause" id="cityBulletinPause" type="button" aria-pressed="false" aria-label="暫停咸陵傳報">暫停</button>
+
 </section>
 
-<section class="journey-overview" aria-label="行旅紀錄"><h2>行旅紀錄</h2><p class="intro">山河萬里，所行皆有跡可循。</p><div class="journey-grid"><div class="journey-item"><small>已協辦懸賞</small><strong id="assistedCount">讀取中…</strong><span>以線上鏢局接案紀錄為準</span></div><div class="journey-item"><small>主線進度</small><strong id="mainProgress">讀取中…</strong><span>《天地不問來處》</span></div><div class="journey-item"><small>支線進度</small><strong id="sideProgress">讀取中…</strong><span>《江上無歸人》</span></div></div><p class="journey-note" id="journeyNote">雲端協辦數量與劇情存檔會分別讀取；尚未開始的案件顯示未開始。</p></section>
+<section class="journey-overview" aria-label="行旅紀錄"><h2>行旅紀錄</h2><p class="intro">山河萬里，所行皆有跡可循。</p><div class="journey-grid"><div class="journey-item"><small>已協辦懸賞</small><strong id="assistedCount">讀取中…</strong><span>以線上鏢局接案紀錄為準</span></div><div class="journey-item"><small>主線進度</small><strong id="mainProgress">讀取中…</strong><span>《天地不問來處》</span></div><div class="journey-item"><small>支線進度</small><strong id="sideProgress">讀取中…</strong><span>《江上無歸人》</span></div></div></section>
 <section class="story-portal" aria-label="江湖演繹入口">
   <div class="story-portal-heading"><em>INTERACTIVE STORY · 江湖演繹</em><strong>入世</strong><span>人間萬象，各有其途。</span></div>
   <div class="story-portal-actions">
@@ -338,8 +344,7 @@ if(!player||!player.name){window.location.replace('index.html')}else{
   const setSpeed=()=>track.style.setProperty('--bulletin-duration',Math.max(40,group.scrollWidth/38)+'s');
   setSpeed();window.addEventListener('resize',setSpeed);
   if(document.fonts)document.fonts.ready.then(setSpeed);
-  const button=document.getElementById('cityBulletinPause');
-  button.addEventListener('click',()=>{const paused=track.closest('.city-bulletin').classList.toggle('is-paused');button.setAttribute('aria-pressed',String(paused));button.textContent=paused?'播放':'暫停';button.setAttribute('aria-label',paused?'播放咸陵傳報':'暫停咸陵傳報')});
+
 })();
 </script>
 </body>
