@@ -77,6 +77,9 @@ main{max-width:1240px;padding:32px 24px 85px}
 .comment-menu{position:absolute;right:0;top:25px;z-index:5;background:#132b29;border:1px solid #4b6a5e;border-radius:8px;padding:5px;box-shadow:0 8px 18px #0008}
 .comment-delete{background:transparent;color:#efb7a9;border:0;font:inherit;font-size:12px;padding:6px 12px;cursor:pointer;white-space:nowrap}
 .comment-deleted .comment-body{color:#78968c;font-style:italic}
+
+/* 圖文書札 */
+.composer{margin-bottom:22px}.composer textarea{width:100%;min-height:100px;resize:vertical;background:#0a1c1d;border:1px solid #436359;border-radius:9px;padding:12px;color:#e5e0d4;font:inherit}.composer-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}.composer button,.composer label.upload-label{background:#1b3934;border:1px solid #897750;color:#e8d2a2;border-radius:7px;padding:7px 13px;cursor:pointer;font:inherit;font-size:13px}.composer button:disabled{opacity:.5}.upload-label input{display:none}.image-previews,.post-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}.image-preview{position:relative}.image-preview img,.post-images img{width:100%;max-height:290px;object-fit:cover;border-radius:8px;display:block}.image-preview button{position:absolute;top:5px;right:5px;background:#102223;color:#fff;border:1px solid #bda77e;border-radius:50%;width:28px;height:28px;cursor:pointer}.post-images button{border:0;padding:0;background:transparent;cursor:zoom-in}.post-images.single{grid-template-columns:1fr}.composer-status{color:#c4b084;font-size:12px}.composer-status.error{color:#f0b9b9}.player-post-tag{color:#a8d0c3;font-size:12px}
 </style>
 </head>
 <body>
@@ -86,7 +89,7 @@ main{max-width:1240px;padding:32px 24px 85px}
 <p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
 <div class="layout">
 <aside class="panel social-sidebar"><h2>傳書分類</h2><div class="filters" id="filters"><button class="filter active" data-character="all">所有書札</button></div><p class="note">循人物之名，尋江湖書札。</p></aside>
-<section aria-label="公開書札動態牆"><div class="feed-head"><h2 id="feedTitle">城中書札</h2></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
+<section aria-label="公開書札動態牆"><div id="playerComposer" class="panel composer hidden"><h2>撰寫書札</h2><textarea id="newPostBody" maxlength="3000" placeholder="江湖所見、城中近聞，皆可留於此處……"></textarea><div id="newImagePreviews" class="image-previews"></div><div class="composer-tools"><label class="upload-label">＋ 附加圖片<input id="newPostImages" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><span id="newImageCount" class="small">0 / 4 張</span><button id="submitPost" type="button">發布書札</button></div><p id="composerStatus" class="composer-status" role="status"></p></div><div class="feed-head"><h2 id="feedTitle">城中書札</h2></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
 </div>
 </main><footer>長明府 · 萬象傳書</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -97,7 +100,7 @@ const db=window.fuyanshuDB;
 const $=id=>document.getElementById(id);
 let accounts=[],posts=[],selected='all',loading=false,currentUser=null;
 let likeCounts=new Map(),myLikes=new Set(),likeBusy=new Set();
-let commentsByPost=new Map(),commentLoadError="",playerName="行旅者";
+let commentsByPost=new Map(),commentLoadError="",playerName="行旅者";let pendingImages=[];
 function showState(message,error=false){const e=$('state');e.textContent=message;e.className='state'+(error?' error':'');e.classList.remove('hidden');}
 function hideState(){$('state').classList.add('hidden');}
 function timeText(value){if(!value)return '時間未記錄';const d=new Date(value);return Number.isNaN(d.getTime())?'時間未記錄':d.toLocaleString('zh-TW',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
@@ -106,7 +109,7 @@ function renderPosts(){
  const root=$('feed');root.replaceChildren();
  const list=posts.filter(p=>selected==='all'||p.author_character_id===selected);
  $('feedTitle').textContent=selected==='all'?'城中書札':(accounts.find(a=>a.character_id===selected)?.characters?.name||'角色')+'的書札';
- if(!list.length){showState(selected==='all'?'目前還沒有公開書札。請先從管理臺發布第一篇。':'這位角色尚未發布公開書札。');return;}
+ if(!list.length){showState(selected==='all'?'目前還沒有公開書札。':'這位角色尚未發布公開書札。');return;}
  hideState();
  for(const p of list){
   const account=accounts.find(a=>a.character_id===p.author_character_id);if(!account)continue;
@@ -118,7 +121,7 @@ function renderPosts(){
   }else avatar.textContent=character.name.slice(0,1);
   const identity=document.createElement('div'),name=document.createElement('div');name.className='name';name.textContent=character.name;
   
-  const meta=document.createElement('div');meta.className='meta';meta.textContent='@'+account.handle+' · '+(character.faction||'咸陵')+' · '+timeText(p.published_at||p.created_at);
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=(account?'@'+account.handle+' · '+(character.faction||'咸陵'):'行旅者')+' · '+timeText(p.published_at||p.created_at);
   identity.append(name,meta);top.append(avatar,identity);
   const body=document.createElement('div');body.className='body';body.textContent=p.body;
   const actions=document.createElement('div');actions.className='post-actions';
@@ -132,7 +135,7 @@ function renderPosts(){
 
   const error=document.createElement('span');error.className='like-error';error.setAttribute('role','status');error.id='like-error-'+p.id;actions.appendChild(error);
   
-  article.append(top,body,actions);
+  article.append(top,body);if(Array.isArray(p.image_paths)&&p.image_paths.length){const gallery=document.createElement('div');gallery.className='post-images'+(p.image_paths.length===1?' single':'');for(const path of p.image_paths){const {data}=db.storage.from('social-images').getPublicUrl(path);const url=data?.publicUrl;if(!url)continue;const link=document.createElement('button');link.type='button';link.setAttribute('aria-label','放大圖片');const img=document.createElement('img');img.src=url;img.alt='書札附圖';img.loading='lazy';link.appendChild(img);link.addEventListener('click',()=>window.open(url,'_blank','noopener,noreferrer'));gallery.appendChild(link);}article.appendChild(gallery);}article.append(actions);
   article.appendChild(buildComments(p));root.appendChild(article);
  }
 }
@@ -240,8 +243,8 @@ async function load(){
   const profile=await db.from('character_social_profiles').select('character_id,handle,characters(name,faction,avatar_url,is_public)').eq('is_active',true);
   if(profile.error)throw profile.error;accounts=(profile.data||[]).filter(a=>a.characters?.is_public);
   if(selected!=='all'&&!accounts.some(a=>a.character_id===selected))selected='all';
-  const result=await db.from('social_posts').select('id,author_character_id,body,published_at,created_at').eq('status','published').eq('visibility','public').not('author_character_id','is',null).order('published_at',{ascending:false}).limit(100);
-  if(result.error)throw result.error;const allowed=new Set(accounts.map(a=>a.character_id));posts=(result.data||[]).filter(p=>allowed.has(p.author_character_id));
+  const result=await db.from('social_posts').select('id,author_character_id,author_user_id,body,image_paths,published_at,created_at').eq('status','published').eq('visibility','public').order('published_at',{ascending:false}).limit(100);
+  if(result.error)throw result.error;const allowed=new Set(accounts.map(a=>a.character_id));posts=(result.data||[]).filter(p=>p.author_user_id||allowed.has(p.author_character_id));const uids=[...new Set(posts.map(p=>p.author_user_id).filter(Boolean))];if(uids.length){const names=await db.from('player_profiles').select('user_id,character_name').in('user_id',uids);if(!names.error){const map=new Map((names.data||[]).map(x=>[x.user_id,x.character_name]));for(const p of posts)if(p.author_user_id)p.player_name=map.get(p.author_user_id)||'行旅者';}}$('playerComposer').classList.toggle('hidden',!currentUser);
   try{await fetchLikes();}catch(e){console.warn('萬象傳書按讚紀錄讀取失敗',e);showState('書札已載入，但按讚紀錄暫時無法同步：'+(e?.message||String(e)),true);}
   await fetchComments();renderFilters();renderPosts();
  }catch(e){$('feed').replaceChildren();showState('讀取失敗：'+(e?.message||String(e)),true);}
