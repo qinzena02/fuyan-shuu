@@ -184,11 +184,45 @@ initializeCloud();
 <script>document.addEventListener("pointerdown",()=>{if(window.parent!==window)window.parent.postMessage("fuyanshu-interaction",location.origin);},{once:true});</script>
 <script src="virtue-system.js"></script>
 <script>
+/* 啟卷翻頁音：按下按鈕時以 Web Audio 即時產生，無須外部音檔。 */
+(function(){
+ let audioContext;
+ window.FYSPlayPageTurn=function(){
+  try{
+   const AC=window.AudioContext||window.webkitAudioContext;
+   if(!AC)return;
+   audioContext=audioContext||new AC();
+   if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
+   const now=audioContext.currentTime;
+   const duration=.58;
+   const buffer=audioContext.createBuffer(1,Math.ceil(audioContext.sampleRate*duration),audioContext.sampleRate);
+   const data=buffer.getChannelData(0);
+   let smooth=0;
+   for(let i=0;i<data.length;i++){
+    const t=i/audioContext.sampleRate;
+    const flutter=.55+.45*Math.sin(2*Math.PI*(8*t+11*t*t));
+    smooth=smooth*.72+(Math.random()*2-1)*.28;
+    const envelope=Math.pow(Math.sin(Math.PI*t/duration),1.3);
+    data[i]=smooth*envelope*flutter;
+   }
+   const source=audioContext.createBufferSource();source.buffer=buffer;
+   const highpass=audioContext.createBiquadFilter();highpass.type='highpass';highpass.frequency.value=420;
+   const lowpass=audioContext.createBiquadFilter();lowpass.type='lowpass';lowpass.frequency.setValueAtTime(2500,now);lowpass.frequency.exponentialRampToValueAtTime(850,now+duration);
+   const gain=audioContext.createGain();gain.gain.value=.17;
+   source.connect(highpass);highpass.connect(lowpass);lowpass.connect(gain);gain.connect(audioContext.destination);
+   source.start(now);source.stop(now+duration);
+   source.onended=()=>{source.disconnect();highpass.disconnect();lowpass.disconnect();gain.disconnect()};
+  }catch(err){/* 音訊被瀏覽器封鎖時，仍正常啟卷。 */}
+ };
+})();
+</script>
+<script>
 (function(){
  const cover=document.getElementById('chapterCover');
  const open=document.getElementById('openChapter');
  open.addEventListener('click',function(){
    if(cover.classList.contains('cover-exiting'))return;
+   window.FYSPlayPageTurn?.();
    cover.classList.add('cover-exiting');
    document.body.classList.remove('cover-locked');
    document.body.classList.add('chapter-revealed');
