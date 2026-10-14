@@ -104,9 +104,7 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 .journey-overview .journey-note{border-top:1px solid #29483f;padding-top:12px;margin:15px 0 0}
 @media(max-width:700px){.journey-overview{padding:19px 16px}.journey-overview .journey-grid{grid-template-columns:1fr}.journey-overview .journey-item,.journey-overview .journey-item:first-child,.journey-overview .journey-item:last-child{border-right:0;border-bottom:1px solid #36544b;padding:12px 2px;min-height:0}.journey-overview .journey-item:last-child{border-bottom:0}}
 
-/* 城中日報：分享公開新聞 */
-.news-share{margin-top:10px;padding:3px 10px;background:transparent;border:1px solid #6b806f;border-radius:20px;color:#e3c98d;font:inherit;font-size:12px;cursor:pointer}
-.news-share:hover,.news-share:focus-visible{background:#1d3934;border-color:#e3c98d}
+
 /* 城中日報：簡潔三則、事件解鎖提示 */
 .news-loading,.news-footnote{font-size:12px;color:#8fb5a7;margin:10px 0 0}
 .news-event{display:inline-block;margin-left:8px;font-size:10px;color:#e5c88b;border:1px solid #8a7450;padding:0 6px;border-radius:10px;vertical-align:middle}
@@ -361,23 +359,6 @@ if(!player||!player.name){window.location.replace('index.html')}else{
   if(item.event){const mark=document.createElement('span');mark.className='news-event';mark.textContent='行跡風聞';title.appendChild(mark)}
   const body=document.createElement('p');body.textContent=item.body;
   summary.append(tag,title);details.append(summary,body);
-   // 劇情限定新聞不公開轉發，避免將個人解鎖內容透露給其他玩家。
-   if(!item.event){
-     const share=document.createElement('button');share.type='button';share.className='news-share';share.textContent='↗ 轉發至萬象傳書';
-     share.addEventListener('click',()=>{
-       const params=new URLSearchParams({news_title:item.title,news_tag:item.tag,news_body:item.body});
-       const target='social.html?'+params.toString();
-       // 在世界觀外框內開啟，保留既有導覽架構。
-       window.location.href=target;
-     });
-     details.appendChild(share);
-     const official=document.createElement('button');official.type='button';official.className='news-share';official.style.marginLeft='8px';official.textContent='↗ 以官方角色轉發';
-     official.addEventListener('click',()=>{
-       const params=new URLSearchParams({news_title:item.title,news_tag:item.tag,news_body:item.body});
-       window.location.href='admin.html?'+params.toString();
-     });
-     details.appendChild(official);
-   }
    feed.appendChild(details);
  });}
  // 在取得雲端資料前也先顯示新聞；資料回來後僅更新一次，不會不停跳動。

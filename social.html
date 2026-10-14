@@ -103,10 +103,11 @@ main{max-width:1240px;padding:32px 24px 85px}
 .comment-inline-reply button{padding:4px 12px;font-size:12px}
 .comment-thread.nested{border-top:0;padding-top:0}
 .comment-replies .comment-replies{margin-left:12px;padding-left:12px}
+.focused-post{outline:1px solid #c6a66f;outline-offset:3px;scroll-margin-top:24px}.name a{color:inherit;text-decoration:none}.name a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
-<header><div class="brand">負驗書 <span class="small">／ 萬象傳書</span></div><nav><a href="city.html">返回咸陵主城 ↗</a></nav></header>
+<header><div class="brand">負驗書 <span class="small">／ 萬象傳書</span></div><nav><a href="personal.html">我的示籙與書札</a>　<a href="city.html">返回咸陵主城 ↗</a></nav></header>
 <main>
 <div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1>
 <p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
@@ -158,12 +159,12 @@ function renderPosts(){
  for(const p of list){
   const account=accounts.find(a=>a.character_id===p.author_character_id);if(!account&&!p.author_user_id)continue;
   const character=account?.characters||{name:p.player_name||'行旅者',faction:'咸陵',avatar_url:null},article=document.createElement('article');article.className='post';
-  const top=document.createElement('div');top.className='post-top';
+  article.id='post-'+p.id;const top=document.createElement('div');top.className='post-top';
   const avatar=document.createElement('div');avatar.className='avatar';
   if(character.avatar_url&&/^https:\/\//i.test(character.avatar_url)){
    const img=document.createElement('img');img.src=character.avatar_url;img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{avatar.replaceChildren();avatar.textContent=character.name.slice(0,1)};avatar.appendChild(img);
   }else avatar.textContent=character.name.slice(0,1);
-  const identity=document.createElement('div'),name=document.createElement('div');name.className='name';name.textContent=character.name;
+  const identity=document.createElement('div'),name=document.createElement('div');name.className='name';name.textContent=character.name;if(p.author_user_id&&currentUser?.id===p.author_user_id){const link=document.createElement('a');link.href='personal.html';link.textContent=character.name;link.title='查看我的個人示籙與書札';name.replaceChildren(link);}
   
   const meta=document.createElement('div');meta.className='meta';meta.textContent=(account?'@'+account.handle+' · '+(character.faction||'咸陵'):'行旅者')+' · '+timeText(p.published_at||p.created_at);
   identity.append(name,meta);top.append(avatar,identity);
@@ -313,21 +314,6 @@ function previewImages(){
   remove.addEventListener('click',()=>{pendingImages.splice(index,1);previewImages();});box.append(img,remove);root.appendChild(box);
  });
 }
-// 從咸陵日報轉來的公開新聞，先作為文字引述；劇情新聞不提供此入口。
-(function receiveCityNews(){
- const params=new URLSearchParams(window.location.search);
- const title=params.get('news_title');
- if(!title)return;
- const tag=params.get('news_tag')||'城中消息';
- const body=params.get('news_body')||'';
- const quote='【轉引咸陵日報｜'+tag+'】\n'+title+'\n'+body.slice(0,500)+'\n—— 來源：咸陵日報';
- const editor=$('newPostBody');
- if(editor&&!editor.value.trim())editor.value=quote;
- const message=$('composerMessage');
- if(message)message.textContent='已帶入公開新聞引文，可先寫下自己的看法，再發布書札。';
- // 移除網址中的新聞正文，避免再次重新整理重複填入。
- history.replaceState(null,'',window.location.pathname+window.location.hash);
-})();
 $('newPostImages').addEventListener('change',event=>{
  const selected=Array.from(event.target.files||[]);event.target.value='';
  for(const file of selected){
@@ -376,7 +362,7 @@ async function load(){
   const result=await db.from('social_posts').select('id,author_character_id,author_user_id,body,image_paths,published_at,created_at').eq('status','published').eq('visibility','public').order('published_at',{ascending:false}).limit(100);
   if(result.error)throw result.error;const allowed=new Set(accounts.map(a=>a.character_id));posts=(result.data||[]).filter(p=>p.author_user_id||allowed.has(p.author_character_id));const uids=[...new Set(posts.map(p=>p.author_user_id).filter(Boolean))];if(uids.length){const names=await db.from('player_profiles').select('user_id,character_name').in('user_id',uids);if(!names.error){const map=new Map((names.data||[]).map(x=>[x.user_id,x.character_name]));for(const p of posts)if(p.author_user_id)p.player_name=map.get(p.author_user_id)||'行旅者';}}$('playerComposer').classList.toggle('hidden',!currentUser);
   try{await fetchLikes();}catch(e){console.warn('萬象傳書按讚紀錄讀取失敗',e);showState('書札已載入，但按讚紀錄暫時無法同步：'+(e?.message||String(e)),true);}
-  await fetchComments();renderFilters();renderPosts();
+  await fetchComments();renderFilters();renderPosts();const focusId=new URLSearchParams(location.search).get('post');if(focusId&&/^[0-9a-f-]{36}$/i.test(focusId)){const target=document.getElementById('post-'+focusId);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.classList.add('focused-post');}}
  }catch(e){$('feed').replaceChildren();showState('讀取失敗：'+(e?.message||String(e)),true);}
  finally{loading=false;}
 }
