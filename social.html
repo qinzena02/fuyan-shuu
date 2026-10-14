@@ -112,8 +112,8 @@ function renderPosts(){
  if(!list.length){showState(selected==='all'?'目前還沒有公開書札。':'這位角色尚未發布公開書札。');return;}
  hideState();
  for(const p of list){
-  const account=accounts.find(a=>a.character_id===p.author_character_id);if(!account)continue;
-  const character=account.characters,article=document.createElement('article');article.className='post';
+  const account=accounts.find(a=>a.character_id===p.author_character_id);if(!account&&!p.author_user_id)continue;
+  const character=account?.characters||{name:p.player_name||'行旅者',faction:'咸陵',avatar_url:null},article=document.createElement('article');article.className='post';
   const top=document.createElement('div');top.className='post-top';
   const avatar=document.createElement('div');avatar.className='avatar';
   if(character.avatar_url&&/^https:\/\//i.test(character.avatar_url)){
@@ -235,6 +235,55 @@ async function toggleLike(postId,button){
  }catch(e){if(error)error.textContent='操作失敗：'+(e?.message||String(e));console.error('萬象傳書按讚失敗',e);}
  finally{likeBusy.delete(postId);button.disabled=false;}
 }
+// 玩家圖文書札：圖片選取、預覽與上傳
+function composerMessage(text,error=false){const el=$('composerStatus');el.textContent=text;el.classList.toggle('error',error);}
+function previewImages(){
+ const root=$('newImagePreviews');root.replaceChildren();$('newImageCount').textContent=pendingImages.length+' / 4 張';
+ pendingImages.forEach((file,index)=>{
+  const box=document.createElement('div');box.className='image-preview';
+  const img=document.createElement('img');img.alt='待發布圖片 '+(index+1);
+  const url=URL.createObjectURL(file);img.src=url;img.onload=()=>URL.revokeObjectURL(url);
+  const remove=document.createElement('button');remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','移除圖片');
+  remove.addEventListener('click',()=>{pendingImages.splice(index,1);previewImages();});box.append(img,remove);root.appendChild(box);
+ });
+}
+$('newPostImages').addEventListener('change',event=>{
+ const selected=Array.from(event.target.files||[]);event.target.value='';
+ for(const file of selected){
+  if(pendingImages.length>=4){composerMessage('每篇最多只能附加四張圖片。',true);break;}
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){composerMessage('僅支援 JPG、PNG、WebP。',true);continue;}
+  if(file.size>5*1024*1024){composerMessage('單張圖片不能超過 5 MB。',true);continue;}
+  pendingImages.push(file);
+ }
+ previewImages();
+});
+$('submitPost').addEventListener('click',async()=>{
+ if(!currentUser){composerMessage('請先登入示籙。',true);return;}
+ const body=$('newPostBody').value.trim();
+ if(!body&&!pendingImages.length){composerMessage('請輸入文字或選擇圖片。',true);return;}
+ const btn=$('submitPost');btn.disabled=true;composerMessage('正在上傳書札……');
+ const uploaded=[];
+ try{
+  for(const file of pendingImages){
+   const extension=({ 'image/jpeg':'jpg','image/png':'png','image/webp':'webp' })[file.type];
+   const random=crypto.randomUUID();
+   const path='players/'+currentUser.id+'/'+random+'.'+extension;
+   const result=await db.storage.from('social-images').upload(path,file,{contentType:file.type,upsert:false});
+   if(result.error)throw result.error;
+   uploaded.push(path);
+  }
+  const payload={author_user_id:currentUser.id,author_character_id:null,body,status:'published',visibility:'public',published_at:new Date().toISOString(),image_paths:uploaded};
+  const result=await db.from('social_posts').insert(payload).select('id');
+  if(result.error)throw result.error;
+  if(!result.data?.length)throw new Error('貼文未成功寫入資料庫，請確認 RLS 權限。');
+  $('newPostBody').value='';pendingImages=[];previewImages();composerMessage('書札已發布。');
+  await load();
+ }catch(error){
+  composerMessage('發布失敗：'+(error?.message||String(error)),true);
+  // 失敗時清除本次上傳但尚未引用的圖片
+  if(uploaded.length)await db.storage.from('social-images').remove(uploaded);
+ }finally{btn.disabled=false;}
+});
 async function load(){
  if(loading)return;loading=true;showState('正在讀取城中書札……');
  try{
