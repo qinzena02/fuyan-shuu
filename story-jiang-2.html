@@ -55,9 +55,16 @@ body.cover-locked>header,body.cover-locked>.hero,body.cover-locked>main,body.cov
 body.chapter-revealed>header,body.chapter-revealed>.hero,body.chapter-revealed>main,body.chapter-revealed>.status-toggle{animation:jiang2Reveal 1s ease both}
 @keyframes jiang2Reveal{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.chapter-cover{transition:none}body.chapter-revealed>header,body.chapter-revealed>.hero,body.chapter-revealed>main,body.chapter-revealed>.status-toggle{animation:none}}
+
+/* 雙卷共用導覽列：同樣順序、字距與返回箭頭 */
+header .fys-unified-nav{display:flex;align-items:center;gap:20px;font-size:13px;line-height:1.6;white-space:nowrap;}
+header .fys-unified-nav a{color:#a8d3c4;text-decoration:none;transition:color .18s;}
+header .fys-unified-nav a:hover,header .fys-unified-nav a:focus-visible{color:#f0d69c;text-decoration:underline;text-underline-offset:4px;}
+@media(max-width:480px){header .fys-unified-nav{gap:14px;font-size:12px;}}
+header{background:#0c191b;border-bottom:1px solid #37564e;padding:16px max(20px,calc((100vw - 1050px)/2));display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
 </style></head><body class="cover-locked">
 <section class="chapter-cover" id="chapterCover" aria-label="續卷啟封畫面" style="--cover-image:url('images/tobi-2021061007.jpg')"><div class="cover-content"><div class="cover-kicker">咸陵鏢局 · 支線委託 · 卷二</div><h1 class="cover-title">江上無歸人、其二</h1><p class="cover-desc">未封之卷 · 江岸有痕 · 七人歸處</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="bounty.html">← 返回卷宗目錄</a></div></section>
-<header><span>負驗書 · 咸陵鏢局</span><nav><a href="bounty.html">← 委託榜</a>　<a href="city.html">咸陵主城</a></nav></header><section class="hero"><div class="eyebrow">支線委託 · 續卷</div><h1>江上無歸人、其二</h1><p>人既有來處，便總該有個歸處。</p></section>
+<header><span>負驗書 · 咸陵鏢局</span><nav class="fys-unified-nav" aria-label="支線導覽"><a href="bounty.html">← 委託榜</a><a href="city.html">咸陵主城</a></nav></header><section class="hero"><div class="eyebrow">支線委託 · 續卷</div><h1>江上無歸人、其二</h1><p>人既有來處，便總該有個歸處。</p></section>
 <main><div class="chapter" id="chapter">卷宗核驗中</div><h2 id="title">正在讀取示籙</h2><div class="prose" id="prose"></div><section class="panel" id="interaction"><div class="tag" id="choiceTitle">玩家選擇</div><div id="choices"></div><div id="reply" class="reply hidden"></div><button id="continue" class="choice hidden">繼續 ›</button></section><p id="status" class="note" role="status">正在連接雲端存檔……</p><div class="toolbar"><a href="story.html">返回前篇</a><a href="bounty.html">返回委託榜</a></div></main>
 <button type="button" class="status-toggle" id="statusToggle" aria-expanded="false" aria-controls="statusSidebar">行旅狀態 ◇</button>
 <aside class="status-sidebar" id="statusSidebar" aria-label="行旅狀態" aria-hidden="true">

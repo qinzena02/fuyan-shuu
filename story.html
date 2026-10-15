@@ -106,11 +106,18 @@ body{font-family:"Noto Serif TC","Microsoft JhengHei",serif}
 .scene-title{font-size:26px}
 .choices{margin-top:24px}
 @media(max-width:650px){.shell{padding:0 15px 65px}.layout>.panel{padding:0}.masthead{min-height:270px}}
+
+/* 雙卷共用導覽列：同樣順序、字距與返回箭頭 */
+header .fys-unified-nav{display:flex;align-items:center;gap:20px;font-size:13px;line-height:1.6;white-space:nowrap;}
+header .fys-unified-nav a{color:#a8d3c4;text-decoration:none;transition:color .18s;}
+header .fys-unified-nav a:hover,header .fys-unified-nav a:focus-visible{color:#f0d69c;text-decoration:underline;text-underline-offset:4px;}
+@media(max-width:480px){header .fys-unified-nav{gap:14px;font-size:12px;}}
+header{background:#0c191b;border-bottom:1px solid #37564e;padding:16px max(20px,calc((100vw - 1050px)/2));display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
 </style>
 </head>
 <body class="cover-locked">
 <section class="chapter-cover" id="chapterCover" aria-label="章節封面" style="--cover-image:url('images/tobi-2021061007.jpg')"><div class="cover-content"><div class="cover-kicker">咸陵鏢局 · 支線委託 · 卷一</div><h1 class="cover-title">江上無歸人</h1><p class="cover-desc">天環江商旅失蹤案</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="bounty.html">← 返回卷宗目錄</a></div></section>
-<header><div class="brand">負驗書</div><nav class="topnav"><a href="city.html">咸陵主城</a><a href="bounty.html">鏢局委託榜</a></nav></header>
+<header><div class="brand">負驗書</div><nav class="fys-unified-nav" aria-label="支線導覽"><a href="bounty.html">← 委託榜</a><a href="city.html">咸陵主城</a></nav></header>
 <div class="shell">
 <section class="masthead"><div class="eyebrow">咸陵鏢局 · 委託演繹 · 卷一</div><h1>江上無歸人</h1><p>天環江商旅失蹤案</p></section>
 <div class="layout">
