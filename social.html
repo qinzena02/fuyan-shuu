@@ -134,20 +134,42 @@ html { min-height: 100%; background: #091315; }
 body {
   min-height: 100vh;
   background-color: #091315;
-  background-image: linear-gradient(rgba(5, 18, 19, .65), rgba(5, 18, 19, .78)), url("images/23938439738a234d733f8eb1e35f7991.jpg");
+  background-image: none;
   background-position: center top;
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
 }
 @media (max-width: 700px) { body { background-attachment: scroll; } }
+
+/* 新版萬象傳書：水墨橫幅。保留原本書札、角色篩選、通知及互動程式。 */
+main{max-width:1240px;padding-top:0}
+.social-hero{
+  position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;
+  min-height:440px;margin:0 calc(-1 * max(24px, (100vw - 1240px) / 2 + 24px)) 36px;
+  padding:88px 24px 96px;overflow:hidden;text-align:center;
+  background-image:linear-gradient(180deg,rgba(5,19,21,.22) 0%,rgba(5,19,21,.30) 47%,#091315 100%),url("images/98be320fe53032e28913b6efe64dd5a6.jpg");
+  background-size:cover;background-position:center 48%;background-repeat:no-repeat;
+}
+.social-hero-content{position:relative;z-index:1;max-width:850px;text-shadow:0 2px 18px #061719aa}
+.social-hero .eyebrow{color:#a9d4c5;letter-spacing:6px}
+.social-hero h1{font-size:clamp(42px,5vw,72px);letter-spacing:.18em;margin:23px 0 34px;color:#ead19d;font-weight:400}
+.social-hero .intro{max-width:720px;margin:0 auto;color:#d5dfd5;line-height:2.1}
+.character-strip{margin-top:0}
+.panel,.post{background:rgba(13,35,34,.92);backdrop-filter:blur(5px)}
+@media(max-width:760px){
+ main{padding:0 15px 60px}
+ .social-hero{min-height:320px;margin:0 -15px 25px;padding:64px 18px 72px;background-position:center center}
+ .social-hero h1{font-size:39px;letter-spacing:.12em;margin:17px 0 19px}
+ .social-hero .eyebrow{font-size:10px;letter-spacing:3px}
+ .social-hero .intro{font-size:13px;line-height:1.9}
+}
 </style>
 </head>
 <body>
 <header><div class="brand">負驗書 <span class="small">／ 萬象傳書</span></div><nav class="header-nav"><div id="notificationWrap" class="notification-wrap hidden"><button id="notificationBell" class="notification-bell" type="button" aria-label="傳書通知" aria-expanded="false" aria-controls="notificationPanel">♢<span id="notificationCount" class="notification-count hidden">0</span></button><div id="notificationPanel" class="notification-panel hidden"><div class="notification-panel-head"><strong>傳書通知</strong><button id="notificationReadAll" type="button" class="notification-read-all">全部標記已讀</button></div><div id="notificationList" aria-live="polite"></div></div></div><a href="personal.html">我的示籙與書札</a><a href="city.html">返回咸陵主城 ↗</a></nav></header><div id="notificationToast" class="notification-toast hidden" role="status" aria-live="polite"></div>
 <main>
-<div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1>
-<p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p>
+<section class="social-hero" aria-label="萬象傳書橫幅"><div class="social-hero-content"><div class="eyebrow">WAN XIANG · LETTERS</div><h1>萬象傳書</h1><p class="intro">咸陵城中，千人萬語循脈而行。有人記錄風聲，有人留下隻字片語；你所讀見的，或許正是某段故事的開端。</p></div></section>
 <nav class="character-strip" aria-label="依角色查看書札"><div class="filters" id="filters"></div></nav>
 <div class="layout">
 <section aria-label="公開書札動態牆"><div id="playerComposer" class="panel composer hidden"><h2>撰寫書札</h2><textarea id="newPostBody" maxlength="3000" placeholder="江湖所見、城中近聞，皆可留於此處……"></textarea><div id="newImagePreviews" class="image-previews"></div><div class="composer-tools"><label class="upload-label">＋ 附加圖片<input id="newPostImages" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><span id="newImageCount" class="small">0 / 4 張</span><button id="submitPost" type="button">發布書札</button></div><p id="composerStatus" class="composer-status" role="status"></p></div><div class="feed-head"><h2 id="feedTitle">城中書札</h2></div><div id="state" class="state" role="status" aria-live="polite">正在接通萬象傳書……</div><div id="feed"></div><p class="note">此處只顯示已正式發布、允許公開的書札。草稿與尚未解鎖的劇情內容不會顯示。</p></section>
