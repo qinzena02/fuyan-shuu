@@ -374,9 +374,10 @@
               <option value="無門無派">無門無派</option>
             </select>
 
-            <div class="hint">
-              太微門暫不開放一般示籙登記。
+            <div class="hint" id="sectDescription" aria-live="polite">
+              請先選擇門派，了解其修行之道。
             </div>
+            <div class="hint">太微門傳承已佚，暫不開放一般示籙登記。</div>
           </div>
 
           <div class="field">
@@ -476,6 +477,20 @@
       "無門無派"
     ];
 
+    // 依玩家選擇顯示門派簡介；不改變原有選項與儲存格式。
+    const sectDescriptions = {
+      "赤霄山莊": "以人身為本，劍鋒隨心。行事灑脫，敢愛敢恨，不輕易受世俗成見拘束。",
+      "天衡門": "以創造為道，精研機巧與器術，從萬物運行之中尋求新的可能。",
+      "玄水宮": "以仁愛為本，重視生命與世間苦難，以所學濟世護生。",
+      "萬象樓": "以流動為道，觀天地萬象、察世情變遷，不囿於一時之見。",
+      "無門無派": "不隸屬任何門派，行走江湖，自擇所學與前行之道。"
+    };
+    const sectDescription = document.getElementById("sectDescription");
+    function updateSectDescription() {
+      sectDescription.textContent = sectDescriptions[playerSect.value] || "請先選擇門派，了解其修行之道。";
+    }
+    playerSect.addEventListener("change", updateSectDescription);
+
     const validOrigins = [
       "咸陵主城",
       "天環江沿岸",
@@ -530,6 +545,7 @@
         saveButton.textContent = "核准示籙 · 保存身分";
       }
 
+      updateSectDescription();
       welcome.classList.add("hidden");
       register.classList.remove("hidden");
 
