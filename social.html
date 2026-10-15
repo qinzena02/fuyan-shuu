@@ -128,6 +128,19 @@ main{max-width:1240px;padding:32px 24px 85px}
 .post-menu{position:absolute;right:0;top:36px;z-index:10;background:#132b29;border:1px solid #526e61;border-radius:8px;padding:5px;box-shadow:0 8px 18px #0008}
 .post-delete{border:0;background:transparent;color:#efb7a9;font:inherit;font-size:12px;padding:7px 12px;cursor:pointer;white-space:nowrap}
 .post-delete:disabled{opacity:.5;cursor:wait}
+
+/* 萬象傳書專屬背景：保留文字區塊的深色底，提高閱讀對比 */
+html { min-height: 100%; background: #091315; }
+body {
+  min-height: 100vh;
+  background-color: #091315;
+  background-image: linear-gradient(rgba(5, 18, 19, .65), rgba(5, 18, 19, .78)), url("images/23938439738a234d733f8eb1e35f7991.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+@media (max-width: 700px) { body { background-attachment: scroll; } }
 </style>
 </head>
 <body>
