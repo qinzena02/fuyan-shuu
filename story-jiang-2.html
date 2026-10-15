@@ -20,7 +20,7 @@ body{background:#091113;color:#ded6c5;line-height:1.95}
 header{border-bottom:1px solid #37564e;background:#0c191b;padding:16px max(20px,calc((100vw - 1050px)/2));display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 header span{letter-spacing:5px;color:#dfc899;font-size:21px}
 header nav{font-size:13px}
-.hero{position:relative;width:100%;min-height:370px;padding:80px 20px 105px;background:linear-gradient(to bottom,rgba(5,15,21,.30) 0%,rgba(5,15,21,.45) 42%,#091113 100%),url('images/tobi-44.jpg') center 48%/cover no-repeat}
+.hero{position:relative;width:100%;min-height:370px;padding:80px 20px 105px;background:linear-gradient(to bottom,rgba(5,15,21,.30) 0%,rgba(5,15,21,.45) 42%,#091113 100%),url('images/tobi-2021061007.jpg') center 48%/cover no-repeat}
 .hero h1{font-size:clamp(30px,6vw,52px);letter-spacing:8px;color:#dfc899;margin:10px 0;font-weight:normal}
 .hero p{color:#d0d7cd;font-size:14px}
 main{max-width:800px;margin:20px auto 0;padding:0 20px 75px}
@@ -31,7 +31,7 @@ main>.prose{white-space:pre-line;font-size:16px;line-height:2.3;min-height:190px
 .panel{background:#102123;border:1px solid #37564e;padding:25px;margin:20px 0}
 .choice{border:1px solid #547569;background:#142b2b;color:#e7ddc8;text-align:left;padding:14px 18px;margin:11px 0;transition:.15s}
 .choice:hover,.choice:focus-visible{border-color:#d9c08f;background:#203b39}
-.chapter-cover{--cover-image:url('images/tobi-44.jpg')}
+.chapter-cover{--cover-image:url('images/tobi-2021061007.jpg')}
 @media(max-width:650px){.hero{min-height:270px;padding:60px 18px}.hero h1{font-size:clamp(28px,8vw,45px);letter-spacing:2px}main{padding:20px 15px 65px}.panel{padding:18px}}
 
 /* 與前篇一致的行旅狀態抽屜 */
@@ -47,8 +47,16 @@ main>.prose{white-space:pre-line;font-size:16px;line-height:2.3;min-height:190px
 .clues li{padding:7px 0;border-bottom:1px solid #29473f}
 .sidebar-note{font-size:12px;color:#8faea3;line-height:1.8;margin-top:15px}
 @media(prefers-reduced-motion:reduce){.status-sidebar{transition:none}}
+
+/* 啟卷轉場：封面淡出、正文漸入（不影響雲端進度） */
+.chapter-cover{opacity:1;transition:opacity .85s ease,visibility .85s ease}
+.chapter-cover.cover-exiting{opacity:0;visibility:hidden;pointer-events:none}
+body.cover-locked>header,body.cover-locked>.hero,body.cover-locked>main,body.cover-locked>.status-toggle{opacity:0}
+body.chapter-revealed>header,body.chapter-revealed>.hero,body.chapter-revealed>main,body.chapter-revealed>.status-toggle{animation:jiang2Reveal 1s ease both}
+@keyframes jiang2Reveal{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.chapter-cover{transition:none}body.chapter-revealed>header,body.chapter-revealed>.hero,body.chapter-revealed>main,body.chapter-revealed>.status-toggle{animation:none}}
 </style></head><body class="cover-locked">
-<section class="chapter-cover" id="chapterCover" aria-label="續卷啟封畫面" style="--cover-image:url('images/tobi-44.jpg')"><div class="cover-content"><div class="cover-kicker">咸陵鏢局 · 支線委託 · 卷二</div><h1 class="cover-title">江上無歸人、其二</h1><p class="cover-desc">未封之卷 · 江岸有痕 · 七人歸處</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="bounty.html">← 返回卷宗目錄</a></div></section>
+<section class="chapter-cover" id="chapterCover" aria-label="續卷啟封畫面" style="--cover-image:url('images/tobi-2021061007.jpg')"><div class="cover-content"><div class="cover-kicker">咸陵鏢局 · 支線委託 · 卷二</div><h1 class="cover-title">江上無歸人、其二</h1><p class="cover-desc">未封之卷 · 江岸有痕 · 七人歸處</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="bounty.html">← 返回卷宗目錄</a></div></section>
 <header><span>負驗書 · 咸陵鏢局</span><nav><a href="bounty.html">← 委託榜</a>　<a href="city.html">咸陵主城</a></nav></header><section class="hero"><div class="eyebrow">支線委託 · 續卷</div><h1>江上無歸人、其二</h1><p>人既有來處，便總該有個歸處。</p></section>
 <main><div class="chapter" id="chapter">卷宗核驗中</div><h2 id="title">正在讀取示籙</h2><div class="prose" id="prose"></div><section class="panel" id="interaction"><div class="tag" id="choiceTitle">玩家選擇</div><div id="choices"></div><div id="reply" class="reply hidden"></div><button id="continue" class="choice hidden">繼續 ›</button></section><p id="status" class="note" role="status">正在連接雲端存檔……</p><div class="toolbar"><a href="story.html">返回前篇</a><a href="bounty.html">返回委託榜</a></div></main>
 <button type="button" class="status-toggle" id="statusToggle" aria-expanded="false" aria-controls="statusSidebar">行旅狀態 ◇</button>
@@ -162,7 +170,46 @@ initJourneyDrawer();
 
 function draw(){renderJourney();const s=scenes[progress?.node]||scenes.start;$('chapter').textContent=s.ch;$('title').textContent=s.title;$('prose').textContent=s.text;$('reply').classList.add('hidden');$('continue').classList.add('hidden');const choices=$('choices');choices.replaceChildren();$('choiceTitle').textContent=s.decisions?'調查選擇 · 影響人物羈絆':s.tone?'選擇你的回答':'卷宗進度';if(s.end){$('choiceTitle').textContent='卷宗結案';$('interaction').querySelector('#choices').textContent='七人去向已查明。可返回委託榜。';return}if(s.tone){s.tone.forEach(([line,reply],i)=>{const b=document.createElement('button');b.className='choice';b.textContent=line;b.onclick=()=>{choices.querySelectorAll('button').forEach(x=>x.disabled=true);$('reply').textContent=reply;$('reply').classList.remove('hidden');$('continue').classList.remove('hidden');$('continue').onclick=()=>advance(s.next)};choices.append(b)})}else if(s.decisions){s.decisions.forEach(([label,target])=>{const b=document.createElement('button');b.className='choice';b.textContent='› '+label;b.onclick=()=>advance(target);choices.append(b)})}else{$('continue').textContent='繼續 ›';$('continue').classList.remove('hidden');$('continue').onclick=()=>advance(s.next)}}
 async function advance(to){if(busy)return;busy=true;$('status').textContent='正在核驗選擇並保存雲端進度……';document.querySelectorAll('button').forEach(b=>b.disabled=true);try{const {data,error}=await db.rpc('jiang2_advance',{p_to_node:to});if(error)throw error;progress=data;draw();await loadJourneyStats();$('status').textContent='行跡已保存至雲端示籙。';window.scrollTo({top:280,behavior:'smooth'})}catch(e){$('status').textContent='保存失敗：'+e.message;draw()}finally{busy=false}}
-function setupCover(){const cover=$('chapterCover');const btn=$('openChapter');btn.addEventListener('click',()=>{btn.disabled=true;cover.classList.add('cover-exiting');document.body.classList.remove('cover-locked');document.body.classList.add('chapter-revealed');setTimeout(()=>{cover.hidden=true;},680);});}
+/* 延續前篇：以 Web Audio 即時合成典籍翻頁聲，無需額外音檔 */
+let pageAudioContext;
+function playPageTurn(){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return;
+  pageAudioContext=pageAudioContext||new AC();
+  if(pageAudioContext.state==='suspended')pageAudioContext.resume().catch(()=>{});
+  const ctx=pageAudioContext,now=ctx.currentTime,duration=.58;
+  const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate);
+  const data=buffer.getChannelData(0);
+  let smooth=0;
+  for(let i=0;i<data.length;i++){
+   const t=i/ctx.sampleRate;
+   const flutter=.55+.45*Math.sin(2*Math.PI*(8*t+11*t*t));
+   smooth=smooth*.72+(Math.random()*2-1)*.28;
+   data[i]=smooth*Math.pow(Math.sin(Math.PI*t/duration),1.3)*flutter;
+  }
+  const source=ctx.createBufferSource();source.buffer=buffer;
+  const high=ctx.createBiquadFilter();high.type='highpass';high.frequency.value=420;
+  const low=ctx.createBiquadFilter();low.type='lowpass';low.frequency.setValueAtTime(2500,now);low.frequency.exponentialRampToValueAtTime(850,now+duration);
+  const gain=ctx.createGain();gain.gain.value=.17;
+  source.connect(high);high.connect(low);low.connect(gain);gain.connect(ctx.destination);
+  source.start(now);source.stop(now+duration);
+  source.onended=()=>{source.disconnect();high.disconnect();low.disconnect();gain.disconnect()};
+ }catch(_){/* 若瀏覽器封鎖音訊，啟卷仍正常進行 */}
+}
+function setupCover(){
+ const cover=$('chapterCover'),btn=$('openChapter');
+ btn.addEventListener('click',()=>{
+  if(cover.classList.contains('cover-exiting'))return;
+  btn.disabled=true;
+  playPageTurn();
+  window.scrollTo({top:0,behavior:'instant'});
+  cover.classList.add('cover-exiting');
+  document.body.classList.remove('cover-locked');
+  document.body.classList.add('chapter-revealed');
+  window.setTimeout(()=>{cover.hidden=true},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:900);
+ });
+}
 setupCover();
 async function init(){try{if(!db)throw Error('找不到 supabase-client.js');const {data,error}=await db.auth.getUser();if(error)throw error;if(!data.user)throw Error('請先登入線上示籙');const r=await db.rpc('jiang2_start');if(r.error)throw r.error;progress=r.data;draw();await loadJourneyStats();$('status').textContent='雲端存檔已載入。'}catch(e){$('title').textContent='卷宗暫時無法啟封';$('prose').textContent='請確認已登入並執行配套 SQL。';$('interaction').classList.add('hidden');$('status').textContent=e.message}}init();
 </script></body></html>
