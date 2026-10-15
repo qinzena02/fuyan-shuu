@@ -22,7 +22,9 @@
 .name{margin-bottom:4px}.quote{margin-top:55px}.chapter h2{position:relative;padding-left:18px}.chapter h2:before{content:"";position:absolute;left:0;top:.55em;width:4px;height:18px;background:#55d7c6;box-shadow:0 0 12px #55d7c67d}.chapter{border-left:1px solid #1d4841;padding-left:22px}.chapter h2 small{color:#65a99d}
 @keyframes scanBorder{0%{filter:hue-rotate(0deg);transform:translateY(-2px)}50%{filter:hue-rotate(35deg);transform:translateY(2px)}100%{filter:hue-rotate(0deg);transform:translateY(-2px)}}
 @keyframes rotateOrbit{to{transform:rotate(360deg)}}@keyframes dotPulse{50%{opacity:.25;box-shadow:0 0 3px #56f5e7}}
-@media(max-width:650px){.cover-hud{padding:14px 16px;font-size:8px}.hud-right{display:none}.article{margin-top:-75px}.portrait-frame{width:128px;height:128px}.portrait{width:114px;height:114px}.orbit{inset:-14px}.orbit-two{inset:-22px}.identity-mark{display:none}.chapter{padding-left:12px}.name{font-size:38px}}
+@media(max-width:650px){.cover-hud{padding:14px 16px;font-size:8px}.hud-right{display:flex;position:absolute;right:16px;top:48px;max-width:calc(100% - 32px);font-size:8px;letter-spacing:.08em;white-space:nowrap;background:rgba(7,22,21,.45);padding:5px 7px;border:1px solid #58d9c335;border-radius:2px}.article{margin-top:-75px}.portrait-frame{width:128px;height:128px}.portrait{width:114px;height:114px}.orbit{inset:-14px}.orbit-two{inset:-22px}.identity-mark{display:none}.chapter{padding-left:12px}.name{font-size:38px}}
+/* 軼聞雜談：原生 details 可展開與收束，預留日後雲端文章載入 */
+.note-list{border-top:1px solid #35564e}.note-item{border-bottom:1px solid #35564e}.note-item summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px;padding:17px 2px;color:#e3d0a8;font-size:15px;transition:color .2s}.note-item summary::-webkit-details-marker{display:none}.note-item summary:hover,.note-item summary:focus-visible{color:#67e1d2}.note-item summary:focus-visible{outline:1px solid #67e1d2;outline-offset:4px}.note-title{color:#a6c4b9;font-size:13px;flex:1}.note-arrow{color:#62c9bb;transition:transform .25s}.note-item[open] .note-arrow{transform:rotate(180deg)}.note-body{padding:0 6px 23px 17px;border-left:1px solid #4a8d7e;margin:0 0 16px 4px;color:#b9c9c0;font-size:14px;white-space:pre-wrap;line-height:2}
 @media(prefers-reduced-motion:reduce){.portrait-frame:after,.orbit,.pulse-dot{animation:none!important}}
 </style></head><body>
 <nav class="top"><a href="characters.html">負驗書 · 咸陵人物誌</a><a href="characters.html">← 返回人物總覽</a></nav>
@@ -34,10 +36,10 @@
   <div class="identity"><h1 class="name" id="name"></h1><span class="identity-line" aria-hidden="true"></span><span class="identity-mark" aria-hidden="true">◈　檔案存取 / ONLINE</span></div>
   <blockquote class="quote" id="quote">江湖路遠，所見未必即是其人。</blockquote>
   <section class="chapter"><h2><small>01 / PERSONAL RECORD</small>人物小檔</h2><dl class="data" id="facts"></dl></section>
-  <section class="chapter"><h2><small>02 / CHARACTER</small>其人其事</h2><div id="records"></div></section>
-  <section class="chapter"><h2><small>03 / IMPRESSIONS</small>印象標籤</h2><div class="tags" id="tags"><span class="quiet">尚未登錄</span></div></section>
+  <section class="chapter"><h2><small>02 / IMPRESSIONS</small>印象標籤</h2><div class="tags" id="tags"><span class="quiet">尚未登錄</span></div></section>
+  <section class="chapter"><h2><small>03 / CHARACTER</small>其人其事</h2><div id="records"></div></section>
   <section class="chapter"><h2><small>04 / BONDS</small>人物羈絆</h2><div id="bond" class="bond">羈絆紀錄尚待開放</div><p class="quiet">僅顯示關係稱謂，不顯示好感數值。</p></section>
-  <section class="chapter"><h2><small>05 / MARGINALIA</small>軼聞雜談</h2><p class="quiet" id="notes">此人軼聞尚未收錄。隨故事推進，卷宗將逐漸補全。</p></section>
+  <section class="chapter"><h2><small>05 / MARGINALIA</small>軼聞雜談</h2><div id="notes" class="note-list"><details class="note-item"><summary><span>【雜談01】</span><span class="note-title">卷宗待續</span><span class="note-arrow" aria-hidden="true">⌄</span></summary><div class="note-body">此人軼聞尚未收錄。隨故事推進，卷宗將逐漸補全。</div></details></div></section>
   <a class="more" href="social.html">前往萬象傳書 ↗</a>
 </main><footer>負驗書 · 咸陵人物誌</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script src="supabase-client.js"></script>
