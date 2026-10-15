@@ -104,7 +104,6 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 .journey-overview .journey-note{border-top:1px solid #29483f;padding-top:12px;margin:15px 0 0}
 @media(max-width:700px){.journey-overview{padding:19px 16px}.journey-overview .journey-grid{grid-template-columns:1fr}.journey-overview .journey-item,.journey-overview .journey-item:first-child,.journey-overview .journey-item:last-child{border-right:0;border-bottom:1px solid #36544b;padding:12px 2px;min-height:0}.journey-overview .journey-item:last-child{border-bottom:0}}
 
-
 /* 城中日報：簡潔三則、事件解鎖提示 */
 .news-loading,.news-footnote{font-size:12px;color:#8fb5a7;margin:10px 0 0}
 .news-event{display:inline-block;margin-left:8px;font-size:10px;color:#e5c88b;border:1px solid #8a7450;padding:0 6px;border-radius:10px;vertical-align:middle}
@@ -132,6 +131,11 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 @media(max-width:520px){.city-bulletin{padding:8px 0}.bulletin-window{mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 10%,#000 90%,transparent)}}
 
 
+/* 萬象傳書未讀提示：只顯示小圓點，不遮擋手機畫面 */
+.social-entry{position:relative}
+.fys-unread-dot{display:none;position:absolute;right:15px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:#36e5ff;box-shadow:0 0 0 2px #0c2525,0 0 10px 3px #29caff99;pointer-events:none}
+.social-entry.has-unread .fys-unread-dot{display:block}
+.social-entry.has-unread{padding-right:36px}
 /* 萬象傳書：沿用城中通行卡片視覺 */
 .city-sidebar .place.social-entry{border-color:#8b784f;background:linear-gradient(145deg,#20332f,#102324)}
 .city-sidebar .place.social-entry:hover{border-color:#e2c68e;background:#29443d}
@@ -167,7 +171,7 @@ h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 <a class="place" href="archive.html"><em>PUBLIC ARCHIVES</em><strong>咸陵典籍庫</strong><span>公開文獻 · 機構與制度</span></a>
 <a class="place" href="personal.html"><em>PERSONAL RECORD</em><strong>示籙個人中心</strong><span>通行憑證 · 仁德值 · 個人資料</span></a>
 <a class="place" href="travel.html"><em>TRAVEL ATLAS</em><strong>咸陵行旅</strong><span>山川地誌 · 五大門派 · 地標導覽</span></a>
-<a class="place social-entry" href="social.html"><em>WANXIANG LETTERS · 江湖傳訊</em><strong>萬象傳書</strong><span>咸陵百聞 · 人物書札 · 江湖近聞</span></a>
+<a class="place social-entry" id="fysSocialEntry" href="social.html"><em>WANXIANG LETTERS · 江湖傳訊</em><strong>萬象傳書</strong><span>咸陵百聞 · 人物書札 · 江湖近聞</span><i class="fys-unread-dot" aria-hidden="true"></i></a>
 </div>
 </aside>
 <h2>咸陵日報 · 城中消息</h2>
@@ -358,8 +362,7 @@ if(!player||!player.name){window.location.replace('index.html')}else{
   const title=document.createElement('span');title.className='news-title';title.textContent=item.title;
   if(item.event){const mark=document.createElement('span');mark.className='news-event';mark.textContent='行跡風聞';title.appendChild(mark)}
   const body=document.createElement('p');body.textContent=item.body;
-  summary.append(tag,title);details.append(summary,body);
-   feed.appendChild(details);
+  summary.append(tag,title);details.append(summary,body);feed.appendChild(details);
  });}
  // 在取得雲端資料前也先顯示新聞；資料回來後僅更新一次，不會不停跳動。
  const baseline=randomPick(normal,3);display(baseline);
@@ -440,6 +443,17 @@ if(!player||!player.name){window.location.replace('index.html')}else{
   if(document.fonts)document.fonts.ready.then(setSpeed);
 
 })();
+</script>
+<script>
+/* 由 world.html 的全域通知同步未讀狀態；不在本頁新增 Supabase 連線。 */
+window.addEventListener('message',function(event){
+  if(event.origin!==location.origin || event.source!==window.parent)return;
+  if(!event.data || event.data.type!=='fys-social-unread')return;
+  const entry=document.getElementById('fysSocialEntry');if(!entry)return;
+  const unread=Number(event.data.count)>0;
+  entry.classList.toggle('has-unread',unread);
+  entry.setAttribute('aria-label',unread?'萬象傳書，有未讀通知':'萬象傳書');
+});
 </script>
 </body>
 </html>

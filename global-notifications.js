@@ -21,9 +21,11 @@ function destination(n){
  return url.href;
 }
 function navigate(n){if(n.post_id)location.href=destination(n);else location.href=new URL('world.html?page=social.html',location.href).href;}
+window.fysSendUnreadToCity=()=>{try{document.getElementById('page')?.contentWindow?.postMessage({type:'fys-social-unread',count:items.filter(n=>!reads.has(n.id)).length},location.origin);}catch(e){}};
 function render(){
  const count=items.filter(n=>!reads.has(n.id)).length;
  badge.textContent=count>99?'99+':String(count);badge.hidden=count===0;
+ try{const frame=document.getElementById('page');if(frame?.contentWindow)frame.contentWindow.postMessage({type:'fys-social-unread',count},location.origin);}catch(e){}
  bell.setAttribute('aria-label',`傳書通知，${count} 則未讀`);
  list.replaceChildren();
  if(!items.length){const p=document.createElement('p');p.textContent='目前沒有傳書通知。';list.append(p);return;}
@@ -61,7 +63,7 @@ async function sync(){
   const newItems=incoming.filter(n=>!shown.has(n.id)&&!nextReads.has(n.id));
   items=incoming;reads=nextReads;
   incoming.forEach(n=>shown.add(n.id));render();
-  if(initialized&&newItems.length)pop(newItems[0]);
+  // 不再顯示遮擋畫面的全域浮動通知；僅更新城中通行藍點。
   initialized=true;
  }catch(e){console.warn('全域傳書通知讀取失敗',e);if(!initialized)list.textContent='通知暫時無法讀取，稍後會自動重試。';}
  finally{busy=false;}

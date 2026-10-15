@@ -10,6 +10,8 @@
 #toggle{background:transparent;color:#dfc899;border:0;cursor:pointer;font:inherit;font-size:13px;padding:4px}
 #hint{color:#8fbeb0;font-size:11px;max-width:150px}
 @media(max-width:500px){#controls{bottom:10px;right:10px;padding:6px 9px}#hint{display:none}}
+/* 通知改由城中通行的萬象傳書螢光藍點呈現，保留後台同步 */
+#fys-notice-bell,#fys-notice-panel,#fys-notice-toast{display:none!important}
 /* 全域傳書通知：位於 iframe 外層 */
 #fys-notice-bell{position:fixed;top:14px;right:17px;z-index:1100;background:#102b2a;border:1px solid #987f54;color:#e7ce99;border-radius:999px;padding:9px 13px;font:inherit;font-size:17px;cursor:pointer;box-shadow:0 5px 20px #0009}
 #fys-notice-count{display:inline-block;background:#b89b67;color:#091113;font-size:11px;border-radius:999px;min-width:19px;line-height:19px;margin-left:5px;text-align:center;font-family:Arial,sans-serif}
@@ -54,8 +56,8 @@ frame.addEventListener('load',()=>{
  update();
  // 讓玩家從案件返回鏢局後恢復主城音樂。
  try{if(allowed.has(page)){const params=new URLSearchParams(location.search);params.set('page',page);if(page!=='social.html'){params.delete('post');params.delete('comment');}history.replaceState(null,'','?'+params.toString());}}catch(e){}
- // 外層已有通知中心，避免內頁重複出現通知鈴鐺或浮動提醒。
- try{const doc=frame.contentDocument;if(page==='social.html'&&doc){const style=doc.createElement('style');style.textContent='#notificationWrap,#notificationToast{display:none!important}';doc.head.appendChild(style);}}catch(e){}
+ // 將未讀狀態同步至城中通行；萬象傳書內頁保留自己的通知中心。
+ if(window.fysSendUnreadToCity)window.fysSendUnreadToCity();
 });
 toggle.addEventListener('click',()=>{
  if(enabled&&!music.paused){enabled=false;music.pause();}
