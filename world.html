@@ -10,18 +10,36 @@
 #toggle{background:transparent;color:#dfc899;border:0;cursor:pointer;font:inherit;font-size:13px;padding:4px}
 #hint{color:#8fbeb0;font-size:11px;max-width:150px}
 @media(max-width:500px){#controls{bottom:10px;right:10px;padding:6px 9px}#hint{display:none}}
+/* 全域傳書通知：位於 iframe 外層 */
+#fys-notice-bell{position:fixed;top:14px;right:17px;z-index:1100;background:#102b2a;border:1px solid #987f54;color:#e7ce99;border-radius:999px;padding:9px 13px;font:inherit;font-size:17px;cursor:pointer;box-shadow:0 5px 20px #0009}
+#fys-notice-count{display:inline-block;background:#b89b67;color:#091113;font-size:11px;border-radius:999px;min-width:19px;line-height:19px;margin-left:5px;text-align:center;font-family:Arial,sans-serif}
+#fys-notice-count[hidden],#fys-notice-bell[hidden],#fys-notice-panel[hidden],#fys-notice-toast[hidden]{display:none!important}
+#fys-notice-panel{position:fixed;z-index:1101;top:62px;right:16px;width:min(370px,calc(100vw - 32px));max-height:min(65vh,550px);overflow:auto;background:#102224;border:1px solid #796d51;border-radius:12px;box-shadow:0 14px 42px #000b;padding:15px}
+.fys-notice-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;color:#e7ce99}
+#fys-notice-readall{border:0;background:transparent;color:#a6c8ba;font:inherit;font-size:12px;cursor:pointer}
+.fys-notice-item{display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;border:0;border-top:1px solid #29453f;background:transparent;color:#c2d4c9;padding:11px 5px;font:inherit;cursor:pointer}
+.fys-notice-item.unread{background:#1b373344}.fys-notice-item strong{font-size:13px;font-weight:normal;color:#e6d3ac}.fys-notice-item small{font-size:11px;color:#86a79c}
+#fys-notice-toast{position:fixed;z-index:1102;top:69px;right:16px;max-width:min(370px,calc(100vw - 32px));background:#18342f;border:1px solid #bda170;border-radius:10px;box-shadow:0 8px 30px #000b}
+#fys-notice-toast button{padding:13px 17px;border:0;background:transparent;color:#f0dba9;font:inherit;font-size:13px;cursor:pointer;text-align:left}
+@media(max-width:500px){#fys-notice-bell{top:9px;right:9px;padding:7px 10px}#fys-notice-panel{top:53px;right:9px}#fys-notice-toast{top:59px;right:9px}}
 </style>
 </head>
 <body>
 <iframe id="page" title="負驗書遊戲內容" src="city.html"></iframe>
 <div id="controls"><button id="toggle" type="button" aria-pressed="false">♫ 開啟主城音樂</button><span id="hint">咸陵行旅 · 背景配樂</span></div>
+<button id="fys-notice-bell" type="button" aria-label="傳書通知" aria-controls="fys-notice-panel" hidden><span aria-hidden="true">♧</span> <span aria-hidden="true">✉</span><span id="fys-notice-count" hidden>0</span></button>
+<div id="fys-notice-panel" role="region" aria-label="傳書通知中心" hidden><div class="fys-notice-heading"><span>萬象傳書 · 通知</span><button id="fys-notice-readall" type="button">全部已讀</button></div><div id="fys-notice-list"></div></div>
+<div id="fys-notice-toast" role="status" aria-live="polite" hidden></div>
 <audio id="music" src="music/lv_0_20260927142906.mp3" preload="auto" loop></audio>
 <script>
 'use strict';
-const allowed=new Set(['city.html','archive.html','bounty.html','story.html','main-story.html','main-chapters.html','main-chapter-1.html','personal.html','travel.html']);
+const allowed=new Set(['city.html','archive.html','bounty.html','story.html','main-story.html','main-chapters.html','main-chapter-1.html','personal.html','travel.html','social.html']);
 const frame=document.getElementById('page'),music=document.getElementById('music'),toggle=document.getElementById('toggle'),controls=document.getElementById('controls'),hint=document.getElementById('hint');
 const initial=new URLSearchParams(location.search).get('page');
-frame.src=allowed.has(initial)?initial:'city.html';
+const deepLink=new URLSearchParams(location.search);
+const frameUrl=new URL(allowed.has(initial)?initial:'city.html',location.href);
+if(initial==='social.html'){for(const key of ['post','comment']){const value=deepLink.get(key);if(value)frameUrl.searchParams.set(key,value);}}
+frame.src=frameUrl.href;
 music.volume=.22;
 let enabled=localStorage.getItem('fuyanshu_city_music')!=='off';
 let isCase=false;
@@ -35,7 +53,9 @@ frame.addEventListener('load',()=>{
  if(isCase){music.pause();music.currentTime=0;}else play();
  update();
  // 讓玩家從案件返回鏢局後恢復主城音樂。
- try{if(allowed.has(page))history.replaceState(null,'','?page='+encodeURIComponent(page));}catch(e){}
+ try{if(allowed.has(page)){const params=new URLSearchParams(location.search);params.set('page',page);if(page!=='social.html'){params.delete('post');params.delete('comment');}history.replaceState(null,'','?'+params.toString());}}catch(e){}
+ // 外層已有通知中心，避免內頁重複出現通知鈴鐺或浮動提醒。
+ try{const doc=frame.contentDocument;if(page==='social.html'&&doc){const style=doc.createElement('style');style.textContent='#notificationWrap,#notificationToast{display:none!important}';doc.head.appendChild(style);}}catch(e){}
 });
 toggle.addEventListener('click',()=>{
  if(enabled&&!music.paused){enabled=false;music.pause();}
@@ -47,4 +67,7 @@ window.addEventListener('message',e=>{if(e.source===frame.contentWindow&&e.data=
 music.addEventListener('error',()=>{hint.textContent='找不到音樂檔案';});
 update();play();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-client.js"></script>
+<script src="global-notifications.js"></script>
 </body></html>
