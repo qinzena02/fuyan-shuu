@@ -92,6 +92,10 @@ body{width:100%;max-width:100%;overflow-x:clip}
 .sidebar-backdrop,.sidebar-backdrop.open{display:none!important;background:transparent!important;pointer-events:none!important}
 
 
+/* 卷一行旅狀態：與卷二相同的抽屜層級，開啟時隱藏側邊標籤。 */
+.status-toggle{z-index:31}
+.status-sidebar{z-index:40}
+.status-toggle[aria-expanded="true"]{visibility:hidden;pointer-events:none}
 /* 與續卷一致的沉浸式正文：不改動故事節點、雲端存檔或按鈕 */
 body{font-family:"Noto Serif TC","Microsoft JhengHei",serif}
 .shell{max-width:none;padding:0 20px 90px}
