@@ -11,7 +11,7 @@ const $=id=>document.getElementById(id);
 let player=null;try{player=JSON.parse(localStorage.getItem('fuyanshu_player')||'null')}catch(e){}
 const sect=String(player?.sect||player?.school||'未登錄');
 let state={index:0,clues:[],choices:[],complete:false},db=null,uid=null,cloudReady=false,processing=false;
-try{let saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&Number.isInteger(saved.index)&&saved.index>=0&&saved.index<SCENES.length)state={...state,...saved};}catch(e){}
+if(!REVIEW){try{let saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&Number.isInteger(saved.index)&&saved.index>=0&&saved.index<SCENES.length)state={...state,...saved};}catch(e){}}
 const SECT_NOTES={
  '天衡門':['你注意到封槽與測流盤的回訊並不同步；機械失靈，不一定意味著有人碰過機關。','你認得測流片上的校準痕跡。那道空白更像記錄被外部訊號覆蓋。'],
  '赤霄山莊':['你先看見受傷者握刀的姿勢。肩傷未必致命，但她正強撐著站穩。','你留意到箭傷的角度；若要查射手，對街樓上或許值得一看。'],
@@ -24,7 +24,7 @@ function persistLocal(){if(REVIEW)return;try{localStorage.setItem(KEY,JSON.strin
 async function persistCloud(next){if(!cloudReady||REVIEW)return true;try{let {data,error}=await db.rpc('save_main_chapter_progress',{p_story_id:STORY,p_progress:next});if(error)throw error;return true}catch(e){$('saveStatus').textContent='雲端儲存失敗，請確認 SQL 已執行與登入狀態：'+e.message;return false}}
 function note(){if(REVIEW)return '回顧模式 · 不更動正式存檔';return cloudReady?'已連結 Supabase · 主線進度雲端同步':'本機暫存 · 雲端尚未連結';}
 function render(){const s=SCENES[state.index];$('chapter').textContent=s.chapter;$('title').textContent=s.title;$('prose').replaceChildren();for(let p of s.paragraphs){const el=document.createElement('p');el.textContent=p;if(p.startsWith('【行旅者】'))el.className='traveler';$('prose').append(el)}
-$('choices').replaceChildren();if(state.complete){const p=document.createElement('p');p.className='done';p.textContent='第一章 · 終｜便再無回聲。';$('choices').append(p);const a=document.createElement('a');a.className='choice';a.href='main-chapters.html';a.textContent='← 返回主線卷宗目錄';$('choices').append(a)}else{
+$('choices').replaceChildren();if(state.complete){const p=document.createElement('p');p.className='done';p.textContent='第一章 · 終｜第三更的鐘聲一直沒有再響。';$('choices').append(p);const a=document.createElement('a');a.className='choice';a.href='main-chapters.html';a.textContent='← 返回主線卷宗目錄';$('choices').append(a)}else{
 let opts=[];
 if(state.index===0)opts=[['提醒人群避開傾斜的軌架','優先救助他人'],['前往脈站通報停運','主動通報異常'],['留意天眼碎裂與燈光熄滅的順序','留意異常時序']];
 else if(state.index===1)opts=[['留意禁步的判定','禁步歸零與封鎖線相互牽動'],['觀察女子肩頭的傷勢','受傷女子仍在強撐']];
