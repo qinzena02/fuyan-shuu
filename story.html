@@ -91,6 +91,17 @@ body{width:100%;max-width:100%;overflow-x:clip}
 /* 支線側欄不再將整個畫面變灰，也不阻斷正文操作 */
 .sidebar-backdrop,.sidebar-backdrop.open{display:none!important;background:transparent!important;pointer-events:none!important}
 
+
+/* 與續卷一致的沉浸式正文：不改動故事節點、雲端存檔或按鈕 */
+body{font-family:"Noto Serif TC","Microsoft JhengHei",serif}
+.shell{max-width:none;padding:0 20px 90px}
+.masthead{width:100vw;margin-left:calc(50% - 50vw);min-height:370px}
+.layout{max-width:820px;margin:25px auto 0}
+.layout>.panel{border:0;background:transparent;box-shadow:none;padding:0}
+.prose{font-size:16px;line-height:2.3;white-space:pre-line}
+.scene-title{font-size:26px}
+.choices{margin-top:24px}
+@media(max-width:650px){.shell{padding:0 15px 65px}.layout>.panel{padding:0}.masthead{min-height:270px}}
 </style>
 </head>
 <body class="cover-locked">

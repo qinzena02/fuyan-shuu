@@ -1,7 +1,65 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>負驗書｜江上無歸人、其二</title><style>
-*{box-sizing:border-box}body{margin:0;background:#0a1515;color:#e3ddcc;font-family:"Noto Serif TC","Microsoft JhengHei",serif;line-height:2}a{color:#a2d8cc;text-decoration:none}header{padding:14px max(18px,calc((100vw - 920px)/2));background:#0a1919;border-bottom:1px solid #34564f;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.hero{background:linear-gradient(#06131266,#091515 96%),url('images/tobi-2021061007.jpg') center/cover;min-height:280px;display:grid;place-content:center;text-align:center;padding:50px 20px}.hero h1{font-size:clamp(27px,5vw,45px);font-weight:400;color:#e6cd91;letter-spacing:.15em}.hero p,.eyebrow{color:#a7c6b7;letter-spacing:.16em;font-size:12px}main{max-width:820px;margin:auto;padding:25px 20px 90px}.chapter{color:#8bcfc4;font-size:12px;letter-spacing:.15em}h2{font-weight:400;color:#e8cf9b;font-size:26px}.prose{white-space:pre-line;line-height:2.15;font-size:16px}.panel{margin:26px 0;padding:22px;border:1px solid #365d54;background:#102322}.choice{display:block;width:100%;text-align:left;padding:13px 16px;margin:10px 0;background:#15302d;color:#eee4ce;border:1px solid #43695e;font:inherit;cursor:pointer}.choice:hover,.choice:focus-visible{border-color:#d5b875;background:#21413a}.choice:disabled{opacity:.5;cursor:wait}.small{font-size:12px;color:#9cbbaf}.tag{font-size:12px;color:#e1c58d;letter-spacing:.1em}.note{color:#b2c7b8;font-size:12px;min-height:24px}.hidden{display:none}.reply{border-left:2px solid #6ecdbb;padding:8px 18px;margin-top:18px;white-space:pre-line}.toolbar{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px}button{font-family:inherit}@media(max-width:600px){.panel{padding:16px}main{padding:20px 15px 65px}.hero{min-height:210px}.prose{font-size:15px}}</style></head><body>
+*{box-sizing:border-box}body{margin:0;background:#0a1515;color:#e3ddcc;font-family:"Noto Serif TC","Microsoft JhengHei",serif;line-height:2}a{color:#a2d8cc;text-decoration:none}header{padding:14px max(18px,calc((100vw - 920px)/2));background:#0a1919;border-bottom:1px solid #34564f;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.hero{background:linear-gradient(#06131266,#091515 96%),url('images/tobi-2021061007.jpg') center/cover;min-height:280px;display:grid;place-content:center;text-align:center;padding:50px 20px}.hero h1{font-size:clamp(27px,5vw,45px);font-weight:400;color:#e6cd91;letter-spacing:.15em}.hero p,.eyebrow{color:#a7c6b7;letter-spacing:.16em;font-size:12px}main{max-width:820px;margin:auto;padding:25px 20px 90px}.chapter{color:#8bcfc4;font-size:12px;letter-spacing:.15em}h2{font-weight:400;color:#e8cf9b;font-size:26px}.prose{white-space:pre-line;line-height:2.15;font-size:16px}.panel{margin:26px 0;padding:22px;border:1px solid #365d54;background:#102322}.choice{display:block;width:100%;text-align:left;padding:13px 16px;margin:10px 0;background:#15302d;color:#eee4ce;border:1px solid #43695e;font:inherit;cursor:pointer}.choice:hover,.choice:focus-visible{border-color:#d5b875;background:#21413a}.choice:disabled{opacity:.5;cursor:wait}.small{font-size:12px;color:#9cbbaf}.tag{font-size:12px;color:#e1c58d;letter-spacing:.1em}.note{color:#b2c7b8;font-size:12px;min-height:24px}.hidden{display:none}.reply{border-left:2px solid #6ecdbb;padding:8px 18px;margin-top:18px;white-space:pre-line}.toolbar{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px}button{font-family:inherit}@media(max-width:600px){.panel{padding:16px}main{padding:20px 15px 65px}.hero{min-height:210px}.prose{font-size:15px}}/* 章節啟卷：只控制呈現，不修改存檔或遊戲狀態 */
+.chapter-cover{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;background:linear-gradient(180deg,rgba(5,13,15,.54),rgba(5,13,15,.77)),var(--cover-image,linear-gradient(135deg,#122d2d,#091113));background-size:cover;background-position:center;overflow:auto}
+.chapter-cover[hidden]{display:none!important}
+.cover-content{width:min(600px,100%);padding:clamp(25px,6vw,58px) 18px;border-top:1px solid #a98b58;border-bottom:1px solid #a98b58;background:rgba(5,16,18,.55);backdrop-filter:blur(3px)}
+.cover-kicker{color:#a8cbbd;letter-spacing:.28em;font-size:12px}
+.cover-title{font-weight:400;font-size:clamp(34px,7vw,60px);letter-spacing:.16em;color:#ead3a3;margin:20px 0 10px;text-shadow:0 5px 24px #000}
+.cover-desc{color:#c0c9bb;font-size:14px;letter-spacing:.12em;margin-bottom:30px}
+.cover-open{padding:13px 43px;border:1px solid #d6bd85;background:rgba(24,53,49,.82);color:#f3ddb0;letter-spacing:.35em;font-size:17px;cursor:pointer;transition:background .2s}
+.cover-open:hover,.cover-open:focus-visible{background:#31554b;outline:2px solid #d6bd85;outline-offset:3px}
+.cover-return{display:block;width:max-content;margin:20px auto 0;color:#a9c2b7;font-size:13px;text-decoration:none}
+.cover-return:hover{text-decoration:underline}
+body.cover-locked{overflow:hidden}
+
+
+
+
+/* 續卷沿用其一的卷宗介面，但使用獨立的江北夜色背景。 */
+body{background:#091113;color:#ded6c5;line-height:1.95}
+header{border-bottom:1px solid #37564e;background:#0c191b;padding:16px max(20px,calc((100vw - 1050px)/2));display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+header span{letter-spacing:5px;color:#dfc899;font-size:21px}
+header nav{font-size:13px}
+.hero{position:relative;width:100%;min-height:370px;padding:80px 20px 105px;background:linear-gradient(to bottom,rgba(5,15,21,.30) 0%,rgba(5,15,21,.45) 42%,#091113 100%),url('images/tobi-44.jpg') center 48%/cover no-repeat}
+.hero h1{font-size:clamp(30px,6vw,52px);letter-spacing:8px;color:#dfc899;margin:10px 0;font-weight:normal}
+.hero p{color:#d0d7cd;font-size:14px}
+main{max-width:800px;margin:20px auto 0;padding:0 20px 75px}
+main>.chapter,main>h2,main>.prose{display:block}
+main>.chapter{font-size:12px;letter-spacing:3px;color:#8fc4b8}
+main>h2{font-size:24px;font-weight:normal;color:#e1c998;margin:10px 0 20px}
+main>.prose{white-space:pre-line;font-size:16px;line-height:2.3;min-height:190px}
+.panel{background:#102123;border:1px solid #37564e;padding:25px;margin:20px 0}
+.choice{border:1px solid #547569;background:#142b2b;color:#e7ddc8;text-align:left;padding:14px 18px;margin:11px 0;transition:.15s}
+.choice:hover,.choice:focus-visible{border-color:#d9c08f;background:#203b39}
+.chapter-cover{--cover-image:url('images/tobi-44.jpg')}
+@media(max-width:650px){.hero{min-height:270px;padding:60px 18px}.hero h1{font-size:clamp(28px,8vw,45px);letter-spacing:2px}main{padding:20px 15px 65px}.panel{padding:18px}}
+
+/* 與前篇一致的行旅狀態抽屜 */
+.status-toggle{position:fixed;right:0;top:42%;z-index:31;background:#193b39;color:#e8d2a1;border:1px solid #927a52;border-right:0;padding:13px 12px;writing-mode:vertical-rl;letter-spacing:3px;box-shadow:0 4px 18px #0009;cursor:pointer}
+.status-sidebar{position:fixed;right:0;top:0;bottom:0;width:min(355px,88vw);overflow-y:auto;background:rgba(12,29,31,.97);border-left:1px solid #927a52;z-index:40;padding:28px 24px;box-shadow:-12px 0 35px #000a;transform:translateX(102%);transition:transform .32s ease;visibility:hidden}
+.status-sidebar.open{transform:translateX(0);visibility:visible}
+.sidebar-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.sidebar-close{background:transparent;color:#dfc899;border:1px solid #806f50;padding:5px 11px;cursor:pointer}
+.aside-title{font-size:16px;color:#d9c08f;margin:0 0 15px;font-weight:normal}
+.stat{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #29473f;padding:10px 0;font-size:13px}
+.stat span:last-child{color:#c5dbd0;text-align:right}
+.clues{list-style:none;margin:10px 0 0;padding:0;font-size:13px;color:#c6d5cb}
+.clues li{padding:7px 0;border-bottom:1px solid #29473f}
+.sidebar-note{font-size:12px;color:#8faea3;line-height:1.8;margin-top:15px}
+@media(prefers-reduced-motion:reduce){.status-sidebar{transition:none}}
+</style></head><body class="cover-locked">
+<section class="chapter-cover" id="chapterCover" aria-label="續卷啟封畫面" style="--cover-image:url('images/tobi-44.jpg')"><div class="cover-content"><div class="cover-kicker">咸陵鏢局 · 支線委託 · 卷二</div><h1 class="cover-title">江上無歸人、其二</h1><p class="cover-desc">未封之卷 · 江岸有痕 · 七人歸處</p><button type="button" class="cover-open" id="openChapter">啟 卷</button><a class="cover-return" href="bounty.html">← 返回卷宗目錄</a></div></section>
 <header><span>負驗書 · 咸陵鏢局</span><nav><a href="bounty.html">← 委託榜</a>　<a href="city.html">咸陵主城</a></nav></header><section class="hero"><div class="eyebrow">支線委託 · 續卷</div><h1>江上無歸人、其二</h1><p>人既有來處，便總該有個歸處。</p></section>
 <main><div class="chapter" id="chapter">卷宗核驗中</div><h2 id="title">正在讀取示籙</h2><div class="prose" id="prose"></div><section class="panel" id="interaction"><div class="tag" id="choiceTitle">玩家選擇</div><div id="choices"></div><div id="reply" class="reply hidden"></div><button id="continue" class="choice hidden">繼續 ›</button></section><p id="status" class="note" role="status">正在連接雲端存檔……</p><div class="toolbar"><a href="story.html">返回前篇</a><a href="bounty.html">返回委託榜</a></div></main>
+<button type="button" class="status-toggle" id="statusToggle" aria-expanded="false" aria-controls="statusSidebar">行旅狀態 ◇</button>
+<aside class="status-sidebar" id="statusSidebar" aria-label="行旅狀態" aria-hidden="true">
+<div class="sidebar-top"><h3 class="aside-title" style="margin:0">示籙 · 行旅狀態</h3><button class="sidebar-close" id="closeStatus" type="button">收合 ×</button></div>
+<div class="stat"><span>持有人</span><span id="playerName">讀取中</span></div>
+<div class="stat"><span>仁德值</span><span id="virtue">讀取中</span></div>
+<div class="stat"><span>紀玖年 · 羈絆</span><span id="jiu">讀取中</span></div>
+<div class="stat"><span>魏應舟 · 羈絆</span><span id="wei">讀取中</span></div>
+<h3 class="aside-title" style="margin-top:28px">其二 · 行跡紀錄</h3><ul class="clues" id="clues"><li>正在讀取卷宗……</li></ul>
+<p class="sidebar-note" id="bondNote">人物羈絆沿用前篇與人物誌的同一份雲端資料；不會從零開始。</p></aside>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script src="supabase-client.js"></script><script>
 'use strict';const db=window.fuyanshuDB,$=id=>document.getElementById(id);let progress=null,busy=false,toneDone=false;
 const scenes={
@@ -63,7 +121,48 @@ ending:{ch:'其二 · 終卷',title:'江上歸人',text:`日暮時分，六名�
 
 ——《江上無歸人、其二》完。`,end:true}
 };
-function draw(){const s=scenes[progress?.node]||scenes.start;$('chapter').textContent=s.ch;$('title').textContent=s.title;$('prose').textContent=s.text;$('reply').classList.add('hidden');$('continue').classList.add('hidden');const choices=$('choices');choices.replaceChildren();$('choiceTitle').textContent=s.decisions?'調查選擇 · 影響人物羈絆':s.tone?'選擇你的回答':'卷宗進度';if(s.end){$('choiceTitle').textContent='卷宗結案';$('interaction').querySelector('#choices').textContent='七人去向已查明。可返回委託榜。';return}if(s.tone){s.tone.forEach(([line,reply],i)=>{const b=document.createElement('button');b.className='choice';b.textContent=line;b.onclick=()=>{choices.querySelectorAll('button').forEach(x=>x.disabled=true);$('reply').textContent=reply;$('reply').classList.remove('hidden');$('continue').classList.remove('hidden');$('continue').onclick=()=>advance(s.next)};choices.append(b)})}else if(s.decisions){s.decisions.forEach(([label,target])=>{const b=document.createElement('button');b.className='choice';b.textContent='› '+label;b.onclick=()=>advance(target);choices.append(b)})}else{$('continue').textContent='繼續 ›';$('continue').classList.remove('hidden');$('continue').onclick=()=>advance(s.next)}}
-async function advance(to){if(busy)return;busy=true;$('status').textContent='正在核驗選擇並保存雲端進度……';document.querySelectorAll('button').forEach(b=>b.disabled=true);try{const {data,error}=await db.rpc('jiang2_advance',{p_to_node:to});if(error)throw error;progress=data;draw();$('status').textContent='行跡已保存至雲端示籙。';window.scrollTo({top:280,behavior:'smooth'})}catch(e){$('status').textContent='保存失敗：'+e.message;draw()}finally{busy=false}}
-async function init(){try{if(!db)throw Error('找不到 supabase-client.js');const {data,error}=await db.auth.getUser();if(error)throw error;if(!data.user)throw Error('請先登入線上示籙');const r=await db.rpc('jiang2_start');if(r.error)throw r.error;progress=r.data;draw();$('status').textContent='雲端存檔已載入。'}catch(e){$('title').textContent='卷宗暫時無法啟封';$('prose').textContent='請確認已登入並執行配套 SQL。';$('interaction').classList.add('hidden');$('status').textContent=e.message}}init();
+
+/* 卷宗行跡及跨卷羈絆：只讀取資料庫，不在前端自行結算好感 */
+const sequelClues={start:[],station:['北岸舊驛道線索'],gate:['北岸舊驛道線索','舊站暗門'],seal:['北岸舊驛道線索','異常封條'],watch:['北岸舊驛道線索','疑似監視痕跡'],witness:['北岸舊驛道線索','商旅目擊證言'],warehouse:['北岸舊驛道線索','商旅目擊證言','江北倉儲區'],rescue:['商旅目擊證言','江北倉儲區','救援路線'],evidence:['商旅目擊證言','江北倉儲區','封存證據'],joint:['商旅目擊證言','江北倉儲區','撤離路線'],ending:['江北倉儲區','六人生還、一人罹難','七人去向查明']};
+function renderJourney(){
+ const items=sequelClues[progress?.node]||[];const ul=$('clues');ul.replaceChildren();
+ if(!items.length){const li=document.createElement('li');li.textContent='尚無其二線索';ul.append(li)}
+ else items.forEach(v=>{const li=document.createElement('li');li.textContent='◇ '+v;ul.append(li)});
+}
+function initJourneyDrawer(){
+ const side=$('statusSidebar'),toggle=$('statusToggle');
+ const setOpen=(open)=>{side.classList.toggle('open',open);side.setAttribute('aria-hidden',String(!open));toggle.setAttribute('aria-expanded',String(open));};
+ toggle.addEventListener('click',()=>setOpen(!side.classList.contains('open')));
+ $('closeStatus').addEventListener('click',()=>{setOpen(false);toggle.focus()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
+}
+async function loadJourneyStats(){
+ if(!db)return;
+ try{
+  const auth=await db.auth.getUser();if(auth.error)throw auth.error;
+  if(!auth.data?.user)return;
+  const userId=auth.data.user.id;
+  const profile=await db.from('player_profiles').select('character_name,virtue_points').eq('user_id',userId).maybeSingle();
+  if(!profile.error&&profile.data){$('playerName').textContent=profile.data.character_name||'旅人';$('virtue').textContent=profile.data.virtue_points??'未登錄'}
+  const chars=await db.from('characters').select('id,character_key').in('character_key',['ji_jiunian','wei_yingzhou']);
+  if(chars.error)throw chars.error;
+  for(const [key,el] of [['ji_jiunian','jiu'],['wei_yingzhou','wei']]){
+   const ch=(chars.data||[]).find(c=>c.character_key===key);
+   if(!ch){$(el).textContent='尚未公開';continue}
+   const result=await db.rpc('get_character_bond',{p_character_id:ch.id});
+   if(result.error)throw result.error;
+   const value=Array.isArray(result.data)?result.data[0]:result.data;
+   const label=typeof value==='string'?value:(value&&[value.bond_title,value.relationship_title,value.bond_label,value.title,value.label,value.relationship_name,value.relation_name,value.bond_name].find(v=>typeof v==='string'&&v.trim()));
+   $(el).textContent=label||'尚未建立羈絆';
+  }
+  $('bondNote').textContent='人物羈絆取自人物誌的雲端累積關係，包含前篇及其二已結算的事件。';
+ }catch(err){$('bondNote').textContent='羈絆讀取暫時失敗：'+err.message+'。劇情仍可繼續，請確認人物誌讀取權限。';}
+}
+initJourneyDrawer();
+
+function draw(){renderJourney();const s=scenes[progress?.node]||scenes.start;$('chapter').textContent=s.ch;$('title').textContent=s.title;$('prose').textContent=s.text;$('reply').classList.add('hidden');$('continue').classList.add('hidden');const choices=$('choices');choices.replaceChildren();$('choiceTitle').textContent=s.decisions?'調查選擇 · 影響人物羈絆':s.tone?'選擇你的回答':'卷宗進度';if(s.end){$('choiceTitle').textContent='卷宗結案';$('interaction').querySelector('#choices').textContent='七人去向已查明。可返回委託榜。';return}if(s.tone){s.tone.forEach(([line,reply],i)=>{const b=document.createElement('button');b.className='choice';b.textContent=line;b.onclick=()=>{choices.querySelectorAll('button').forEach(x=>x.disabled=true);$('reply').textContent=reply;$('reply').classList.remove('hidden');$('continue').classList.remove('hidden');$('continue').onclick=()=>advance(s.next)};choices.append(b)})}else if(s.decisions){s.decisions.forEach(([label,target])=>{const b=document.createElement('button');b.className='choice';b.textContent='› '+label;b.onclick=()=>advance(target);choices.append(b)})}else{$('continue').textContent='繼續 ›';$('continue').classList.remove('hidden');$('continue').onclick=()=>advance(s.next)}}
+async function advance(to){if(busy)return;busy=true;$('status').textContent='正在核驗選擇並保存雲端進度……';document.querySelectorAll('button').forEach(b=>b.disabled=true);try{const {data,error}=await db.rpc('jiang2_advance',{p_to_node:to});if(error)throw error;progress=data;draw();await loadJourneyStats();$('status').textContent='行跡已保存至雲端示籙。';window.scrollTo({top:280,behavior:'smooth'})}catch(e){$('status').textContent='保存失敗：'+e.message;draw()}finally{busy=false}}
+function setupCover(){const cover=$('chapterCover');const btn=$('openChapter');btn.addEventListener('click',()=>{btn.disabled=true;cover.classList.add('cover-exiting');document.body.classList.remove('cover-locked');document.body.classList.add('chapter-revealed');setTimeout(()=>{cover.hidden=true;},680);});}
+setupCover();
+async function init(){try{if(!db)throw Error('找不到 supabase-client.js');const {data,error}=await db.auth.getUser();if(error)throw error;if(!data.user)throw Error('請先登入線上示籙');const r=await db.rpc('jiang2_start');if(r.error)throw r.error;progress=r.data;draw();await loadJourneyStats();$('status').textContent='雲端存檔已載入。'}catch(e){$('title').textContent='卷宗暫時無法啟封';$('prose').textContent='請確認已登入並執行配套 SQL。';$('interaction').classList.add('hidden');$('status').textContent=e.message}}init();
 </script></body></html>
